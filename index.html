@@ -267,6 +267,18 @@ input.i,select.i{background:rgba(255,255,255,.06);color:var(--ink)}
 .aw .mine div.ok{border-style:solid}.aw .mine div.ok.g{border-color:rgba(61,224,255,.5)}.aw .mine div.ok.b{border-color:rgba(255,181,71,.5)}
 .aw .cta{display:flex;align-items:center;justify-content:center;gap:8px;margin-top:12px;font-size:13px;font-weight:800;color:#3DE0FF;animation:nudge 1.6s ease-in-out infinite}
 @keyframes nudge{50%{transform:translateY(4px)}}
+.aw .t3{display:flex;flex-direction:column;gap:8px;margin-top:12px}
+.aw .t3r{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:16px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);animation:pop .5s ease-out both}
+.aw .t3r:nth-child(2){animation-delay:.08s}.aw .t3r:nth-child(3){animation-delay:.16s}
+.aw .t3r .pos{font:700 26px 'Bebas Neue',Impact,sans-serif;width:16px;color:#93A4C8}.aw .t3r:first-child .pos{color:#F2F6FF}
+.aw .t3r .ti{width:36px;height:36px;border-radius:12px;display:grid;place-items:center;flex:none}
+.aw .t3r.g .ti{background:rgba(61,224,255,.15);color:#3DE0FF}.aw .t3r.b .ti{background:rgba(255,181,71,.15);color:#FFB547}
+.aw .t3r:first-child.g{border-color:rgba(61,224,255,.45)}.aw .t3r:first-child.b{border-color:rgba(255,181,71,.45)}
+.aw .t3r .tx{flex:1;min-width:0}.aw .t3r .tx b{display:block;font-size:15px;color:#F2F6FF}.aw .t3r .tx small{font-size:11px;color:#93A4C8}
+.aw .t3r .who{display:flex;flex-direction:column;align-items:center;gap:2px;font-size:11px;color:#C9D6F2;font-weight:700}
+.aw .t3r .who .av{width:30px;height:30px;font-size:11px}
+.aw .t3r .n{font:700 24px 'Bebas Neue',Impact,sans-serif;color:#F2F6FF;min-width:18px;text-align:right}
+.aw .t3e{margin-top:12px;font-size:13px;color:#93A4C8}
 .aw .sh{width:100%;margin-top:12px;min-height:46px;border-radius:14px;border:1px solid rgba(61,224,255,.4);background:transparent;color:#F2F6FF;font-weight:800;font-size:14px}
 </style>
 </head>
@@ -287,15 +299,22 @@ input.i,select.i{background:rgba(255,255,255,.06);color:var(--ink)}
 </defs></svg>
 <script>
 {
-const KEY='fuchibol_club_v8';
+const KEY='fuchibol_club_v9';
 const CUPO={'5 vs 5':14,'7 vs 7':18};
 const ROL={ARQ:'Arquero',DEF:'Defensa',MED:'Medio',DEL:'Delantero'};
 const PIE=['Diestro','Zurdo','Ambidiestro'];
 const TEAM={N:'Negro',B:'Blanco'};
-const TAGS_OK=['Bestia','Crack','Muralla','Pulpo','Pulmón','Mago','Cañonero'];
-const TAGS_BAD=['Paquete','Tanga','Llegó tarde','Tronco','Chupón','Fantasma','Actor'];
-const TDESC={Bestia:'Imparable',Crack:'La rompió',Muralla:'No pasó nadie',Pulpo:'Lo atajó todo',Pulmón:'Corrió por todos',Mago:'Puro lujo',Cañonero:'Qué remate',Paquete:'Más estorbo que ayuda',Tanga:'Se la pusieron toda la noche','Llegó tarde':'Llegó al segundo tiempo',Tronco:'Ni una buena',Chupón:'No la soltó nunca',Fantasma:'¿Vino a jugar?',Actor:'Se tiró en todas'};
+const TAGS_OK=['Crack','Muralla','Pulmón','Cañonero'],GK_OK=['Pulpo','Gato','Volador','Líbero'];
+const TAGS_BAD=['Paquete','Chupón','Llegó tarde','Fantasma'],GK_BAD=['Tanga','Mantequilla','Colador','Estatua'];
+const tagsFor=(id,k)=>{const a=(typeof S!=='undefined'&&S&&S.players?pl(id):null)?.rol==='ARQ';return k==='good'?(a?GK_OK:TAGS_OK):(a?GK_BAD:TAGS_BAD)};
+const TDESC={Bestia:'Imparable',Crack:'La rompió',Muralla:'No pasó nadie',Pulpo:'Lo atajó todo',Pulmón:'Corrió por todos',Mago:'Puro lujo',Cañonero:'Qué remate',Paquete:'Más estorbo que ayuda',Tanga:'Se la pusieron toda la noche','Llegó tarde':'Llegó al segundo tiempo',Tronco:'Ni una buena',Chupón:'No la soltó nunca',Fantasma:'¿Vino a jugar?',Actor:'Se tiró en todas',Gato:'Puro reflejo',Volador:'Voló a todas',Líbero:'Salió jugando',Mantequilla:'Se le resbaló todo',Colador:'Le entró todo',Estatua:'Ni se movió'};
 const TI={
+Gato:'<path d="M5 4l3 5h8l3-5v9a7 7 0 0 1-14 0z"/><circle cx="9.5" cy="13" r=".9" fill="currentColor"/><circle cx="14.5" cy="13" r=".9" fill="currentColor"/><path d="M12 15.5v1M10 17.5l2-1 2 1"/>',
+Volador:'<path d="M3 15c4 0 7-2 9-6 2 4 5 6 9 6"/><path d="M6 19c2-1 4-3 6-6 2 3 4 5 6 6"/><circle cx="12" cy="5" r="2"/>',
+Líbero:'<circle cx="7" cy="17" r="3"/><path d="M10 15l9-9M14 6h5v5"/>',
+Mantequilla:'<path d="M3 14l6-5h12l-6 5z"/><path d="M3 14v4h12v-4M15 18l6-5V9"/>',
+Colador:'<circle cx="12" cy="12" r="8"/><circle cx="9" cy="9" r=".8" fill="currentColor"/><circle cx="15" cy="9" r=".8" fill="currentColor"/><circle cx="12" cy="12" r=".8" fill="currentColor"/><circle cx="9" cy="15" r=".8" fill="currentColor"/><circle cx="15" cy="15" r=".8" fill="currentColor"/>',
+Estatua:'<rect x="6" y="18" width="12" height="3"/><circle cx="12" cy="5" r="2"/><path d="M12 7v11M8 10h8"/>',
 Bestia:'<path d="M5 6c0 3 2 5 4 5M19 6c0 3-2 5-4 5"/><path d="M8 10h8l1 5c0 3-2 5-5 5s-5-2-5-5z"/><circle cx="10" cy="14" r=".8" fill="currentColor"/><circle cx="14" cy="14" r=".8" fill="currentColor"/><path d="M10.5 18h3"/>',
 Crack:'<path d="M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1-4.4-4.3 6.1-.9z"/>',
 Muralla:'<rect x="3" y="5" width="18" height="14" rx="1"/><path d="M3 9.7h18M3 14.3h18M9 5v4.7M15 5v4.7M6 9.7v4.6M12 9.7v4.6M18 9.7v4.6M9 14.3V19M15 14.3V19"/>',
@@ -359,7 +378,7 @@ function seed(){
   let rs=7;const rnd=()=>(rs=(rs*9301+49297)%233280)/233280;
   const lastM=matches.filter(m=>m.estado==='finalizado').pop();const votes={};
   lastM.convocados.forEach(v=>{if(['p2','p5','p6'].includes(v)||rnd()<.3)return;const o=lastM.convocados.filter(x=>x!==v);
-    votes[v]={good:rnd()<.85?{pid:['p14','p4','p11','p6'].filter(x=>x!==v)[Math.floor(rnd()*3)],tag:TAGS_OK[Math.floor(rnd()*TAGS_OK.length)]}:null,
+    votes[v]={good:rnd()<.85?{pid:['p14','p4','p11','p6'].filter(x=>x!==v)[Math.floor(rnd()*3)],tag:TAGS_OK[Math.floor(rnd()*4)]}:null,
               bad:rnd()<.75?{pid:['p13','p15','p9'].filter(x=>x!==v)[Math.floor(rnd()*2)],tag:TAGS_BAD[Math.floor(rnd()*4)]}:null}});
   lastM.post={votes};
   const torneos=[{id:'t1',nombre:'Torneo de noviembre',inicio:'2026-11-08',semanas:6}];
@@ -634,10 +653,14 @@ function awards(m){if(!postOpen(m))return'';const P=post(m),y=me(),can=y&&m.conv
     if(!w)return`<div class="pc ${cls}"><div class="k">${lbl}</div><div class="ph"><div class="q">?</div></div><b class="n">Sin dueño</b><small>todavía</small><div class="also"></div></div>`;
     const p=pl(w[0]),tg=topTag(w[1].tags)[0];
     return`<div class="pc ${cls}"><div class="k">${lbl}</div><div class="ph">${av(p)}<span class="bd">${ticon(tg,16)}</span></div><b class="n">${esc(first(p))}</b><small>${esc(tg)} · ${w[1].n} voto${w[1].n>1?'s':''}</small><div class="also">${r.slice(1,3).map(([id,o])=>esc(first(pl(id)))+' '+o.n).join(' · ')}</div></div>`};
+  const top3=()=>{const c={};Object.values(P.votes).forEach(v=>['good','bad'].forEach(k=>{const x=v[k];if(!x)return;const key=k+'|'+x.pid+'|'+x.tag;c[key]=(c[key]||0)+1}));
+    const r=Object.entries(c).sort((a,b)=>b[1]-a[1]).slice(0,3);
+    if(!r.length)return'<div class="t3e">Nadie ha votado. Arranca tú.</div>';
+    return`<div class="t3">${r.map(([key,n],i)=>{const[k,pid,tg]=key.split('|'),p=pl(pid);return`<div class="t3r ${k==='good'?'g':'b'}" data-act="tok" data-id="${pid}"><span class="pos">${i+1}</span><span class="ti">${ticon(tg,20)}</span><div class="tx"><b>${esc(tg)}</b><small>${esc(TDESC[tg]||'')}</small></div><div class="who">${av(p,'sm')}<span>${esc(first(p))}</span></div><span class="n">${n}</span></div>`}).join('')}</div>`};
   const mv=k=>{const x=mine[k];return`<div class="${x?'ok ':''}${k==='good'?'g':'b'}">${k==='good'?'Tu buena':'Tu mala'}<b>${x?esc(x.tag)+' → '+esc(first(pl(x.pid))):'Pendiente'}</b></div>`};
   const done=mine.good&&mine.bad;
-  return`<section class="aw"><span class="live"><i></i>PREMIOS EN VIVO</span><h2>¿QUIÉN LA ROMPIÓ?<br>¿QUIÉN FUE EL PAQUETE?</h2>
-  <div class="pod">${pc('good')}${pc('bad')}</div>
+  return`<section class="aw"><span class="live"><i></i>PREMIOS EN VIVO</span><h2>¿QUIÉN LA ROMPIÓ?<br>¿QUIÉN FUE EL PAQUETE?</h2><div class="xs" style="color:#93A4C8;margin-top:2px">Top 3 de la fecha</div>
+  ${top3()}
   <div class="bar">${Array.from({length:tot},(_,i)=>`<i class="${i<voters?'on':''}"></i>`).join('')}</div>
   <div class="meta"><span>Votaron ${voters} de ${tot} · anónimo</span><span>${nx?'Cierra '+esc(fShort(nx.fecha)):'Cierra al próximo partido'}</span></div>
   ${can?`${done?'':`<div class="cta">Toca a cualquiera en la cancha <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M12 5v14M5 12l7 7 7-7"/></svg></div>`}`:''}</section>`}
@@ -665,7 +688,7 @@ function sheetPost(id){const m=S.matches.find(x=>x.id===boardM),p=pl(id),y=me(),
   const got=[...Object.entries(r.good).map(([t,c])=>`<span class="tag ok" style="display:inline-flex;align-items:center;gap:4px">${ticon(t,14)}${esc(t)}${c>1?' · '+c:''}</span>`),...Object.entries(r.bad).map(([t,c])=>`<span class="tag no" style="display:inline-flex;align-items:center;gap:4px">${ticon(t,14)}${esc(t)}${c>1?' · '+c:''}</span>`)].join('');
   sheet(`<div style="display:flex;gap:12px;align-items:center">${av(p,'lg')}<div><div class="kick" style="color:var(--mute)">${TEAM[team]} · ${esc(ROL[p.rol])}</div><h2 style="font-size:26px;margin-top:4px">${esc(p.nombre.toUpperCase())}</h2><div class="s muted" style="margin-top:4px">${g} gol${g===1?'':'es'} en este partido</div></div></div>
   ${got?`<div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:12px">${got}</div>`:''}
-  ${can?`<label class="f">Dale una buena <span class="xs muted" style="font-weight:500">· desliza</span></label>${chips('good',TAGS_OK)}<label class="f">o una mala</label>${chips('bad',TAGS_BAD)}<p class="xs muted" style="margin:10px 0 0">Tienes una buena y una mala por partido. Si eliges otra, reemplaza la anterior.</p>`:''}`)}
+  ${can?`<label class="f">Dale una buena <span class="xs muted" style="font-weight:500">· desliza</span></label>${chips('good',tagsFor(id,'good'))}<label class="f">o una mala</label>${chips('bad',tagsFor(id,'bad'))}<p class="xs muted" style="margin:10px 0 0">Tienes una buena y una mala por partido. Si eliges otra, reemplaza la anterior.</p>`:''}`)}
 let galM=null,galIdx=0;
 function openGal(payId){const p0=S.pays.find(x=>x.id===payId);galM=p0.matchId;const list=S.pays.filter(x=>x.matchId===galM).sort((a,b)=>a.ts-b.ts);galIdx=Math.max(0,list.findIndex(x=>x.id===payId));drawGal()}
 function drawGal(){const m=S.matches.find(x=>x.id===galM),c=cancha(m),list=S.pays.filter(x=>x.matchId===galM).sort((a,b)=>a.ts-b.ts);if(!list.length){close();return}
