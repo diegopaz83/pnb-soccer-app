@@ -465,7 +465,8 @@ function renderLanding(){
 }
 
 /* ---------- sheets ---------- */
-function sheet(h){$('#layer').innerHTML=`<div class="scrim" data-act="bg"><div class="sheet" role="dialog" aria-modal="true"><div class="grab"></div>${h}</div></div>`}
+let sheetAt=0;
+function sheet(h){sheetAt=Date.now();$('#layer').innerHTML=`<div class="scrim" data-act="bg"><div class="sheet" role="dialog" aria-modal="true"><div class="grab"></div>${h}</div></div>`}
 const close=()=>$('#layer').innerHTML='';
 let pd=null;
 function drawPay(){const m=S.matches.find(x=>x.id===pd.mid),pm=payMap(m),c=cancha(m),open=m.convocados.filter(id=>!pm[id]),tot=cuota(m)*pd.cubre.size,yo=me().id;
@@ -544,13 +545,15 @@ function bindPitch(){const pitch=$('#pitch');if(!pitch)return;const adm=isAdmin(
     tk.addEventListener('pointerdown',e=>{sx=e.clientX;sy=e.clientY;mv=false;down=true;if(adm){tk.setPointerCapture(e.pointerId);tk.classList.add('drag')}});
     tk.addEventListener('pointermove',e=>{if(!adm||!down)return;if(Math.hypot(e.clientX-sx,e.clientY-sy)>6)mv=true;if(!mv)return;const r=pitch.getBoundingClientRect();tk.style.left=Math.max(6,Math.min(94,(e.clientX-r.left)/r.width*100))+'%';tk.style.top=Math.max(5,Math.min(95,(e.clientY-r.top)/r.height*100))+'%'});
     tk.addEventListener('pointerup',()=>{down=false;tk.classList.remove('drag');const m=S.matches.find(x=>x.id===boardM),id=tk.dataset.id;
-      if(mv&&adm&&m.estado!=='finalizado'){const b=m.board[id];b.x=parseFloat(tk.style.left);b.y=parseFloat(tk.style.top);const nt=b.y<50?'N':'B';if(nt!==b.team){b.team=nt;save();render()}else save()}else sheetTok(id)});
+      if(mv&&adm&&m.estado!=='finalizado'){const b=m.board[id];b.x=parseFloat(tk.style.left);b.y=parseFloat(tk.style.top);const nt=b.y<50?'N':'B';if(nt!==b.team){b.team=nt;save();render()}else save()}});
+    tk.addEventListener('click',()=>{if(mv)return;sheetTok(tk.dataset.id)});
     tk.addEventListener('pointercancel',()=>{down=false;tk.classList.remove('drag')})})}
 
 /* ---------- events ---------- */
 document.addEventListener('click',async e=>{
   const t=e.target.closest('[data-act]');if(!t)return;const a=t.dataset.act,id=t.dataset.id;
   if(a==='bg'&&e.target!==t)return;
+  if(['givedirect','givep','gtag'].includes(a)&&Date.now()-sheetAt<450)return;
   const M=()=>S.matches.find(x=>x.id===(t.dataset.m||curMatch));
   switch(a){
     case'tab':tab=t.dataset.v;page=null;draft=null;render();scrollTo(0,0);break;
