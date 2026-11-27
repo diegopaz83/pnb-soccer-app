@@ -2,8 +2,16 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Fuchibol</title>
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#060D1E">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Fuchibol">
+<link rel="apple-touch-icon" href="img/apple-touch-icon.png">
+<link rel="icon" type="image/png" href="img/icon-192.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -309,11 +317,35 @@ input.i.err{border-color:#FFB547;box-shadow:0 0 0 3px rgba(255,181,71,.25)}
 .kb .kv{margin-top:4px;font:800 19px/1.2 Inter,system-ui,sans-serif;letter-spacing:.3px;color:#F2F6FF;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .kb .ks{margin-top:3px;font-size:12px;color:#93A4C8}
 .kb+.kb{margin-top:8px}
+.callgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:10px}
+.callgrid button{display:flex;flex-direction:column;align-items:center;gap:4px;padding:8px 4px;border-radius:14px;border:1.5px solid var(--line);background:rgba(255,255,255,.03);color:var(--mute);font-size:12px;font-weight:700;opacity:.55}
+.callgrid button.on{border-color:var(--neon);background:rgba(61,224,255,.1);color:#F2F6FF;opacity:1}
+.chipb{padding:6px 14px;border-radius:99px;border:1px solid var(--line);background:transparent;color:#F2F6FF;font-weight:700;font-size:13px}
+.cs{display:grid;gap:8px;margin:12px 0 4px}.csg{padding:10px 12px;border-radius:14px;background:rgba(255,255,255,.04);border:1px solid var(--line)}
+.csh{display:flex;align-items:baseline;gap:8px;font-size:13px;font-weight:700;color:#C9D6F2}.csh b{font:700 24px 'Bebas Neue',Impact,sans-serif}
+.csg.v .csh b{color:#3DE0FF}.csg.n .csh b{color:#FFB547}.csg.s .csh b{color:#93A4C8}.csn{font-size:12px;color:#93A4C8;margin-top:2px;line-height:1.4}
+.call{position:fixed;inset:0;z-index:60;background:#060D1E;display:flex;align-items:flex-end;animation:up .3s ease-out}
+.call>img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:grayscale(1) brightness(.45)}
+.call::before{content:'';position:absolute;inset:0;background:linear-gradient(180deg,rgba(24,70,184,.35),#060D1E 78%);z-index:1}
+.call .cin{position:relative;z-index:2;width:100%;max-width:480px;margin:0 auto;padding:24px 22px calc(28px + env(safe-area-inset-bottom))}
+.call .cl{font-size:11px;font-weight:800;letter-spacing:2px;color:#3DE0FF}
+.call .ct{font:700 22px 'Bebas Neue',Impact,sans-serif;letter-spacing:3px;color:#C9D6F2;margin-top:14px}
+.call .cd{font:700 58px/1 'Bebas Neue',Impact,sans-serif;letter-spacing:1px;color:#F2F6FF;margin-top:4px}
+.call .cc{margin-top:14px;font-size:15px;font-weight:700;color:#F2F6FF;line-height:1.4}.call .cc span{font-size:13px;font-weight:500;color:#93A4C8}
+.call .cq{font:700 40px 'Bebas Neue',Impact,sans-serif;letter-spacing:1.5px;color:#3DE0FF;margin-top:22px}
+.call .cteam{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
+.call .cteam button{min-height:40px;border-radius:12px;border:1px solid rgba(255,255,255,.15);background:transparent;color:#C9D6F2;font-weight:700}
+.call .cteam button.on{border-color:#3DE0FF;color:#F2F6FF;background:rgba(61,224,255,.12)}
+.call .cbtn{display:grid;grid-template-columns:1fr 2fr;gap:10px;margin-top:14px}
+.call .cbtn button{min-height:60px;border-radius:18px;font-size:18px;font-weight:900;border:0}
+.call .cbtn .no{background:rgba(255,255,255,.08);color:#F2F6FF;border:1px solid rgba(255,255,255,.15)}
+.call .cbtn .si{background:#3DE0FF;color:#04121F;box-shadow:0 0 30px rgba(61,224,255,.45)}.call .cbtn .si:disabled{opacity:.35;box-shadow:none}
+.call .cf{color:#FFB547;font-size:14px;margin:10px 0 0}
 .aw .sh{width:100%;margin-top:12px;min-height:46px;border-radius:14px;border:1px solid rgba(61,224,255,.4);background:transparent;color:#F2F6FF;font-weight:800;font-size:14px}
 </style>
 </head>
 <body>
-<div id="app"></div><div id="layer"></div>
+<div id="app"></div><div id="call"></div><div id="layer"></div>
 <svg width="0" height="0" style="position:absolute"><defs>
 <symbol id="crest" viewBox="0 0 64 74"><path d="M32 2 L61 12 V36 C61 54 48 66 32 72 C16 66 3 54 3 36 V12 Z" fill="#fff"/><path d="M32 8 L55 16 V36 C55 51 44 61 32 66 C20 61 9 51 9 36 V16 Z" fill="#0B1736"/><path d="M9 30 H55 V40 H9 Z" fill="#4EA8FF"/><circle cx="32" cy="35" r="8" fill="#fff"/><path d="M32 30.5l3.6 2.7-1.4 4.1h-4.4l-1.4-4.1z" fill="#0B1736"/></symbol>
 <symbol id="t-home" viewBox="0 0 24 24"><path d="M3 11l9-7 9 7v9h-6v-6H9v6H3z" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"/></symbol>
@@ -329,7 +361,7 @@ input.i.err{border-color:#FFB547;box-shadow:0 0 0 3px rgba(255,181,71,.25)}
 </defs></svg>
 <script>
 {
-const KEY='fuchibol_club_v14';
+const KEY='fuchibol_club_v15';
 const CUPO={'5 vs 5':14,'7 vs 7':18};
 const ROL={ARQ:'Arquero',DEF:'Defensa',MED:'Medio',DEL:'Delantero'};
 const PIE=['Diestro','Zurdo','Ambidiestro'];
@@ -407,7 +439,7 @@ function seed(){
     const m={id:'m'+k,fecha:d,hora:k%2?'19:00':'20:00',canchaId:c.id,fmt:c.formato,cupo:CUPO[c.formato],cuota:cuotaCalc(c.valor,conv.slice(0,CUPO[c.formato]).length),convocados:conv.slice(0,CUPO[c.formato]),estado:'finalizado',goals,board:{}};
     autoBoard(m,P);matches.push(m);d=addDays(d,7)});
   const nx={id:'mx',fecha:'2026-11-29',hora:'20:00',canchaId:'c1',fmt:'7 vs 7',cupo:18,cuota:cuotaCalc(270000,12),convocados:all.slice(0,12),estado:'cerrada',goals:[],board:{}};P.forEach(p=>{});autoBoard(nx,P);matches.push(nx);
-  const ny={id:'my',fecha:'2026-12-06',hora:'19:00',canchaId:'c2',fmt:'5 vs 5',cupo:14,cuota:0,convocados:['p0','p1','p3','p4','p5','p7','p8'],estado:'abierta',goals:[],board:{}};autoBoard(ny,P);matches.push(ny);
+  const ny={id:'my',fecha:'2026-12-06',hora:'19:00',canchaId:'c2',fmt:'5 vs 5',cupo:14,cuota:0,convocados:['p0','p1','p3','p4','p5','p7','p8'],llamados:all.filter(x=>x!=='p15'),nov:['p6','p10'],estado:'abierta',goals:[],board:{}};autoBoard(ny,P);matches.push(ny);
   const pays=[];
   matches.filter(m=>m.estado==='finalizado').forEach(m=>{const pend=m.fecha==='2026-11-22'?['p2','p5','p6','p9','p13']:[];const pay=m.convocados.filter(x=>!pend.includes(x));for(let i=0;i<pay.length;i+=4){const cv=pay.slice(i,i+4);pays.push({id:uid(),matchId:m.id,payerId:cv[0],cubre:cv,monto:m.cuota*cv.length,proof:SAMPLE,ts:dt(m.fecha).getTime()-864e5,estado:'verificado'})}});
   let rs=7;const rnd=()=>(rs=(rs*9301+49297)%233280)/233280;
@@ -469,6 +501,19 @@ const crest=s=>`<svg width="${s}" height="${Math.round(s*74/64)}" aria-hidden="t
 function topbar(){const m=me(),d=myDebt();return`<div class="top">${crest(28)}<span style="display:flex;flex-direction:column;line-height:1"><span class="d brand">FUCHIBOL</span>${isAdmin()?'<span class="admbadge" style="margin-top:4px;align-self:flex-start">ADMIN</span>':''}<span class="now" style="font-size:11px;font-weight:700;color:#DCE3F2;margin-top:3px;white-space:nowrap">${nowTxt()}</span></span><span class="sp"></span>${d?`<button class="debt" data-act="paynow" data-id="${d.id}"><i></i>Pagar ${cop(cuota(d))}</button>`:''}${m?`<button data-act="tab" data-v="yo" aria-label="Mi perfil">${av(m,'sky')}</button>`:`<button class="ghostbtn" data-act="logout"><svg width="16" height="16"><use href="#i-out"/></svg>Salir</button>`}</div>`}
 
 /* ---------- render ---------- */
+const callStatus=m=>{if(!m.llamados)return'';const nv=m.nov||[],sr=m.llamados.filter(id=>!m.convocados.includes(id)&&!nv.includes(id));
+  const grp=(l,ids,cls)=>`<div class="csg ${cls}"><div class="csh"><b>${ids.length}</b>${l}</div><div class="csn">${ids.length?ids.map(id=>esc(first(pl(id)))).join(' · '):'—'}</div></div>`;
+  return`<div class="cs">${grp('Van',m.convocados,'v')}${grp('No van',nv,'n')}${grp('Sin responder',sr,'s')}</div>`};
+const pendingCall=()=>{const y=me();if(!y||visor()||y.invitado)return null;return upcoming().find(m=>m.estado==='abierta'&&(m.llamados||[]).includes(y.id)&&!m.convocados.includes(y.id)&&!(m.nov||[]).includes(y.id))||null};
+let callTeam=null;
+function showCall(){const el=$('#call'),m=pendingCall();if(!m){el.innerHTML='';return}const y=me(),c=cancha(m),full=m.convocados.length>=m.cupo;callTeam=callTeam||y.equipo||'N';
+  const d=new Date(m.fecha+'T12:00:00'),dia=d.toLocaleDateString('es-CO',{weekday:'long'}).toUpperCase(),fe=d.toLocaleDateString('es-CO',{day:'numeric',month:'short'}).replace('.','').toUpperCase();
+  el.innerHTML=`<div class="call"><img src="${IMG.estadio}" alt=""><div class="cin"><div class="cl">LLAMADO · ${esc(first(y)).toUpperCase()}</div>
+  <div class="ct">CONVOCATORIA</div><div class="cd">${dia} ${fe}<br>${esc(fTime(m.hora))}</div>
+  <div class="cc">${esc(c.nombre)} · ${esc(c.formato)}<br><span>Van ${m.convocados.length} de ${m.cupo} · se cierra ${esc(fCierre(m))}</span></div>
+  <div class="cq">¿VAS A IR?</div>
+  ${full?'<p class="cf">Ya no hay cupo. Si alguien se baja, te avisamos.</p>':`<div class="cteam">${['N','B'].map(t=>`<button class="${callTeam===t?'on':''}" data-act="callteam" data-v="${t}">${TEAM[t]}</button>`).join('')}</div>`}
+  <div class="cbtn"><button class="no" data-act="callno" data-m="${m.id}">No</button><button class="si" data-act="callsi" data-m="${m.id}" ${full?'disabled':''}>Sí, voy</button></div></div></div>`}
 function render(){
   autoClose();
   if(!S.ses){renderLanding();return}
@@ -476,6 +521,7 @@ function render(){
   const T=[['inicio','t-home','Convocatoria'],['pizarra','t-board','Pizarra'],['yo','t-me',visor()?'Salir':'Yo'],['torneo','t-cup','Torneo'],...(isAdmin()?[['admin','t-gear','Admin']]:[])];const dbt=myDebt();
   $('#app').innerHTML=`<div class="app">${body}</div><nav class="tabs"><div class="in" style="--nt:${T.length}">${T.map(([v,i,l])=>`<button class="${tab===v?'on':''}${v==='admin'?' adm':''}" data-act="${v==='yo'&&visor()?'logout':'tab'}" data-v="${v}"><svg><use href="#${i}"/></svg>${l}${v==='inicio'&&dbt?'<span class="dot"></span>':''}</button>`).join('')}</div></nav>`;
   if(tab==='pizarra'&&!page)bindPitch();
+  showCall();
 }
 
 function vInicio(){
@@ -512,7 +558,7 @@ function vInicio(){
     if(inn&&!mine)act+=`<button class="btn" data-act="pay">Pagar Cuota · ${cop(q)}</button>`;
     else if(inn&&mine)act+=`<button class="btn soft" disabled style="opacity:1"><svg><use href="#i-ok"/></svg>${mine.estado==='verificado'?'Estás al día':'Pago enviado, falta verificar'}</button>`;
   }
-  const admCard=!adm?'':st==='abierta'?`<section class="card"><h3>Gestionar convocatoria <span class="tag wait">Abierta</span></h3><button class="btn navy" data-act="share" data-id="${m.id}">Compartir por WhatsApp</button><div style="display:grid;grid-template-columns:1fr 1fr;gap:10px"><button class="btn gray" data-act="guest">+ Invitado</button><button class="btn gray" data-act="closeconv" data-id="${m.id}">Cerrar ya</button></div><button class="btn link" data-act="newm">Lanzar otra convocatoria</button></section>`
+  const admCard=!adm?'':st==='abierta'?`<section class="card"><h3>Gestionar convocatoria <span class="tag wait">Abierta</span></h3>${callStatus(m)}<button class="btn navy" data-act="share" data-id="${m.id}">Compartir por WhatsApp</button><div style="display:grid;grid-template-columns:1fr 1fr;gap:10px"><button class="btn gray" data-act="guest">+ Invitado</button><button class="btn gray" data-act="closeconv" data-id="${m.id}">Cerrar ya</button></div><button class="btn link" data-act="newm">Lanzar otra convocatoria</button></section>`
     :st==='cerrada'?`<section class="card"><h3>Día del partido <span class="tag ok">Cerrada</span></h3><button class="btn navy" data-act="score" data-id="${m.id}">Anotar marcador y terminar</button><button class="btn link" data-act="newm">Lanzar nueva convocatoria</button></section>`
     :`<section class="card"><h3>Cobro <span class="tag ${pct>=100?'ok':'wait'}">${pct>=100?'Completo':'Pendiente'}</span></h3><button class="btn gray" data-act="copyfaltan">Recordar a los que faltan</button><button class="btn link" data-act="score" data-id="${m.id}">Editar marcador</button></section>`;
   const tcount=t=>m.convocados.filter(id=>m.board?.[id]?.team===t).length;
@@ -610,6 +656,10 @@ function vPizarra(){
 }
 
 let draft=null;
+let installEv=null;window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();installEv=e;if(tab==='yo')render()});
+const standalone=()=>matchMedia('(display-mode: standalone)').matches||navigator.standalone;
+const installCard=()=>{if(standalone())return'';const ios=/iphone|ipad|ipod/i.test(navigator.userAgent);
+  return`<section class="card"><h3>Instala Fuchibol en tu celular</h3><p class="s muted" style="margin:6px 0 0">${ios?'En Safari toca Compartir y luego "Agregar a inicio".':installEv?'Queda como una app más, con su ícono, a pantalla completa.':'En Chrome abre el menú ⋮ y toca "Instalar app" o "Agregar a pantalla principal".'}</p>${installEv?'<button class="btn navy" data-act="install">Instalar app</button>':''}</section>`};
 function vYo(){
   const p=me();if(!p)return'';if(!draft||draft.id!==p.id)draft={...p};const d=draft,s=stats(p.id);
   const opt=(k,list)=>`<div class="opts" style="grid-template-columns:repeat(${list.length},minmax(0,1fr))">${list.map(([v,l])=>`<button class="${d[k]===v?'on':''}" data-act="set" data-k="${k}" data-v="${v}">${l}</button>`).join('')}</div>`;
@@ -628,7 +678,7 @@ function vYo(){
     <div style="display:grid;grid-template-columns:1fr 1.6fr;gap:10px"><label class="f">Número<input class="i" id="f-dorsal" type="number" inputmode="numeric" min="0" max="99" value="${esc(d.dorsal??'')}"></label><label class="f">Celular<input class="i" id="f-tel" type="tel" inputmode="tel" value="${esc(d.tel||'')}"></label></div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px"><button class="btn gray" data-act="photo">Cambiar foto</button><button class="btn" data-act="saveyo">Guardar</button></div></section>
 
-  <div style="padding:0 16px"><button class="btn link" data-act="logout">Cerrar sesión · ${esc(p.email)}</button></div>`;
+  ${installCard()}<div style="padding:0 16px"><button class="btn link" data-act="logout">Cerrar sesión · ${esc(p.email)}</button></div>`;
 }
 
 function vAdmin(){
@@ -797,12 +847,12 @@ document.addEventListener('click',async e=>{
     case'filt':filt=t.dataset.v;render();break;
     case'join':{const m=M(),yo=me();if(m.estado!=='abierta'){toast('La convocatoria ya cerró');return}if(m.convocados.length>=m.cupo){toast('No quedan cupos');return}const def=yo.equipo||'N';const tc=t=>m.convocados.filter(id=>(m.board?.[id]?.team)===t).length;
       sheet(`<h2>YO VOY</h2><p class="muted s" style="margin:4px 0 0">${esc(fShort(m.fecha))} · ${esc(fTime(m.hora))} · ${esc(cancha(m).nombre)}</p><label class="f">¿Con qué equipo juegas?</label><div class="goalbtns" style="margin-top:8px">${['N','B'].map(t=>`<button class="g${t}" data-act="joinok" data-v="${t}" data-m="${m.id}" style="${t===def?'outline:3px solid var(--sky);outline-offset:2px':''}">${TEAM[t]}${t===def?' · el tuyo':''}<span style="display:block;font-size:12px;font-weight:600;opacity:.75">van ${tc(t)}</span></button>`).join('')}</div><p class="xs muted" style="margin:12px 0 0">Te puedes bajar hasta ${esc(fCierre(m))}. Después, si confirmaste, pagas aunque no vayas.</p>`);break}
-    case'joinok':{const m=M(),y=me().id;if(!m.convocados.includes(y)){m.convocados.push(y);m.board[y]={team:t.dataset.v}}else{m.board[y]={team:t.dataset.v}}save();close();render();toast('Listo, vas con '+TEAM[t.dataset.v]);break}
+    case'joinok':{const m=M(),y=me().id;m.nov=(m.nov||[]).filter(x=>x!==y);if(!m.convocados.includes(y)){m.convocados.push(y);m.board[y]={team:t.dataset.v}}else{m.board[y]={team:t.dataset.v}}save();close();render();toast('Listo, vas con '+TEAM[t.dataset.v]);break}
     case'swapteam':{const m=M(),y=me().id;const nt=(m.board[y]?.team||'N')==='N'?'B':'N';m.board[y]={team:nt};save();render();toast('Ahora vas con '+TEAM[nt]);break}
     case'leave':{const m=M();if(m.estado!=='abierta'){toast('Ya cerró: igual debes pagar');return}
       sheet(`<div style="text-align:center"><h2 style="font-size:34px;margin-top:6px">¿SEGURO NO VAS?</h2><p style="font-size:17px;font-weight:700;margin:10px 0 0">¡Nos vas a dejar el roto, HP!</p><p class="muted s" style="margin:6px 0 0">Van ${m.convocados.length} de ${m.cupo} para el ${esc(fShort(m.fecha))}. Te puedes bajar hasta ${esc(fCierre(m))}.</p></div>
       <button class="btn navy" data-act="bg">No, sí voy</button><button class="btn bad" data-act="leaveok" data-m="${m.id}">Sí, me bajo</button>`);break}
-    case'leaveok':{const m=M(),y=me().id;if(m.estado!=='abierta'){close();toast('Ya cerró: igual debes pagar');return}m.convocados=m.convocados.filter(x=>x!==y);delete m.board[y];save();render();
+    case'leaveok':{const m=M(),y=me().id;if(m.estado!=='abierta'){close();toast('Ya cerró: igual debes pagar');return}m.convocados=m.convocados.filter(x=>x!==y);m.nov=[...new Set([...(m.nov||[]),y])];delete m.board[y];save();render();
       sheet(`<div style="text-align:center;padding:10px 0"><div class="d" style="font-size:64px;color:var(--bad)">GALLINA</div><p class="muted s" style="margin:8px 0 0">Te bajaste del partido del ${esc(fShort(m.fecha))}. Si te arrepientes, toca "Yo voy" otra vez mientras siga abierta.</p></div><button class="btn gray" data-act="bg">Ok, me lo merezco</button>`);break}
     case'paynow':curMatch=id;tab='inicio';page=null;render();scrollTo(0,0);pd={mid:id,cubre:new Set([me().id]),proof:''};drawPay();break;
     case'pay':if(curM()?.estado!=='finalizado'){toast('Se paga cuando termine el partido');return}pd={mid:curMatch,cubre:new Set([me().id]),proof:''};drawPay();break;
@@ -856,9 +906,20 @@ document.addEventListener('click',async e=>{
       <label class="f">Cancha</label><div class="opts" id="n-c">${S.canchas.map((c,i)=>`<button class="${i===0?'on':''}" data-act="opt" data-v="${c.id}" style="text-align:left;padding:10px 14px;min-height:56px">${esc(c.nombre)}<span class="xs" style="display:block;font-weight:500;opacity:.8">${esc(c.formato)} · hasta ${CUPO[c.formato]} · ${cop(c.valor)}</span></button>`).join('')}</div>
       <label class="f">Fecha<input class="i" id="n-f" type="date" value="${d}"></label>
       <label class="f">Hora</label><div class="opts" id="n-h" style="grid-template-columns:1fr 1fr">${HORAS.map(([v,l],i)=>`<button class="${i===1?'on':''}" data-act="opt" data-v="${v}">${l}</button>`).join('')}</div>
-      <button class="btn navy" data-act="createm">Publicar convocatoria</button>`);break}
+      <div class="fsec">¿A quién llamas? <small id="n-cnt">${S.players.filter(p=>!p.invitado).length} jugadores</small></div>
+      <div style="display:flex;gap:8px;margin-top:8px"><button class="chipb" data-act="callall" data-v="1">Todos</button><button class="chipb" data-act="callall" data-v="0">Ninguno</button></div>
+      <div class="callgrid" id="n-p">${S.players.filter(p=>!p.invitado).map(p=>`<button class="on" data-act="callp" data-id="${p.id}">${av(p,'sm')}<span>${esc(first(p))}</span></button>`).join('')}</div>
+      <p class="xs muted" style="margin:8px 0 0">Cuando abran la app les sale el llamado: ¿vas? Sí o no.</p>
+      <div class="fsave"><button class="btn navy" data-act="createm">Publicar y llamar</button></div>`);break}
+    case'install':{if(!installEv)return;installEv.prompt();const r=await installEv.userChoice;installEv=null;render();toast(r.outcome==='accepted'?'¡Instalada!':'Cuando quieras la instalas');break}
+    case'callteam':callTeam=t.dataset.v;showCall();break;
+    case'callsi':{const m=S.matches.find(x=>x.id===t.dataset.m),y=me().id;if(m.convocados.length>=m.cupo){toast('No quedan cupos');return}m.nov=(m.nov||[]).filter(x=>x!==y);if(!m.convocados.includes(y))m.convocados.push(y);m.board[y]={team:callTeam||'N'};callTeam=null;save();render();toast('¡Listo! Vas con '+TEAM[m.board[y].team]);break}
+    case'callno':{const m=S.matches.find(x=>x.id===t.dataset.m),y=me().id;m.nov=[...new Set([...(m.nov||[]),y])];callTeam=null;save();render();toast('Anotado: no vas. Si cambias de idea, toca "Yo voy".');break}
+    case'callp':t.classList.toggle('on');{const n=document.querySelectorAll('#n-p .on').length;$('#n-cnt').textContent=n+' jugador'+(n===1?'':'es')}break;
+    case'callall':document.querySelectorAll('#n-p button').forEach(b=>b.classList.toggle('on',t.dataset.v==='1'));{const n=document.querySelectorAll('#n-p .on').length;$('#n-cnt').textContent=n+' jugador'+(n===1?'':'es')}break;
     case'createm':{const c=S.canchas.find(x=>x.id===$('#n-c .on')?.dataset.v);const f=$('#n-f').value;if(!c||!f){toast('Elige cancha y fecha');return}
-      const m={id:'m'+uid(),fecha:f,hora:$('#n-h .on')?.dataset.v||'20:00',canchaId:c.id,fmt:c.formato,cupo:CUPO[c.formato],cuota:0,convocados:[],estado:'abierta',goals:[],board:{}};
+      const m={id:'m'+uid(),fecha:f,hora:$('#n-h .on')?.dataset.v||'20:00',canchaId:c.id,fmt:c.formato,cupo:CUPO[c.formato],cuota:0,convocados:[],llamados:[...document.querySelectorAll('#n-p .on')].map(b=>b.dataset.id),nov:[],estado:'abierta',goals:[],board:{}};
+      if(!m.llamados.length){toast('Elige al menos a un jugador');return}
       if(cierreDe(m)<=new Date()){toast('La fecha debe ser al menos en 2 días');return}
       S.matches.push(m);curMatch=m.id;save();page=null;tab='inicio';render();
       sheet(`<h2>CONVOCATORIA PUBLICADA</h2><p class="muted s" style="margin:4px 0 0">Mándala al grupo de WhatsApp para que la gente entre y confirme.</p><div style="white-space:pre-line;background:var(--bg);border-radius:14px;padding:14px;margin-top:12px;font-size:14px">${esc(shareText(m))}</div><button class="btn navy" data-act="copy" data-t="${esc(shareText(m))}">Copiar mensaje</button><button class="btn link" data-act="bg">Listo</button>`);break}
@@ -876,6 +937,8 @@ document.addEventListener('change',async e=>{const f=e.target.files?.[0];if(!f)r
   try{if(e.target.id==='proofIn'){pd.proof=await shrink(f,900);drawPay()}if(e.target.id==='photoIn'){syncDraft();draft.foto=await shrink(f,360);const i=S.players.findIndex(p=>p.id===me().id);S.players[i].foto=draft.foto;save();render()}}catch(err){toast('No se pudo leer la imagen')}});
 render();
 }
+
+try{if('serviceWorker' in navigator&&location.protocol==='https:'&&location.hostname.endsWith('github.io'))navigator.serviceWorker.register('sw.js')}catch(e){}
 </script>
 </body>
 </html>

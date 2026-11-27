@@ -1,0 +1,17 @@
+{
+  "name": "Fuchibol",
+  "short_name": "Fuchibol",
+  "description": "Convocatorias, pizarra, pagos y tercer tiempo del grupo",
+  "lang": "es-CO",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#060D1E",
+  "theme_color": "#060D1E",
+  "icons": [
+    { "src": "img/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "img/icon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "img/icon-maskable.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
