@@ -20,7 +20,7 @@ button,input,select{font:inherit;color:inherit}button{cursor:pointer;border:0;ba
 :focus-visible{outline:3px solid var(--sky);outline-offset:2px}
 h1,h2,h3{margin:0}
 .d{font-family:Anton,Impact,"Arial Narrow",sans-serif;font-weight:400;letter-spacing:.3px;line-height:1}
-.app{max-width:480px;margin:0 auto;min-height:100vh;background:var(--bg);padding-bottom:170px;position:relative}
+.app{max-width:480px;margin:0 auto;min-height:100vh;background:var(--bg);padding-bottom:110px;position:relative}
 /* hero */
 .hero{position:relative;color:#fff;overflow:hidden;background:var(--navy)}
 .hero>img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
@@ -124,9 +124,10 @@ input.i:focus,select.i:focus{border-color:var(--sky);outline:0}
 .gN{background:#111;color:#fff}.gB{background:#fff;color:var(--navy);border:2px solid var(--navy)!important}
 .pgrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:12px}
 .pgrid button{display:flex;flex-direction:column;align-items:center;gap:6px;padding:12px 4px;border-radius:16px;background:var(--bg);font-weight:700;font-size:13px;line-height:1.2}
-.paybar{position:fixed;left:50%;transform:translateX(-50%);bottom:84px;z-index:29;width:calc(100% - 24px);max-width:456px;display:flex;align-items:center;gap:12px;padding:10px 10px 10px 16px;border-radius:18px;background:var(--navy);color:#fff;text-align:left;box-shadow:0 10px 28px rgba(11,23,54,.35)}
-.paybar>span:first-child{flex:1}.paybar b{display:block;font-size:15px}.paybar small{color:#C9D3E6;font-size:12px}
-.paybar .pb{background:var(--sky);color:var(--navy);font-weight:800;padding:12px 18px;border-radius:12px}
+.debt{display:inline-flex;align-items:center;gap:6px;height:34px;padding:0 12px;border-radius:99px;background:var(--sky);color:var(--navy);font-size:13px;font-weight:800;white-space:nowrap}
+.debt i{width:8px;height:8px;border-radius:50%;background:var(--bad)}
+.tabs .dot{position:absolute;top:6px;right:calc(50% - 18px);width:9px;height:9px;border-radius:50%;background:var(--bad);border:2px solid #fff}
+.tabs button{position:relative}
 .toast{position:fixed;left:50%;top:16px;transform:translateX(-50%);z-index:70;background:var(--navy);color:#fff;font-weight:700;padding:12px 18px;border-radius:14px;animation:up .2s;max-width:90vw;text-align:center}
 .lb{position:fixed;inset:0;z-index:80;background:rgba(0,0,0,.9);display:grid;place-items:center;padding:20px}.lb img{max-width:100%;max-height:90vh;border-radius:12px}
 .empty{padding:18px;text-align:center;color:var(--mute)}
@@ -164,7 +165,7 @@ input.i:focus,select.i:focus{border-color:var(--sky);outline:0}
 </defs></svg>
 <script>
 {
-const KEY='fuchibol_club_v3';
+const KEY='fuchibol_club_v4';
 const CUPO={'5 vs 5':14,'7 vs 7':18};
 const ROL={ARQ:'Arquero',DEF:'Defensa',MED:'Medio',DEL:'Delantero'};
 const PIE=['Diestro','Zurdo','Ambidiestro'];
@@ -208,12 +209,10 @@ function seed(){
     const goals=[];for(let i=0;i<a;i++)goals.push({id:uid(),playerId:scorersN[(k+i)%scorersN.length],team:'N'});for(let i=0;i<b;i++)goals.push({id:uid(),playerId:scorersB[(k+i)%scorersB.length],team:'B'});
     const m={id:'m'+k,fecha:d,hora:k%2?'19:00':'20:00',canchaId:c.id,fmt:c.formato,cupo:CUPO[c.formato],cuota:cuotaCalc(c.valor,conv.slice(0,CUPO[c.formato]).length),convocados:conv.slice(0,CUPO[c.formato]),estado:'finalizado',goals,board:{}};
     autoBoard(m,P);matches.push(m);d=addDays(d,7)});
-  const nx={id:'mx',fecha:'2026-11-29',hora:'20:00',canchaId:'c1',fmt:'7 vs 7',cupo:18,cuota:cuotaCalc(270000,12),convocados:all.slice(0,12),estado:'cerrada',goals:[],board:{}};autoBoard(nx,P);matches.push(nx);
+  const nx={id:'mx',fecha:'2026-11-29',hora:'20:00',canchaId:'c1',fmt:'7 vs 7',cupo:18,cuota:cuotaCalc(270000,12),convocados:all.slice(0,12),estado:'cerrada',goals:[],board:{}};P.forEach(p=>{});autoBoard(nx,P);matches.push(nx);
   const ny={id:'my',fecha:'2026-12-06',hora:'19:00',canchaId:'c2',fmt:'5 vs 5',cupo:14,cuota:0,convocados:['p0','p1','p3','p4','p5','p7','p8'],estado:'abierta',goals:[],board:{}};autoBoard(ny,P);matches.push(ny);
   const pays=[];
-  matches.filter(m=>m.estado==='finalizado').forEach(m=>{for(let i=0;i<m.convocados.length;i+=4){const cv=m.convocados.slice(i,i+4);pays.push({id:uid(),matchId:m.id,payerId:cv[0],cubre:cv,monto:m.cuota*cv.length,proof:SAMPLE,ts:dt(m.fecha).getTime()-864e5,estado:'verificado'})}});
-  pays.push({id:uid(),matchId:'mx',payerId:'p0',cubre:['p0','p1','p3'],monto:nx.cuota*3,proof:SAMPLE,ts:Date.now()-36e5*5,estado:'verificado'});
-  pays.push({id:uid(),matchId:'mx',payerId:'p4',cubre:['p4'],monto:nx.cuota,proof:SAMPLE,ts:Date.now()-36e5*2,estado:'reportado'});
+  matches.filter(m=>m.estado==='finalizado').forEach(m=>{const pend=m.fecha==='2026-11-22'?['p2','p5','p6','p9','p13']:[];const pay=m.convocados.filter(x=>!pend.includes(x));for(let i=0;i<pay.length;i+=4){const cv=pay.slice(i,i+4);pays.push({id:uid(),matchId:m.id,payerId:cv[0],cubre:cv,monto:m.cuota*cv.length,proof:SAMPLE,ts:dt(m.fecha).getTime()-864e5,estado:'verificado'})}});
   const torneos=[{id:'t1',nombre:'Torneo de noviembre',inicio:'2026-11-08',semanas:6}];
   return {players:P,canchas,matches,pays,torneos,ses:null};
 }
@@ -237,9 +236,11 @@ const fCierre=m=>fShort(addDays(m.fecha,-1))+', '+fTime(m.hora);
 const cuota=m=>m.estado==='abierta'?cuotaCalc(cancha(m).valor,m.convocados.length):m.cuota;
 function closeConv(m){m.estado='cerrada';m.cuota=cuotaCalc(cancha(m).valor,m.convocados.length)}
 function autoClose(){let ch=false;S.matches.forEach(m=>{if(m.estado==='abierta'&&Date.now()>=cierreDe(m)){closeConv(m);ch=true}});if(ch)save()}
-function shareText(m){const c=cancha(m);return `Convocatoria Fuchibol\n${fShort(m.fecha)} · ${fTime(m.hora)}\n${c.nombre} (${c.formato}) · ${c.direccion}\nCupos: ${m.cupo}. Entra a la app y toca "Yo voy".\nSe cierra ${fCierre(m)}. La cuota es la cancha (${cop(c.valor)}) dividida entre los que confirmen. Si confirmas y no vas, igual pagas.`}
-function myDebt(){const y=me();if(!y)return null;return upcoming().find(m=>m.estado==='cerrada'&&m.convocados.includes(y.id)&&!payMap(m)[y.id])||null}
-function curM(){const u=upcoming();if(!u.length)return null;return u.find(x=>x.id===curMatch)||(curMatch=u[0].id,u[0])}
+function shareText(m){const c=cancha(m);return `Convocatoria Fuchibol\n${fShort(m.fecha)} · ${fTime(m.hora)}\n${c.nombre} (${c.formato}) · ${c.direccion}\nCupos: ${m.cupo}. Entra a la app y toca "Yo voy".\nSe cierra ${fCierre(m)}. La cuota es la cancha (${cop(c.valor)}) dividida entre los que confirmen y se paga después del partido. Si confirmas y no vas, igual pagas.`}
+const porCobrar=m=>m.estado==='finalizado'&&m.convocados.some(id=>!payMap(m)[id]);
+function myDebt(){const y=me();if(!y)return null;return finished().find(m=>m.convocados.includes(y.id)&&!payMap(m)[y.id])||null}
+function inicioList(){return S.matches.filter(m=>m.estado!=='finalizado'||porCobrar(m)).sort((a,b)=>(a.fecha+a.hora).localeCompare(b.fecha+b.hora))}
+function curM(){const u=inicioList();if(!u.length)return null;const f=u.find(x=>x.id===curMatch);if(f)return f;const d=myDebt()||u.find(x=>x.estado!=='finalizado')||u[0];curMatch=d.id;return d}
 function activeT(){const t=[...S.torneos].sort((a,b)=>b.inicio.localeCompare(a.inicio))[0];if(!t)return null;const fin=addDays(t.inicio,t.semanas*7-1);return{...t,fin}}
 function tally(ms){let N=0,B=0,E=0;ms.forEach(m=>{const s=score(m);s.N>s.B?N++:s.B>s.N?B++:E++});return{N,B,E}}
 function stats(id){const f=finished();const pj=f.filter(m=>m.convocados.includes(id));const gol=f.reduce((a,m)=>a+m.goals.filter(g=>g.playerId===id).length,0);
@@ -247,16 +248,15 @@ function stats(id){const f=finished();const pj=f.filter(m=>m.convocados.includes
   const deb=S.matches.filter(m=>m.convocados.includes(id)&&!payMap(m)[id]).length;return{pj:pj.length,gol,gan,deb}}
 function av(p,cls=''){if(!p)return`<span class="av ${cls}">?</span>`;const f=img(p.foto);return f?`<img class="av ${cls}" src="${f}" alt="">`:`<span class="av ${cls}">${esc(ini(p.nombre))}</span>`}
 const crest=s=>`<svg width="${s}" height="${Math.round(s*74/64)}" aria-hidden="true"><use href="#crest"/></svg>`;
-function topbar(){const m=me();return`<div class="top">${crest(28)}<span class="d brand">FUCHIBOL</span><span class="sp"></span>${m?`<button data-act="tab" data-v="yo" aria-label="Mi perfil">${av(m,'sky')}</button>`:`<button class="ghostbtn" data-act="logout"><svg width="16" height="16"><use href="#i-out"/></svg>Salir</button>`}</div>`}
+function topbar(){const m=me(),d=myDebt();return`<div class="top">${crest(28)}<span class="d brand">FUCHIBOL</span><span class="sp"></span>${d?`<button class="debt" data-act="paynow" data-id="${d.id}"><i></i>Pagar ${cop(cuota(d))}</button>`:''}${m?`<button data-act="tab" data-v="yo" aria-label="Mi perfil">${av(m,'sky')}</button>`:`<button class="ghostbtn" data-act="logout"><svg width="16" height="16"><use href="#i-out"/></svg>Salir</button>`}</div>`}
 
 /* ---------- render ---------- */
 function render(){
   autoClose();
   if(!S.ses){renderLanding();return}
   const body=page==='admin'?vAdmin():({inicio:vInicio,torneo:vTorneo,pizarra:vPizarra,yo:vYo})[tab]();
-  const T=[['torneo','t-cup','Torneo'],['inicio','t-home','Convocatoria'],['pizarra','t-board','Pizarra'],['yo','t-me',visor()?'Salir':'Yo']];
-  $('#app').innerHTML=`<div class="app">${body}</div><nav class="tabs"><div class="in">${T.map(([v,i,l])=>`<button class="${tab===v&&!page?'on':''}" data-act="${v==='yo'&&visor()?'logout':'tab'}" data-v="${v}"><svg><use href="#${i}"/></svg>${l}</button>`).join('')}</div></nav>`;
-  const owe=myDebt();if(owe&&!(tab==='inicio'&&curMatch===owe.id)){const b=document.createElement('button');b.className='paybar';b.dataset.act='paynow';b.dataset.id=owe.id;b.innerHTML=`<span><b>Debes ${cop(cuota(owe))}</b><small>${esc(fShort(owe.fecha))} · ${esc(cancha(owe).nombre)}</small></span><span class="pb">Pagar</span>`;$('#app .app').appendChild(b)}
+  const T=[['inicio','t-home','Convocatoria'],['pizarra','t-board','Pizarra'],['yo','t-me',visor()?'Salir':'Yo'],['torneo','t-cup','Torneo']];const dbt=myDebt();
+  $('#app').innerHTML=`<div class="app">${body}</div><nav class="tabs"><div class="in">${T.map(([v,i,l])=>`<button class="${tab===v&&!page?'on':''}" data-act="${v==='yo'&&visor()?'logout':'tab'}" data-v="${v}"><svg><use href="#${i}"/></svg>${l}${v==='inicio'&&dbt?'<span class="dot"></span>':''}</button>`).join('')}</div></nav>`;
   if(tab==='pizarra'&&!page)bindPitch();
 }
 
@@ -264,45 +264,53 @@ function vInicio(){
   const m=curM(),yo=me(),adm=isAdmin();
   const launch=adm?`<section class="card"><h3>Convocatorias</h3><p class="muted s" style="margin:6px 0 0">Elige cancha, fecha y hora. La gente confirma con "Yo voy" hasta un día antes.</p><button class="btn navy" data-act="newm">Lanzar convocatoria</button></section>`:'';
   if(!m)return`<section class="hero" style="min-height:330px"><img src="${IMG.estadio}" alt="" style="object-position:62% 35%"><div class="in" style="display:flex;flex-direction:column;min-height:330px">${topbar()}<div style="margin-top:auto"><div class="kick">Sin convocatoria abierta</div><h1 class="d" style="font-size:40px;margin-top:6px">SE VIENE EL PRÓXIMO</h1></div></div></section>${launch}`;
-  const c=cancha(m),pm=payMap(m),rec=recogido(m),pct=Math.min(100,Math.round(rec/(c.valor||1)*100)),open=m.estado==='abierta',q=cuota(m);
+  const c=cancha(m),pm=payMap(m),rec=recogido(m),pct=Math.min(100,Math.round(rec/(c.valor||1)*100)),q=cuota(m),sc=score(m);
+  const st=m.estado; // abierta | cerrada | finalizado
   const inn=yo&&m.convocados.includes(yo.id),mine=yo&&pm[yo.id],lleno=m.convocados.length>=m.cupo;
   const pend=m.convocados.filter(id=>!pm[id]),okk=m.convocados.filter(id=>pm[id]);
   const t=activeT();const tm=t?S.matches.filter(x=>x.estado==='finalizado'&&x.fecha>=t.inicio&&x.fecha<=t.fin):[];const tt=tally(tm);
-  const kick=open?`CONVOCATORIA ABIERTA · CIERRA ${fCierre(m).toUpperCase()}`:(t&&m.fecha>=t.inicio&&m.fecha<=t.fin?`CONVOCATORIA CERRADA · FECHA ${Math.floor((dt(m.fecha)-dt(t.inicio))/6048e5)+1} DE ${t.semanas}`:'CONVOCATORIA CERRADA');
+  const kick=st==='abierta'?`CONVOCATORIA ABIERTA · CIERRA ${fCierre(m).toUpperCase()}`:st==='cerrada'?'CONVOCATORIA CERRADA · A JUGAR':(pct>=100?'PARTIDO TERMINADO · CANCHA PAGA':'PARTIDO TERMINADO · POR PAGAR');
   const step=(n,l,on,done)=>`<div style="flex:1;text-align:center"><div style="width:26px;height:26px;margin:0 auto;border-radius:50%;display:grid;place-items:center;font-size:12px;font-weight:800;background:${on?'var(--sky)':done?'var(--navy)':'var(--line)'};color:${on?'var(--navy)':done?'#fff':'var(--mute)'}">${done?'<svg width="14" height="14"><use href="#i-ok"/></svg>':n}</div><div class="xs" style="font-weight:${on?800:600};color:${on?'var(--ink)':'var(--mute)'};margin-top:4px">${l}</div></div>`;
-  const stepper=`<div style="display:flex;align-items:flex-start;margin-bottom:12px">${step(1,'Convocatoria',open,!open)}${step(2,'Pagos',!open&&pct<100,!open&&pct>=100)}${step(3,'Partido',!open&&pct>=100,false)}</div>`;
+  const stepper=`<div style="display:flex;align-items:flex-start;margin-bottom:12px">${step(1,'Convocatoria',st==='abierta',st!=='abierta')}${step(2,'Partido',st==='cerrada',st==='finalizado')}${step(3,'Pago',st==='finalizado'&&pct<100,st==='finalizado'&&pct>=100)}</div>`;
+  const mt=yo?(m.board?.[yo.id]?.team||yo.equipo||'N'):'N';
   let act='';
-  if(open){
+  if(st==='abierta'){
     act=`<div class="between"><b>Van ${m.convocados.length} de ${m.cupo}</b><span class="muted s">Cuota hoy ${m.convocados.length?cop(q):'—'}</span></div><div class="bar"><i style="width:${Math.round(m.convocados.length/m.cupo*100)}%"></i></div>
-    <p class="muted s" style="margin:10px 0 0">La cuota es ${cop(c.valor)} ÷ los que confirmen. Queda fija al cerrar, ${esc(fCierre(m))}.</p>`;
+    <p class="muted s" style="margin:10px 0 0">La cuota es ${cop(c.valor)} ÷ los que confirmen. Queda fija al cerrar (${esc(fCierre(m))}) y se paga después del partido.</p>`;
     if(visor())act+=`<p class="muted s" style="margin:10px 0 0">Estás mirando como invitado.</p>`;
     else if(!inn)act+=`<button class="btn" data-act="join" ${lleno?'disabled':''}>${lleno?'Cupos llenos':'Yo voy'}</button><p class="xs muted" style="text-align:center;margin:8px 0 0">Si confirmas y luego no vas, igual pagas.</p>`;
-    else{const mt=m.board?.[yo.id]?.team||yo.equipo||'N';act+=`<button class="btn soft" disabled style="opacity:1"><svg><use href="#i-ok"/></svg>Vas con ${TEAM[mt]}. Pagas cuando cierre</button><div style="display:grid;grid-template-columns:1fr 1fr"><button class="btn link" data-act="swapteam">Cambiar a ${TEAM[mt==='N'?'B':'N']}</button><button class="btn link" data-act="leave">Ya no puedo ir</button></div><p class="xs muted" style="text-align:center;margin:0">Puedes bajarte hasta ${esc(fCierre(m))}</p>`}
+    else act+=`<button class="btn soft" disabled style="opacity:1"><svg><use href="#i-ok"/></svg>Vas con ${TEAM[mt]}</button><div style="display:grid;grid-template-columns:1fr 1fr"><button class="btn link" data-act="swapteam">Cambiar a ${TEAM[mt==='N'?'B':'N']}</button><button class="btn link" data-act="leave">Ya no puedo ir</button></div><p class="xs muted" style="text-align:center;margin:0">Puedes bajarte hasta ${esc(fCierre(m))}</p>`;
+  }else if(st==='cerrada'){
+    act=`<div class="between"><b>${m.convocados.length} confirmados</b><span class="muted s">${cop(c.valor)} ÷ ${m.convocados.length}</span></div><div class="d" style="font-size:36px;margin-top:6px">${cop(q)} <span class="muted s" style="font-family:Inter;font-weight:600">cuota · se paga al terminar</span></div>`;
+    act+=inn?`<button class="btn navy" data-act="tab" data-v="pizarra">Ver alineación · juegas con ${TEAM[mt]}</button>`:`<button class="btn gray" data-act="tab" data-v="pizarra">Ver alineación</button>`;
   }else{
-    act=`<div class="between"><b>${m.convocados.length} confirmados</b><span class="muted s">${cop(c.valor)} ÷ ${m.convocados.length}</span></div><div class="d" style="font-size:40px;margin-top:6px">${cop(q)} <span class="muted s" style="font-family:Inter;font-weight:600">cuota final</span></div>`;
-    if(visor()||!inn)act+=`<p class="muted s" style="margin:10px 0 0">${visor()?'Estás mirando como invitado.':'La convocatoria ya cerró.'}</p>`;
-    else if(!mine)act+=`<button class="btn" data-act="pay">Pagar mi cuota · ${cop(q)}</button><p class="xs muted" style="text-align:center;margin:8px 0 0">La convocatoria cerró: si no puedes ir, igual pagas.</p>`;
-    else act+=`<button class="btn soft" disabled style="opacity:1"><svg><use href="#i-ok"/></svg>${mine.estado==='verificado'?'Vas y estás al día':'Pago enviado, falta verificar'}</button>`;
+    act=`<div class="between"><b>Cuota ${cop(q)}</b><span class="muted s">${okk.length} de ${m.convocados.length} pagaron</span></div><div class="bar g"><i style="width:${Math.round(okk.length/Math.max(1,m.convocados.length)*100)}%"></i></div>`;
+    if(inn&&!mine)act+=`<button class="btn" data-act="pay">Pagar mi cuota · ${cop(q)}</button>`;
+    else if(inn&&mine)act+=`<button class="btn soft" disabled style="opacity:1"><svg><use href="#i-ok"/></svg>${mine.estado==='verificado'?'Estás al día':'Pago enviado, falta verificar'}</button>`;
   }
-  const admCard=adm?(open?`<section class="card"><h3>Gestionar convocatoria <span class="tag wait">Abierta</span></h3><button class="btn navy" data-act="share" data-id="${m.id}">Compartir por WhatsApp</button><div style="display:grid;grid-template-columns:1fr 1fr;gap:10px"><button class="btn gray" data-act="guest">+ Invitado</button><button class="btn gray" data-act="closeconv" data-id="${m.id}">Cerrar ya</button></div><button class="btn link" data-act="newm">Lanzar otra convocatoria</button></section>`
-    :`<section class="card"><h3>Gestionar partido <span class="tag ok">Cerrada</span></h3><button class="btn navy" data-act="score" data-id="${m.id}">Anotar marcador</button><button class="btn gray" data-act="copyfaltan">Recordar a los que faltan</button><button class="btn link" data-act="newm">Lanzar nueva convocatoria</button></section>`):'';
-  const up=upcoming();
+  const admCard=!adm?'':st==='abierta'?`<section class="card"><h3>Gestionar convocatoria <span class="tag wait">Abierta</span></h3><button class="btn navy" data-act="share" data-id="${m.id}">Compartir por WhatsApp</button><div style="display:grid;grid-template-columns:1fr 1fr;gap:10px"><button class="btn gray" data-act="guest">+ Invitado</button><button class="btn gray" data-act="closeconv" data-id="${m.id}">Cerrar ya</button></div><button class="btn link" data-act="newm">Lanzar otra convocatoria</button></section>`
+    :st==='cerrada'?`<section class="card"><h3>Día del partido <span class="tag ok">Cerrada</span></h3><button class="btn navy" data-act="score" data-id="${m.id}">Anotar marcador y terminar</button><button class="btn link" data-act="newm">Lanzar nueva convocatoria</button></section>`
+    :`<section class="card"><h3>Cobro <span class="tag ${pct>=100?'ok':'wait'}">${pct>=100?'Completo':'Pendiente'}</span></h3><button class="btn gray" data-act="copyfaltan">Recordar a los que faltan</button><button class="btn link" data-act="score" data-id="${m.id}">Editar marcador</button></section>`;
   const tcount=t=>m.convocados.filter(id=>m.board?.[id]?.team===t).length;
-  const list=open?`<section class="card"><h3>Van · ${m.convocados.length} <small>Negro ${tcount('N')} · Blanco ${tcount('B')}</small></h3>${m.convocados.map(id=>{const p=pl(id);const tm=m.board?.[id]?.team||'N';return p?`<div class="li">${av(p)}<div class="nm">${esc(p.nombre)}<small>${esc(ROL[p.rol])}${p.invitado?' · Invitado':''}</small></div><span class="tag" style="background:${tm==='N'?'#111':'#fff'};color:${tm==='N'?'#fff':'var(--navy)'};border:1.5px solid var(--navy)">${TEAM[tm]}</span></div>`:''}).join('')||'<div class="empty">Nadie ha confirmado todavía.</div>'}</section>`
-   :`<section class="card"><h3>Cancha ${pct>=100?'<span class="tag ok">Cancha paga</span>':`<small style="color:var(--ok);font-weight:700">${cop(rec)} de ${cop(c.valor)}</small>`}</h3><div class="bar g"><i style="width:${pct}%"></i></div>
+  const goers=`<section class="card"><h3>Van · ${m.convocados.length} <small>Negro ${tcount('N')} · Blanco ${tcount('B')}</small></h3>${m.convocados.map(id=>{const p=pl(id);const tm2=m.board?.[id]?.team||'N';return p?`<div class="li">${av(p)}<div class="nm">${esc(p.nombre)}<small>${esc(ROL[p.rol])}${p.invitado?' · Invitado':''}</small></div><span class="tag" style="background:${tm2==='N'?'#111':'#fff'};color:${tm2==='N'?'#fff':'var(--navy)'};border:1.5px solid var(--navy)">${TEAM[tm2]}</span></div>`:''}).join('')||'<div class="empty">Nadie ha confirmado todavía.</div>'}</section>`;
+  const payBlock=`<section class="card"><h3>Cancha ${pct>=100?'<span class="tag ok">Cancha paga</span>':`<small style="color:var(--ok);font-weight:700">${cop(rec)} de ${cop(c.valor)}</small>`}</h3><div class="bar g"><i style="width:${pct}%"></i></div>
     <div class="nequi"><div style="flex:1"><div class="xs" style="color:#C9D3E6">Nequi · ${esc(c.titular)} · solo Nequi</div><div class="d">${esc(String(c.nequi).replace(/(\d{3})(\d{3})(\d{4})/,'$1 $2 $3'))}</div></div><button class="btn sm" data-act="copy" data-t="${esc(c.nequi)}">Copiar</button></div></section>
-  <section class="card"><h3>Quiénes van</h3>
+  <section class="card"><h3>Quiénes faltan</h3>
     ${pend.length?`<div class="grp" style="color:var(--bad)">FALTAN POR PAGAR · ${pend.length}</div>${pend.map(id=>personRow(id,null)).join('')}`:''}
     ${okk.length?`<div class="grp" style="color:var(--ok)">PAGARON · ${okk.length}</div>${okk.map(id=>personRow(id,pm[id])).join('')}`:''}</section>
   <section class="card"><h3>Comprobantes <small>todos los ven</small></h3>${S.pays.filter(p=>p.matchId===m.id).sort((a,b)=>b.ts-a.ts).map(proofRow).join('')||'<div class="empty">Aún no hay pagos.</div>'}</section>`;
+  const center=st==='finalizado'?`<div class="d" style="font-size:56px">${sc.N} – ${sc.B}</div><div style="font-size:13px;font-weight:700;color:#DCE3F2;margin-top:4px">FINAL · ${esc(fShort(m.fecha).toUpperCase())}</div>`
+    :`<div class="d" style="font-size:44px">${esc(fTime(m.hora).replace(/ (am|pm)/,'').replace(':00',''))}<span style="font-size:22px"> ${fTime(m.hora).slice(-2).toUpperCase()}</span></div><div style="font-size:13px;font-weight:700;color:#DCE3F2;margin-top:4px">${esc(fShort(m.fecha).toUpperCase())}</div>`;
+  const list=inicioList();
+  const lab=x=>x.estado==='abierta'?'Abierta':x.estado==='cerrada'?'Por jugar':'Por pagar';
   return `<section class="hero" style="min-height:400px"><img src="${IMG.estadio}" alt="" style="object-position:62% 35%"><div class="in" style="display:flex;flex-direction:column;min-height:400px;padding-bottom:40px">${topbar()}
     <div style="margin-top:auto"><div class="kick">${esc(kick)}</div>
-    <div class="vs" style="margin-top:14px"><div><div class="kit N"></div><div class="d tname">NEGRO</div></div><div><div class="d" style="font-size:44px">${esc(fTime(m.hora).replace(/ (am|pm)/,'').replace(':00',''))}<span style="font-size:22px"> ${fTime(m.hora).slice(-2).toUpperCase()}</span></div><div style="font-size:13px;font-weight:700;color:#DCE3F2;margin-top:4px">${esc(fShort(m.fecha).toUpperCase())}</div></div><div><div class="kit B"></div><div class="d tname">BLANCO</div></div></div>
+    <div class="vs" style="margin-top:14px"><div><div class="kit N"></div><div class="d tname">NEGRO</div></div><div>${center}</div><div><div class="kit B"></div><div class="d tname">BLANCO</div></div></div>
     <a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(c.direccion)}" target="_blank" rel="noopener" style="display:flex;justify-content:center;align-items:center;gap:6px;margin-top:14px;color:#fff;text-decoration:none;font-size:14px;font-weight:600"><svg width="16" height="16"><use href="#i-pin"/></svg>${esc(c.nombre)} · ${esc(c.formato)} ›</a></div></div></section>
-  ${up.length>1?`<div style="display:flex;gap:6px;overflow-x:auto;padding:30px 16px 0;margin-bottom:-14px">${up.map(x=>`<button class="btn sm ${x.id===m.id?'navy':'gray'}" data-act="pickm" data-id="${x.id}">${esc(fShort(x.fecha))} · ${x.estado==='abierta'?'Abierta':'Cerrada'}</button>`).join('')}</div>`:''}
-  <section class="card lift" ${up.length>1?'style="margin-top:22px"':''}>${stepper}${act}</section>
-  ${t?`<button class="ribbon" data-act="tab" data-v="torneo"><div style="flex:1"><div class="kick">${esc(t.nombre)}</div><div class="s" style="color:#C9D3E6">${tm.length} de ${t.semanas} fechas jugadas</div></div><div class="d">NEGRO ${tt.N} – ${tt.B} BLANCO</div></button>`:''}
-  ${admCard}${list}`;
+  ${list.length>1?`<div style="display:flex;gap:6px;overflow-x:auto;padding:30px 16px 0;margin-bottom:-14px">${list.map(x=>`<button class="btn sm ${x.id===m.id?'navy':'gray'}" style="flex:none" data-act="pickm" data-id="${x.id}">${esc(fShort(x.fecha))} · ${lab(x)}</button>`).join('')}</div>`:''}
+  <section class="card lift" ${list.length>1?'style="margin-top:22px"':''}>${stepper}${act}</section>
+  ${admCard}${st==='finalizado'?payBlock:goers}
+  ${t?`<button class="ribbon" data-act="tab" data-v="torneo"><div style="flex:1"><div class="kick">${esc(t.nombre)}</div><div class="s" style="color:#C9D3E6">${tm.length} de ${t.semanas} fechas jugadas</div></div><div class="d">NEGRO ${tt.N} – ${tt.B} BLANCO</div></button>`:''}`;
 }
 function personRow(id,py){const p=pl(id);if(!p)return'';
   const sub=[ROL[p.rol],p.invitado?'Invitado':'',py&&py.payerId!==id?'pagó '+first(pl(py.payerId)):''].filter(Boolean).map(esc).join(' · ');
@@ -491,8 +499,8 @@ document.addEventListener('click',async e=>{
     case'joinok':{const m=M(),y=me().id;if(!m.convocados.includes(y)){m.convocados.push(y);m.board[y]={team:t.dataset.v}}else{m.board[y]={team:t.dataset.v}}save();close();render();toast('Listo, vas con '+TEAM[t.dataset.v]);break}
     case'swapteam':{const m=M(),y=me().id;const nt=(m.board[y]?.team||'N')==='N'?'B':'N';m.board[y]={team:nt};save();render();toast('Ahora vas con '+TEAM[nt]);break}
     case'leave':{const m=M(),y=me().id;if(m.estado!=='abierta'){toast('Ya cerró: igual debes pagar');return}m.convocados=m.convocados.filter(x=>x!==y);delete m.board[y];save();render();break}
-    case'paynow':curMatch=id;tab='inicio';page=null;pd={mid:id,cubre:new Set([me().id]),proof:''};render();drawPay();break;
-    case'pay':if(curM()?.estado==='abierta'){toast('Se paga cuando cierre la convocatoria');return}pd={mid:curMatch,cubre:new Set([me().id]),proof:''};drawPay();break;
+    case'paynow':curMatch=id;tab='inicio';page=null;render();scrollTo(0,0);pd={mid:id,cubre:new Set([me().id]),proof:''};drawPay();break;
+    case'pay':if(curM()?.estado!=='finalizado'){toast('Se paga cuando termine el partido');return}pd={mid:curMatch,cubre:new Set([me().id]),proof:''};drawPay();break;
     case'cover':t.checked?pd.cubre.add(id):pd.cubre.delete(id);drawPay();break;
     case'proof':$('#proofIn').click();break;
     case'photo':$('#photoIn').click();break;
@@ -518,7 +526,7 @@ document.addEventListener('click',async e=>{
     case'gback':goalTeam=null;drawScore(t.dataset.m);break;
     case'goal':{const m=M();m.goals.push({id:uid(),playerId:t.dataset.p,team:goalTeam});goalTeam=null;save();drawScore(m.id);render();toast('Gol anotado');break}
     case'ungoal':{const m=M();m.goals.splice(Number(t.dataset.i),1);save();drawScore(m.id);render();break}
-    case'finish':case'reopen':{const m=M();m.estado=a==='finish'?'finalizado':'cerrada';save();close();render();toast(a==='finish'?'Partido terminado':'Partido reabierto');break}
+    case'finish':case'reopen':{const m=M();m.estado=a==='finish'?'finalizado':'cerrada';curMatch=m.id;save();close();render();toast(a==='finish'?'Partido terminado. Ya pueden pagar.':'Partido reabierto');break}
     case'cancha':sheetCancha(id);break;
     case'savecancha':{const g=k=>$('#c-'+k).value.trim();if(!g('nombre')||!g('nequi')||!Number(g('valor'))){toast('Nombre, valor y Nequi son obligatorios');return}
       const c={id:id||'c'+uid(),nombre:g('nombre'),direccion:g('direccion'),formato:$('#c-fmt .on')?.dataset.v||'7 vs 7',valor:Number(g('valor')),nequi:g('nequi').replace(/\D/g,''),titular:g('titular'),notas:g('notas')};
@@ -535,8 +543,8 @@ document.addEventListener('click',async e=>{
       S.matches.push(m);curMatch=m.id;save();page=null;tab='inicio';render();
       sheet(`<h2>CONVOCATORIA PUBLICADA</h2><p class="muted s" style="margin:4px 0 0">Mándala al grupo de WhatsApp para que la gente entre y confirme.</p><div style="white-space:pre-line;background:var(--bg);border-radius:14px;padding:14px;margin-top:12px;font-size:14px">${esc(shareText(m))}</div><button class="btn navy" data-act="copy" data-t="${esc(shareText(m))}">Copiar mensaje</button><button class="btn link" data-act="bg">Listo</button>`);break}
     case'share':{const m=M()||S.matches.find(x=>x.id===id);copy(shareText(S.matches.find(x=>x.id===id)));break}
-    case'closeconv':{const m=S.matches.find(x=>x.id===id);sheet(`<h2>CERRAR CONVOCATORIA</h2><p class="muted s" style="margin:6px 0 0">Van ${m.convocados.length}. La cuota queda en <b>${cop(cuotaCalc(cancha(m).valor,m.convocados.length))}</b> (${cop(cancha(m).valor)} ÷ ${m.convocados.length}). Nadie más podrá entrar ni bajarse.</p><button class="btn navy" data-act="closeok" data-id="${m.id}">Cerrar y fijar cuota</button><button class="btn link" data-act="bg">Cancelar</button>`);break}
-    case'closeok':{const m=S.matches.find(x=>x.id===id);closeConv(m);save();close();render();toast('Convocatoria cerrada. Ya pueden pagar.');break}
+    case'closeconv':{const m=S.matches.find(x=>x.id===id);sheet(`<h2>CERRAR CONVOCATORIA</h2><p class="muted s" style="margin:6px 0 0">Van ${m.convocados.length}. La cuota queda en <b>${cop(cuotaCalc(cancha(m).valor,m.convocados.length))}</b> (${cop(cancha(m).valor)} ÷ ${m.convocados.length}). Nadie más podrá entrar ni bajarse. Se paga al terminar el partido.</p><button class="btn navy" data-act="closeok" data-id="${m.id}">Cerrar y fijar cuota</button><button class="btn link" data-act="bg">Cancelar</button>`);break}
+    case'closeok':{const m=S.matches.find(x=>x.id===id);closeConv(m);save();close();render();toast('Convocatoria cerrada. Cuota fijada.');break}
     case'newt':sheet(`<h2>NUEVO TORNEO</h2><p class="muted s" style="margin:4px 0 0">Cuenta partidos ganados por Negro y Blanco.</p><label class="f">Nombre<input class="i" id="t-n" placeholder="Ej. Torneo de diciembre"></label><label class="f">Empieza<input class="i" id="t-i" type="date" value="${new Date().toISOString().slice(0,10)}"></label><label class="f">Semanas<input class="i" id="t-s" type="number" inputmode="numeric" value="6" min="1" max="52"></label><button class="btn navy" data-act="savet">Crear torneo</button>`);break;
     case'savet':{const n=$('#t-n').value.trim()||'Torneo';const i=$('#t-i').value;const w=Number($('#t-s').value)||6;if(!i){toast('Elige la fecha');return}S.torneos.push({id:'t'+uid(),nombre:n,inicio:i,semanas:w});filt='tor';save();close();render();toast('Torneo creado');break}
     case'tadmin':{const p=pl(id);p.admin=!p.admin;save();render();break}
