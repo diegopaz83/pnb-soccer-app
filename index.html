@@ -304,6 +304,11 @@ input.i.money{font-size:24px;font-weight:800;letter-spacing:.5px}
 input.i.err{border-color:#FFB547;box-shadow:0 0 0 3px rgba(255,181,71,.25)}
 .fsave{position:sticky;bottom:calc(-22px - env(safe-area-inset-bottom));margin:18px -20px calc(-22px - env(safe-area-inset-bottom));padding:12px 20px calc(22px + env(safe-area-inset-bottom));background:linear-gradient(transparent,rgba(10,20,46,.96) 30%)}
 .nequi+.nequi{margin-top:8px}
+.kb{display:flex;align-items:center;gap:14px;margin-top:10px;padding:14px 16px;border-radius:16px;background:rgba(0,0,0,.28);border:1px solid var(--line)}
+.kb .kt{flex:1;min-width:0}.kb .kl{font-size:10px;font-weight:800;letter-spacing:1.4px;text-transform:uppercase;color:var(--neon)}
+.kb .kv{margin-top:4px;font:800 19px/1.2 Inter,system-ui,sans-serif;letter-spacing:.3px;color:#F2F6FF;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.kb .ks{margin-top:3px;font-size:12px;color:#93A4C8}
+.kb+.kb{margin-top:8px}
 .aw .sh{width:100%;margin-top:12px;min-height:46px;border-radius:14px;border:1px solid rgba(61,224,255,.4);background:transparent;color:#F2F6FF;font-weight:800;font-size:14px}
 </style>
 </head>
@@ -426,8 +431,8 @@ const me=()=>S.ses?.mode==='player'?pl(S.ses.id):null;
 const visor=()=>S.ses?.mode==='visor';
 const isAdmin=()=>!!me()?.admin;
 const fmtKey=k=>/^\d{10}$/.test(String(k))?String(k).replace(/(\d{3})(\d{3})(\d{4})/,'$1 $2 $3'):String(k||'');
-const keyBox=c=>{const row=(lbl,val,shown,msg)=>`<div class="nequi"><div style="flex:1;min-width:0"><div class="xs" style="color:#C9D3E6">${lbl} · ${esc(c.titular||'')}</div><div class="d" style="overflow:hidden;text-overflow:ellipsis">${esc(shown)}</div></div><button class="btn sm" data-act="copy" data-t="${esc(val)}" data-msg="${msg}">Copiar</button></div>`;
-  return (c.llave?row('Llave Bre-B · desde cualquier banco',c.llave,fmtKey(c.llave),'Llave copiada'):'')+(c.nequi?row('Nequi',c.nequi,fmtKey(c.nequi),'Nequi copiado'):'')};
+const keyBox=c=>{const row=(lbl,sub,val,shown,msg)=>`<div class="kb"><div class="kt"><div class="kl">${lbl}</div><div class="kv">${esc(shown)}</div><div class="ks">${esc(c.titular||'')}${sub?' · '+sub:''}</div></div><button class="btn sm" data-act="copy" data-t="${esc(val)}" data-msg="${msg}">Copiar</button></div>`;
+  return (c.llave?row('Llave Bre-B','desde cualquier banco',c.llave,fmtKey(c.llave),'Llave copiada'):'')+(c.nequi?row('Nequi','',c.nequi,fmtKey(c.nequi),'Nequi copiado'):'')};
 const cancha=m=>S.canchas.find(c=>c.id===m.canchaId)||{nombre:'Cancha por definir',valor:0,nequi:'',direccion:'',formato:''};
 const payMap=m=>{const o={};S.pays.filter(p=>p.matchId===m.id&&p.estado!=='rechazado').forEach(p=>p.cubre.forEach(id=>{o[id]=o[id]||p}));return o};
 const recogido=m=>S.pays.filter(p=>p.matchId===m.id&&p.estado!=='rechazado').reduce((a,p)=>a+p.monto,0);
