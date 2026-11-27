@@ -293,6 +293,10 @@ input.i,select.i{background:rgba(255,255,255,.06);color:var(--ink)}
 .aw .t3r .n{font:700 24px 'Bebas Neue',Impact,sans-serif;color:#F2F6FF;min-width:18px;text-align:right}
 .aw .t3e{margin-top:12px;font-size:13px;color:#93A4C8}
 .tk.rated::before{content:'';position:absolute;z-index:5;top:-3px;left:calc(50% - 22px);width:12px;height:12px;border-radius:50%;background:#3DE0FF;border:2px solid #0A142E}.tk.bn.rated::before{left:calc(50% - 17px)}
+.car.mix button.g .ic{background:rgba(61,224,255,.15);color:#3DE0FF}.car.mix button.b .ic{background:rgba(255,181,71,.15);color:#FFB547}
+.car.mix button.g.on{background:rgba(61,224,255,.1);border-color:#3DE0FF}.car.mix button.b.on{background:rgba(255,181,71,.1);border-color:#FFB547}
+.car.mix button.g.picked{box-shadow:0 0 0 3px rgba(61,224,255,.35),0 0 24px rgba(61,224,255,.5)}.car.mix button.b.picked{box-shadow:0 0 0 3px rgba(255,181,71,.35),0 0 24px rgba(255,181,71,.5)}
+.car.mix button.b:first-of-type,.car.mix button.g+button.b{margin-left:10px}
 .aw .sh{width:100%;margin-top:12px;min-height:46px;border-radius:14px;border:1px solid rgba(61,224,255,.4);background:transparent;color:#F2F6FF;font-weight:800;font-size:14px}
 </style>
 </head>
@@ -313,7 +317,7 @@ input.i,select.i{background:rgba(255,255,255,.06);color:var(--ink)}
 </defs></svg>
 <script>
 {
-const KEY='fuchibol_club_v10';
+const KEY='fuchibol_club_v11';
 const CUPO={'5 vs 5':14,'7 vs 7':18};
 const ROL={ARQ:'Arquero',DEF:'Defensa',MED:'Medio',DEL:'Delantero'};
 const PIE=['Diestro','Zurdo','Ambidiestro'];
@@ -398,8 +402,8 @@ function seed(){
   lastM.convocados.forEach(v=>{if(['p2','p5','p6'].includes(v)||rnd()<.3)return;const o=lastM.convocados.filter(x=>x!==v);
     const vv=votes[v]={};
     if(rnd()<.85){const t=['p14','p4','p11','p6'].filter(x=>x!==v)[Math.floor(rnd()*3)];(vv[t]=vv[t]||{}).good=TAGS_OK[Math.floor(rnd()*4)]}
-    if(rnd()<.75){const t=['p13','p15','p9'].filter(x=>x!==v)[Math.floor(rnd()*2)];(vv[t]=vv[t]||{}).bad=TAGS_BAD[Math.floor(rnd()*4)]}
-    if(rnd()<.4){const t=o[Math.floor(rnd()*o.length)];(vv[t]=vv[t]||{}).good=vv[t].good||TAGS_OK[Math.floor(rnd()*4)]}});
+    if(rnd()<.75){const t=['p13','p15','p9'].filter(x=>x!==v)[Math.floor(rnd()*2)];vv[t]={};vv[t].bad=TAGS_BAD[Math.floor(rnd()*4)]}
+    if(rnd()<.4){const t=o[Math.floor(rnd()*o.length)];if(!vv[t])vv[t]={good:TAGS_OK[Math.floor(rnd()*4)]}}});
   lastM.post={votes};
   const torneos=[{id:'t1',nombre:'Torneo de noviembre',inicio:'2026-11-08',semanas:6}];
   return {players:P,canchas,matches,pays,torneos,ses:null};
@@ -684,14 +688,14 @@ function awards(m){if(!postOpen(m))return'';const P=post(m),y=me(),can=y&&m.conv
   ${top3()}
   <div class="bar">${Array.from({length:tot},(_,i)=>`<i class="${i<voters?'on':''}"></i>`).join('')}</div>
   <div class="meta"><span>Votaron ${voters} de ${tot}</span><span>${nx?'Cierra '+esc(fShort(nx.fecha)):'Cierra al próximo partido'}</span></div>
-  ${can?(done?'<p class="dn">Ya calificaste a todos. A ver quién cae.</p>':`<button class="go" data-act="hintpitch">Llamar al VAR · te falta${left>1?'n':''} ${left}</button><p class="hn">Toca a cualquier jugador en la cancha y dale una buena y/o una mala. Nadie sabrá que fuiste tú.</p>`):''}</section>`}
+  ${can?`<button class="go" data-act="hintpitch">Llamar al VAR</button><p class="hn">Toca al que quieras en la cancha y ponle una etiqueta. Nadie sabrá que fuiste tú.</p>`:''}</section>`}
 function sheetPost(id){const m=S.matches.find(x=>x.id===boardM),p=pl(id),y=me(),open=postOpen(m),can=y&&m.convocados.includes(y.id)&&open&&y.id!==id,mine=y&&post(m).votes[y.id]?.[id]||{};
   const g=m.goals.filter(x=>x.playerId===id).length,team=m.board?.[id]?.team||'N',r=received(m,id);
-  const chips=(k,list)=>carousel(k,list,t=>mine[k]===t,'givedirect',`data-id="${id}"`);
+  const mix=`<div class="car mix">${[...tagsFor(id,'good').map(t=>['good',t]),...tagsFor(id,'bad').map(t=>['bad',t])].map(([k,t])=>`<button class="${k==='good'?'g':'b'}${mine[k]===t?' on':''}" data-act="givedirect" data-k="${k}" data-v="${esc(t)}" data-id="${id}"><span class="ic">${ticon(t)}</span><b>${esc(t)}</b><small>${esc(TDESC[t]||'')}</small></button>`).join('')}</div>`;
   const got=[...Object.entries(r.good).map(([t,c])=>`<span class="tag ok" style="display:inline-flex;align-items:center;gap:4px">${ticon(t,14)}${esc(t)}${c>1?' · '+c:''}</span>`),...Object.entries(r.bad).map(([t,c])=>`<span class="tag no" style="display:inline-flex;align-items:center;gap:4px">${ticon(t,14)}${esc(t)}${c>1?' · '+c:''}</span>`)].join('');
   sheet(`<div style="display:flex;gap:12px;align-items:center">${av(p,'lg')}<div><div class="kick" style="color:var(--mute)">${TEAM[team]} · ${esc(ROL[p.rol])}</div><h2 style="font-size:26px;margin-top:4px">${esc(p.nombre.toUpperCase())}</h2><div class="s muted" style="margin-top:4px">${g} gol${g===1?'':'es'} en este partido</div></div></div>
   ${got?`<div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:12px">${got}</div>`:''}
-  ${can?`<label class="f">Dale una buena <span class="xs muted" style="font-weight:500">· desliza</span></label>${chips('good',tagsFor(id,'good'))}<label class="f">o una mala</label>${chips('bad',tagsFor(id,'bad'))}<p class="xs muted" style="margin:10px 0 0">A cada jugador le puedes dar una buena y una mala. Si eliges otra, reemplaza la anterior.</p>`:''}`)}
+  ${can?`<label class="f">¿Qué hizo? <span class="xs muted" style="font-weight:500">· desliza</span></label>${mix}<p class="xs muted" style="margin:10px 0 0">Una sola etiqueta por jugador. Si eliges otra, reemplaza la anterior.</p>`:''}`)}
 let galM=null,galIdx=0;
 function openGal(payId){const p0=S.pays.find(x=>x.id===payId);galM=p0.matchId;const list=S.pays.filter(x=>x.matchId===galM).sort((a,b)=>a.ts-b.ts);galIdx=Math.max(0,list.findIndex(x=>x.id===payId));drawGal()}
 function drawGal(){const m=S.matches.find(x=>x.id===galM),c=cancha(m),list=S.pays.filter(x=>x.matchId===galM).sort((a,b)=>a.ts-b.ts);if(!list.length){close();return}
@@ -806,7 +810,7 @@ document.addEventListener('click',async e=>{
     case'pickb':boardM=id;render();break;
     case'bmode':{boardMode=t.dataset.v;const f=finished();boardM=boardMode==='hist'?(f[1]?.id||f[0]?.id):(upcoming().find(x=>x.estado==='cerrada')||f[0]||upcoming()[0])?.id;render();break}
     case'givep':case'givedirect':case'ungive':{if(a==='givedirect'&&!t.dataset.done){t.dataset.done='1';t.classList.add('picked');setTimeout(()=>t.click(),430);return}lastPop=t.dataset.id+t.dataset.k;setTimeout(()=>{lastPop=null},900);const m=S.matches.find(x=>x.id===boardM),y=me().id,P=post(m),V=P.votes[y]=P.votes[y]||{},v=V[id]=V[id]||{},k=t.dataset.k;
-      if(a==='ungive')v[k]=null;else{const tag=t.dataset.v;v[k]=v[k]===tag?null:tag}
+      if(a==='ungive')v[k]=null;else{const tag=t.dataset.v;v[k]=v[k]===tag?null:tag;v[k==='good'?'bad':'good']=null}
       save();render();close();toast(v[k]?`${v[k]} → ${first(pl(id))}`:'Quitado');break}
     case'auto':{const m=S.matches.find(x=>x.id===boardM);autoBoard(m,S.players);save();render();toast('Equipos armados por posición');break}
     case'score':drawScore(id);break;
