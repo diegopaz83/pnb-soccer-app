@@ -97,7 +97,7 @@ h1,h2,h3{margin:0}
 .pitch{position:relative;margin:14px 16px 0;aspect-ratio:939/1400;border-radius:22px;overflow:hidden;background:var(--navy2);touch-action:pan-y;user-select:none}
 .pitch>img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;pointer-events:none}
 .pitch.old>img{filter:grayscale(1) brightness(.85)}.pitch.old .tk .c{filter:grayscale(.6)}
-.goalb{position:absolute;z-index:5;top:-6px;right:10px;display:flex;align-items:center;gap:2px;background:#fff;color:var(--navy);border-radius:99px;padding:1px 5px 1px 2px;font-size:10px;font-weight:800;box-shadow:0 1px 4px rgba(0,0,0,.35)}
+.goalb{position:absolute;z-index:5;top:-7px;left:calc(50% + 9px);width:22px;height:22px;filter:drop-shadow(0 2px 3px rgba(0,0,0,.55))}.goalb svg{display:block}.goalb i{position:absolute;left:15px;bottom:-6px;min-width:16px;height:16px;padding:0 4px;border-radius:99px;background:#3DE0FF;color:#04121F;font:900 10px/16px Inter,system-ui,sans-serif;font-style:normal;text-align:center;border:2px solid #0A142E}.tk.bn .goalb{width:18px;height:18px;left:calc(50% + 4px);top:-6px}.tk.bn .goalb i{left:11px}
 .pitch::after{content:"";position:absolute;inset:0;background:rgba(11,23,54,.15);pointer-events:none}
 .tk{position:absolute;margin:-21px 0 0 -38px;display:flex;flex-direction:column;align-items:center;gap:3px;width:76px;touch-action:manipulation;cursor:pointer}
 .pitch.edit .tk{touch-action:none;cursor:grab}
@@ -317,7 +317,7 @@ input.i,select.i{background:rgba(255,255,255,.06);color:var(--ink)}
 </defs></svg>
 <script>
 {
-const KEY='fuchibol_club_v11';
+const KEY='fuchibol_club_v12';
 const CUPO={'5 vs 5':14,'7 vs 7':18};
 const ROL={ARQ:'Arquero',DEF:'Defensa',MED:'Medio',DEL:'Delantero'};
 const PIE=['Diestro','Zurdo','Ambidiestro'];
@@ -328,6 +328,7 @@ const HEAD={Crack:n=>`${n} la rompió y nadie lo paró`,Muralla:n=>`Por donde es
 Paquete:n=>`${n}: más estorbo que ayuda`,Chupón:n=>`${n} todavía tiene el balón`,'Llegó tarde':n=>`${n} llegó al segundo tiempo`,Fantasma:n=>`¿Alguien vio a ${n}?`,
 Pulpo:n=>`${n} lo atajó todo`,Gato:n=>`${n} con reflejos de gato`,Volador:n=>`${n} voló a todas`,Líbero:n=>`${n} salió jugando desde el arco`,
 Tanga:n=>`A ${n} se la pusieron toda la noche`,Mantequilla:n=>`A ${n} se le resbaló todo`,Colador:n=>`El arco de ${n} fue un colador`,Estatua:n=>`${n} ni se movió`};
+const BALL='<svg width="100%" height="100%" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="11" fill="#fff" stroke="#0B1736" stroke-width="1.3"/><path d="M12 7.4l4.4 3.2-1.7 5.1H9.3l-1.7-5.1z" fill="#0B1736"/><g stroke="#0B1736" stroke-width="1.2" fill="none"><path d="M12 7.4V2M16.4 10.6l5-1.7M14.7 15.7l3.1 4.3M9.3 15.7l-3.1 4.3M7.6 10.6l-5-1.7"/></g><path d="M9.4 1.4L12 2l2.6-.6A11 11 0 0 0 9.4 1.4zM21.6 7.6l.3 3.1 1-1.6a11 11 0 0 0-1.3-1.5zM19.4 20.6l-1.6-.6-1 2.4a11 11 0 0 0 2.6-1.8zM4.6 20.6a11 11 0 0 0 2.6 1.8l-1-2.4zM1.1 9.1l1 1.6.3-3.1a11 11 0 0 0-1.3 1.5z" fill="#0B1736"/></svg>';
 const tagsFor=(id,k)=>{const a=(typeof S!=='undefined'&&S&&S.players?pl(id):null)?.rol==='ARQ';return k==='good'?(a?GK_OK:TAGS_OK):(a?GK_BAD:TAGS_BAD)};
 const TDESC={Bestia:'Imparable',Crack:'La rompió',Muralla:'No pasó nadie',Pulpo:'Lo atajó todo',Pulmón:'Corrió por todos',Mago:'Puro lujo',Cañonero:'Qué remate',Paquete:'Más estorbo que ayuda',Tanga:'Se la pusieron toda la noche','Llegó tarde':'Llegó al segundo tiempo',Tronco:'Ni una buena',Chupón:'No la soltó nunca',Fantasma:'¿Vino a jugar?',Actor:'Se tiró en todas',Gato:'Puro reflejo',Volador:'Voló a todas',Líbero:'Salió jugando',Mantequilla:'Se le resbaló todo',Colador:'Le entró todo',Estatua:'Ni se movió'};
 const TI={
@@ -390,7 +391,7 @@ function seed(){
   const scorersN=['p2','p4','p0','p9','p2','p10'],scorersB=['p14','p6','p13','p14','p12'];
   const matches=[];let d='2026-09-13';
   scores.forEach(([a,b],k)=>{const c=canchas[k%3===2?1:0];const conv=c.formato==='5 vs 5'?all.slice(0,14):all;
-    const goals=[];for(let i=0;i<a;i++)goals.push({id:uid(),playerId:scorersN[(k+i)%scorersN.length],team:'N'});for(let i=0;i<b;i++)goals.push({id:uid(),playerId:scorersB[(k+i)%scorersB.length],team:'B'});
+    const goals=[];for(let i=0;i<a;i++)goals.push({id:uid(),playerId:scorersN[(k+i)%scorersN.length],team:'N'});for(let i=0;i<b;i++)goals.push({id:uid(),playerId:scorersB[(k+Math.floor(i/2))%scorersB.length],team:'B'});
     const m={id:'m'+k,fecha:d,hora:k%2?'19:00':'20:00',canchaId:c.id,fmt:c.formato,cupo:CUPO[c.formato],cuota:cuotaCalc(c.valor,conv.slice(0,CUPO[c.formato]).length),convocados:conv.slice(0,CUPO[c.formato]),estado:'finalizado',goals,board:{}};
     autoBoard(m,P);matches.push(m);d=addDays(d,7)});
   const nx={id:'mx',fecha:'2026-11-29',hora:'20:00',canchaId:'c1',fmt:'7 vs 7',cupo:18,cuota:cuotaCalc(270000,12),convocados:all.slice(0,12),estado:'cerrada',goals:[],board:{}};P.forEach(p=>{});autoBoard(nx,P);matches.push(nx);
@@ -587,7 +588,7 @@ function vPizarra(){
   const old=fin&&!postOpen(m);
   return hero+chips+(fin?awards(m):'')+`<div class="pitch${old?' old':''}${isAdmin()&&!fin?' edit':''}" id="pitch"><img src="${IMG.cancha}" alt="Cancha">
     <span class="plabel" style="top:12px;background:#111;color:#fff">NEGRO · ${cnt('N')} JUG.</span>${bench('N').length?'<span class="blabel" style="top:12px">CAMBIO</span>':''}${bench('B').length?'<span class="blabel" style="bottom:12px">CAMBIO</span>':''}<span class="plabel" style="bottom:12px;background:#fff;color:var(--navy)">BLANCO · ${cnt('B')} JUG.</span>
-    ${[...on,...['N','B'].flatMap(t=>bench(t).map((id,k)=>[id,{team:t,bn:1,x:92,y:t==='N'?13+k*8.5:86-k*8.5}]))].map(([id,v])=>{const p=pl(id);if(!p)return'';const f=img(p.foto),g=gcount(id);return`<div class="tk ${v.team}${v.bn?' bn':''}${postOpen(m)&&me()&&me().id===id?' me':''}${postOpen(m)&&me()&&ratedBy(m,me().id).includes(id)?' rated':''}" data-id="${id}" style="left:${v.x}%;top:${v.y}%"><div class="c">${f?`<img src="${f}" alt="">`:esc(p.dorsal||ini(p.nombre))}</div>${g?`<b class="goalb"><svg width="12" height="12" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10" fill="#fff" stroke="#0B1736" stroke-width="2"/><path d="M12 7.5l4 2.9-1.5 4.7h-5L8 10.4z" fill="#0B1736"/></svg>${g>1?g:''}</b>`:''}<span>${esc(first(p))}</span>${(()=>{const r=rc(id),g=topTag(r.good),b2=topTag(r.bad);return (g?`<em class="rt${lastPop===id+'good'?' pop':''}" style="background:#3DE0FF;color:#04121F;display:flex;align-items:center;gap:3px">${ticon(g[0],11)}${esc(g[0])}</em>`:'')+(b2?`<em class="rt${lastPop===id+'bad'?' pop':''}" style="background:#FFB547;color:#1F1405;display:flex;align-items:center;gap:3px">${ticon(b2[0],11)}${esc(b2[0])}</em>`:'')})()}</div>`}).join('')}</div>
+    ${[...on,...['N','B'].flatMap(t=>bench(t).map((id,k)=>[id,{team:t,bn:1,x:89,y:t==='N'?13+k*8.5:86-k*8.5}]))].map(([id,v])=>{const p=pl(id);if(!p)return'';const f=img(p.foto),g=gcount(id);return`<div class="tk ${v.team}${v.bn?' bn':''}${postOpen(m)&&me()&&me().id===id?' me':''}${postOpen(m)&&me()&&ratedBy(m,me().id).includes(id)?' rated':''}" data-id="${id}" style="left:${v.x}%;top:${v.y}%"><div class="c">${f?`<img src="${f}" alt="">`:esc(p.dorsal||ini(p.nombre))}</div>${g?`<b class="goalb">${BALL}${g>1?`<i>${g}</i>`:''}</b>`:''}<span>${esc(first(p))}</span>${(()=>{const r=rc(id),g=topTag(r.good),b2=topTag(r.bad);return (g?`<em class="rt${lastPop===id+'good'?' pop':''}" style="background:#3DE0FF;color:#04121F;display:flex;align-items:center;gap:3px">${ticon(g[0],11)}${esc(g[0])}</em>`:'')+(b2?`<em class="rt${lastPop===id+'bad'?' pop':''}" style="background:#FFB547;color:#1F1405;display:flex;align-items:center;gap:3px">${ticon(b2[0],11)}${esc(b2[0])}</em>`:'')})()}</div>`}).join('')}</div>
   <p class="muted xs" style="margin:8px 16px 0">${fin?(postOpen(m)?'Postpartido: toca a un jugador (también los del cambio) para darle una buena o una mala. Máximo una de cada una.':'Así quedó el partido.'):'Los que no están en la cancha son el cambio de su equipo.'}</p>
   
   ${isAdmin()&&!fin?`<div style="padding:0 16px"><button class="btn navy" data-act="auto">Alinear automático por posición</button></div>`:''}`;
