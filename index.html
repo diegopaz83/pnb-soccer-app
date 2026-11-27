@@ -125,6 +125,12 @@ input.i:focus,select.i:focus{border-color:var(--sky);outline:0}
 .goalbtns{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}
 .goalbtns button{min-height:62px;border-radius:16px;font-weight:800;font-size:16px}
 .gN{background:#111;color:#fff}.gB{background:#fff;color:var(--navy);border:2px solid var(--navy)!important}
+.car{display:flex;gap:10px;overflow-x:auto;scroll-snap-type:x mandatory;padding:4px 2px 10px;margin:6px -20px 0;padding-inline:20px;scrollbar-width:none}.car::-webkit-scrollbar{display:none}
+.car button{flex:0 0 96px;scroll-snap-align:start;display:flex;flex-direction:column;align-items:center;gap:6px;padding:12px 6px;border-radius:18px;background:var(--bg);border:2px solid transparent;text-align:center}
+.car button .ic{width:54px;height:54px;border-radius:50%;display:grid;place-items:center}
+.car.good .ic{background:var(--ok-soft);color:var(--ok)}.car.bad .ic{background:var(--bad-soft);color:var(--bad)}
+.car button b{font-size:14px;line-height:1.1}.car button small{font-size:11px;color:var(--mute);line-height:1.2}
+.car.good button.on{border-color:var(--ok);background:#fff}.car.bad button.on{border-color:var(--bad);background:#fff}
 .pgrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:12px}
 .pgrid button{display:flex;flex-direction:column;align-items:center;gap:6px;padding:12px 4px;border-radius:16px;background:var(--bg);font-weight:700;font-size:13px;line-height:1.2}
 .debt{display:inline-flex;align-items:center;gap:6px;height:34px;padding:0 12px;border-radius:99px;background:var(--sky);color:var(--navy);font-size:13px;font-weight:800;white-space:nowrap}
@@ -168,13 +174,30 @@ input.i:focus,select.i:focus{border-color:var(--sky);outline:0}
 </defs></svg>
 <script>
 {
-const KEY='fuchibol_club_v7';
+const KEY='fuchibol_club_v8';
 const CUPO={'5 vs 5':14,'7 vs 7':18};
 const ROL={ARQ:'Arquero',DEF:'Defensa',MED:'Medio',DEL:'Delantero'};
 const PIE=['Diestro','Zurdo','Ambidiestro'];
 const TEAM={N:'Negro',B:'Blanco'};
-const TAGS_OK=['Muralla','Golazo','Pulmón','Crack','Salvó el partido','Buen compañero'];
-const TAGS_BAD=['Llegó tarde','Se perdió el gol del año','Chupó','Desaparecido','Tronco','Puro drama'];
+const TAGS_OK=['Bestia','Crack','Muralla','Pulpo','Pulmón','Mago','Cañonero'];
+const TAGS_BAD=['Paquete','Tanga','Llegó tarde','Tronco','Chupón','Fantasma','Actor'];
+const TDESC={Bestia:'Imparable',Crack:'La rompió',Muralla:'No pasó nadie',Pulpo:'Lo atajó todo',Pulmón:'Corrió por todos',Mago:'Puro lujo',Cañonero:'Qué remate',Paquete:'Más estorbo que ayuda',Tanga:'Se la pusieron toda la noche','Llegó tarde':'Llegó al segundo tiempo',Tronco:'Ni una buena',Chupón:'No la soltó nunca',Fantasma:'¿Vino a jugar?',Actor:'Se tiró en todas'};
+const TI={
+Bestia:'<path d="M5 6c0 3 2 5 4 5M19 6c0 3-2 5-4 5"/><path d="M8 10h8l1 5c0 3-2 5-5 5s-5-2-5-5z"/><circle cx="10" cy="14" r=".8" fill="currentColor"/><circle cx="14" cy="14" r=".8" fill="currentColor"/><path d="M10.5 18h3"/>',
+Crack:'<path d="M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1-4.4-4.3 6.1-.9z"/>',
+Muralla:'<rect x="3" y="5" width="18" height="14" rx="1"/><path d="M3 9.7h18M3 14.3h18M9 5v4.7M15 5v4.7M6 9.7v4.6M12 9.7v4.6M18 9.7v4.6M9 14.3V19M15 14.3V19"/>',
+Pulpo:'<path d="M7 11a5 5 0 0110 0v2H7z"/><path d="M8 13c0 3-2 4-3 6M10.5 13c0 3-1 5-1.5 7M13.5 13c0 3 1 5 1.5 7M16 13c0 3 2 4 3 6"/><circle cx="10" cy="9.5" r=".8" fill="currentColor"/><circle cx="14" cy="9.5" r=".8" fill="currentColor"/>',
+Pulmón:'<path d="M12 4v8M12 9c-1 1-3 1-3 1M12 9c1 1 3 1 3 1"/><path d="M9 8C6 8 4 12 4 16c0 2 1 3 3 3 2 0 3-1 3-3v-6M15 8c3 0 5 4 5 8 0 2-1 3-3 3-2 0-3-1-3-3v-6"/>',
+Mago:'<path d="M12 3l6 15H6z"/><path d="M4 18h16"/><path d="M10.5 9.5l1 .5M12.5 12.5l1 .5"/>',
+Cañonero:'<circle cx="7" cy="15" r="4"/><path d="M10 13l9-6M11.5 15.5L20 12"/><path d="M17 4l2 3M21 9l-2 1"/>',
+Paquete:'<path d="M3 8l9-4 9 4v9l-9 4-9-4z"/><path d="M3 8l9 4 9-4M12 12v9M7.5 6l9 4"/>',
+Tanga:'<path d="M3 7h18l-7 9h-4z"/><path d="M3 7c3 1 6 2 7 9M21 7c-3 1-6 2-7 9"/>',
+'Llegó tarde':'<circle cx="12" cy="13" r="8"/><path d="M12 9v4l3 2M9 3h6M18.5 6.5l1.5-1.5"/>',
+Tronco:'<ellipse cx="6" cy="12" rx="3" ry="5"/><path d="M6 7h13c2 0 2 10 0 10H6"/><ellipse cx="6" cy="12" rx="1.2" ry="2"/>',
+Chupón:'<circle cx="10" cy="9" r="6"/><path d="M14 13l6 7"/><path d="M10 5a4 4 0 014 4M7 9a3 3 0 003 3"/>',
+Fantasma:'<path d="M5 20V11a7 7 0 0114 0v9l-2.3-2-2.4 2-2.3-2-2.3 2-2.4-2z"/><circle cx="9.5" cy="11" r="1" fill="currentColor"/><circle cx="14.5" cy="11" r="1" fill="currentColor"/>',
+Actor:'<path d="M4 5h9v6a4.5 4.5 0 01-9 0z"/><path d="M11 9h9v6a4.5 4.5 0 01-9 0"/><path d="M6.5 8.5h1M9.5 8.5h1M13.5 13h1M16.5 13h1M6.5 12.5c.8.7 2.2.7 3 0M14 17c.8-.7 2.2-.7 3 0"/>'};
+const ticon=(t,sz=26)=>`<svg width="${sz}" height="${sz}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${TI[t]||'<circle cx="12" cy="12" r="8"/>'}</svg>`;
 
 const IMG={estadio:'img/estadio.jpg',esquina:'img/esquina.jpg',balon:'img/balon.jpg',guayos:'img/guayos.jpg',cancha:'img/cancha.jpg'};
 const SL={'7 vs 7':[[50,90],[28,78],[72,78],[20,64],[50,67],[80,64],[50,56]],'5 vs 5':[[50,90],[30,76],[70,76],[34,60],[66,60]]};
@@ -224,7 +247,7 @@ function seed(){
   const lastM=matches.filter(m=>m.estado==='finalizado').pop();const votes={};
   lastM.convocados.forEach(v=>{if(['p2','p5','p6'].includes(v)||rnd()<.3)return;const o=lastM.convocados.filter(x=>x!==v);
     votes[v]={good:rnd()<.85?{pid:['p14','p4','p11','p6'].filter(x=>x!==v)[Math.floor(rnd()*3)],tag:TAGS_OK[Math.floor(rnd()*TAGS_OK.length)]}:null,
-              bad:rnd()<.75?{pid:['p13','p15','p9'].filter(x=>x!==v)[Math.floor(rnd()*2)],tag:TAGS_BAD[Math.floor(rnd()*3)]}:null}});
+              bad:rnd()<.75?{pid:['p13','p15','p9'].filter(x=>x!==v)[Math.floor(rnd()*2)],tag:TAGS_BAD[Math.floor(rnd()*4)]}:null}});
   lastM.post={votes};
   const torneos=[{id:'t1',nombre:'Torneo de noviembre',inicio:'2026-11-08',semanas:6}];
   return {players:P,canchas,matches,pays,torneos,ses:null};
@@ -388,7 +411,7 @@ function vPizarra(){
   const old=fin&&!postOpen(m);
   return hero+chips+`<div class="pitch${old?' old':''}" id="pitch"><img src="${IMG.cancha}" alt="Cancha">
     <span class="plabel" style="top:12px;background:#111;color:#fff">NEGRO · ${cnt('N')} JUG.</span><span class="plabel" style="bottom:12px;background:#fff;color:var(--navy)">BLANCO · ${cnt('B')} JUG.</span>
-    ${on.map(([id,v])=>{const p=pl(id);if(!p)return'';const f=img(p.foto),g=gcount(id);return`<div class="tk ${v.team}" data-id="${id}" style="left:${v.x}%;top:${v.y}%"><div class="c">${f?`<img src="${f}" alt="">`:esc(p.dorsal||ini(p.nombre))}</div>${g?`<b class="goalb"><svg width="12" height="12" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10" fill="#fff" stroke="#0B1736" stroke-width="2"/><path d="M12 7.5l4 2.9-1.5 4.7h-5L8 10.4z" fill="#0B1736"/></svg>${g>1?g:''}</b>`:''}<span>${esc(first(p))}</span>${(()=>{const r=rc(id),g=topTag(r.good),b2=topTag(r.bad);return (g?`<em class="rt" style="background:#E3F4EA;color:#1E7A4A">${esc(g[0])}</em>`:'')+(b2?`<em class="rt" style="background:#D92D20;color:#fff">${esc(b2[0])}</em>`:'')})()}</div>`}).join('')}</div>
+    ${on.map(([id,v])=>{const p=pl(id);if(!p)return'';const f=img(p.foto),g=gcount(id);return`<div class="tk ${v.team}" data-id="${id}" style="left:${v.x}%;top:${v.y}%"><div class="c">${f?`<img src="${f}" alt="">`:esc(p.dorsal||ini(p.nombre))}</div>${g?`<b class="goalb"><svg width="12" height="12" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10" fill="#fff" stroke="#0B1736" stroke-width="2"/><path d="M12 7.5l4 2.9-1.5 4.7h-5L8 10.4z" fill="#0B1736"/></svg>${g>1?g:''}</b>`:''}<span>${esc(first(p))}</span>${(()=>{const r=rc(id),g=topTag(r.good),b2=topTag(r.bad);return (g?`<em class="rt" style="background:#E3F4EA;color:#1E7A4A;display:flex;align-items:center;gap:3px">${ticon(g[0],11)}${esc(g[0])}</em>`:'')+(b2?`<em class="rt" style="background:#D92D20;color:#fff;display:flex;align-items:center;gap:3px">${ticon(b2[0],11)}${esc(b2[0])}</em>`:'')})()}</div>`}).join('')}</div>
   <p class="muted xs" style="margin:8px 16px 0">${fin?(postOpen(m)?'Postpartido: da máximo una buena y una mala. Se borra cuando arranque el próximo partido.':'Así quedó el partido.'):'Los que no están en la cancha son el cambio de su equipo.'}</p>
   ${fin?postCards(m):''}${row('N')}${row('B')}
   ${isAdmin()&&!fin?`<div style="padding:0 16px"><button class="btn navy" data-act="auto">Alinear automático por posición</button></div>`:''}`;
@@ -466,10 +489,11 @@ function drawScore(id){const m=S.matches.find(x=>x.id===id),s=score(m),a=isAdmin
   <div style="margin-top:12px">${m.goals.map((g,i)=>`<div class="li"><span class="kit ${g.team}" style="width:24px;height:24px;margin:0;border-width:2px;border-color:var(--navy);box-shadow:none"></span><div class="nm">${g.playerId?esc(pl(g.playerId)?.nombre||'?'):'Autogol / otro'}<small>Gol ${i+1} · ${TEAM[g.team]}</small></div>${a?`<button class="btn sm gray" data-act="ungoal" data-m="${m.id}" data-i="${i}">Quitar</button>`:''}</div>`).join('')||'<div class="empty">Sin goles todavía.</div>'}</div>
   ${a?(m.estado!=='finalizado'?`<button class="btn navy" data-act="finish" data-m="${m.id}">Terminar partido</button>`:`<button class="btn link" data-act="reopen" data-m="${m.id}">Reabrir partido</button>`):''}`)}
 let giveTag={good:TAGS_OK[0],bad:TAGS_BAD[0]};
+const carousel=(k,list,isOn,act,extra)=>`<div class="car ${k}">${list.map(t=>`<button class="${isOn(t)?'on':''}" data-act="${act}" data-k="${k}" data-v="${esc(t)}" ${extra||''}><span class="ic">${ticon(t)}</span><b>${esc(t)}</b><small>${esc(TDESC[t]||'')}</small></button>`).join('')}</div>`;
 function postCards(m){if(!postOpen(m))return'';const y=me(),P=post(m),mine=y&&P.votes[y.id]||{},can=y&&m.convocados.includes(y.id);
   const agg={};Object.values(P.votes).forEach(v=>['good','bad'].forEach(k=>{const x=v[k];if(!x)return;const key=k+'|'+x.pid+'|'+x.tag;agg[key]=(agg[key]||0)+1}));
   const rows=k=>{const by={};Object.entries(agg).filter(([key])=>key.startsWith(k)).forEach(([key,c])=>{const[,pid,tag]=key.split('|');(by[pid]=by[pid]||[]).push([tag,c])});
-    return Object.entries(by).sort((a,b)=>b[1].reduce((x,y)=>x+y[1],0)-a[1].reduce((x,y)=>x+y[1],0)).map(([pid,tags])=>`<div class="li" style="align-items:flex-start">${av(pl(pid),'sm')}<div class="nm">${esc(first(pl(pid)))}<div style="display:flex;flex-wrap:wrap;gap:4px;margin-top:4px">${tags.sort((a,b)=>b[1]-a[1]).map(([tg,c])=>`<span class="tag ${k==='good'?'ok':'no'}">${esc(tg)}${c>1?' · '+c:''}</span>`).join('')}</div></div></div>`).join('')};
+    return Object.entries(by).sort((a,b)=>b[1].reduce((x,y)=>x+y[1],0)-a[1].reduce((x,y)=>x+y[1],0)).map(([pid,tags])=>`<div class="li" style="align-items:flex-start">${av(pl(pid),'sm')}<div class="nm">${esc(first(pl(pid)))}<div style="display:flex;flex-wrap:wrap;gap:4px;margin-top:4px">${tags.sort((a,b)=>b[1]-a[1]).map(([tg,c])=>`<span class="tag ${k==='good'?'ok':'no'}" style="display:inline-flex;align-items:center;gap:4px">${ticon(tg,14)}${esc(tg)}${c>1?' · '+c:''}</span>`).join('')}</div></div></div>`).join('')};
   const mineBtn=k=>{const x=mine[k];return`<button class="btn sm ${k==='good'?'gray':'bad'}" style="width:100%;margin-top:0;min-height:48px" data-act="give" data-k="${k}">${x?`${esc(x.tag)} → ${esc(first(pl(x.pid)))}`:(k==='good'?'+ Dar una buena':'+ Dar una mala')}</button>`};
   return`<section class="card"><h3>Postpartido <small>se borra al arrancar el próximo</small></h3>
     ${can?`<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px">${mineBtn('good')}${mineBtn('bad')}</div>`:'<p class="xs muted" style="margin:8px 0 0">Solo los que jugaron pueden dar.</p>'}
@@ -477,16 +501,16 @@ function postCards(m){if(!postOpen(m))return'';const y=me(),P=post(m),mine=y&&P.
     ${!rows('good')&&!rows('bad')?'<div class="empty">Nadie ha dicho nada todavía.</div>':''}</section>`}
 function sheetGive(k){const m=S.matches.find(x=>x.id===boardM),y=me().id,mine=post(m).votes[y]?.[k],list=k==='good'?TAGS_OK:TAGS_BAD;if(mine)giveTag[k]=mine.tag;
   sheet(`<h2>${k==='good'?'UNA BUENA':'UNA MALA'}</h2><p class="muted s" style="margin:4px 0 0">Solo una por partido. Elige qué y a quién.</p>
-  <div class="opts" style="grid-template-columns:repeat(2,minmax(0,1fr))">${list.map(t=>`<button class="${giveTag[k]===t?'on':''}" data-act="gtag" data-k="${k}" data-v="${esc(t)}">${esc(t)}</button>`).join('')}</div>
+  ${carousel(k,list,t=>giveTag[k]===t,'gtag')}
   <label class="f">¿A quién?</label><div class="pgrid">${m.convocados.filter(id=>id!==y).map(id=>`<button data-act="givep" data-k="${k}" data-id="${id}" style="${mine?.pid===id?'outline:3px solid var(--sky)':''}">${av(pl(id))}${esc(first(pl(id)))}</button>`).join('')}</div>
   ${mine?`<button class="btn link" data-act="ungive" data-k="${k}">Quitar la que di</button>`:''}`)}
 function sheetPost(id){const m=S.matches.find(x=>x.id===boardM),p=pl(id),y=me(),open=postOpen(m),can=y&&m.convocados.includes(y.id)&&open&&y.id!==id,mine=y&&post(m).votes[y.id]||{};
   const g=m.goals.filter(x=>x.playerId===id).length,team=m.board?.[id]?.team||'N',r=received(m,id);
-  const chips=(k,list)=>`<div class="opts" style="grid-template-columns:repeat(3,minmax(0,1fr))">${list.map(t=>{const on=mine[k]?.pid===id&&mine[k]?.tag===t;return`<button class="${on?'on':''}" data-act="givedirect" data-k="${k}" data-id="${id}" data-v="${esc(t)}" style="min-height:40px;font-size:13px;${!on&&k==='bad'?'color:var(--bad)':''}">${esc(t)}</button>`}).join('')}</div>`;
-  const got=[...Object.entries(r.good).map(([t,c])=>`<span class="tag ok">${esc(t)}${c>1?' · '+c:''}</span>`),...Object.entries(r.bad).map(([t,c])=>`<span class="tag no">${esc(t)}${c>1?' · '+c:''}</span>`)].join('');
+  const chips=(k,list)=>carousel(k,list,t=>mine[k]?.pid===id&&mine[k]?.tag===t,'givedirect',`data-id="${id}"`);
+  const got=[...Object.entries(r.good).map(([t,c])=>`<span class="tag ok" style="display:inline-flex;align-items:center;gap:4px">${ticon(t,14)}${esc(t)}${c>1?' · '+c:''}</span>`),...Object.entries(r.bad).map(([t,c])=>`<span class="tag no" style="display:inline-flex;align-items:center;gap:4px">${ticon(t,14)}${esc(t)}${c>1?' · '+c:''}</span>`)].join('');
   sheet(`<div style="display:flex;gap:12px;align-items:center">${av(p,'lg')}<div><div class="kick" style="color:var(--mute)">${TEAM[team]} · ${esc(ROL[p.rol])}</div><h2 style="font-size:26px;margin-top:4px">${esc(p.nombre.toUpperCase())}</h2><div class="s muted" style="margin-top:4px">${g} gol${g===1?'':'es'} en este partido</div></div></div>
   ${got?`<div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:12px">${got}</div>`:''}
-  ${can?`<label class="f">Dale una buena</label>${chips('good',TAGS_OK)}<label class="f">o una mala</label>${chips('bad',TAGS_BAD)}<p class="xs muted" style="margin:10px 0 0">Tienes una buena y una mala por partido. Si eliges otra, reemplaza la anterior.</p>`:''}`)}
+  ${can?`<label class="f">Dale una buena <span class="xs muted" style="font-weight:500">· desliza</span></label>${chips('good',TAGS_OK)}<label class="f">o una mala</label>${chips('bad',TAGS_BAD)}<p class="xs muted" style="margin:10px 0 0">Tienes una buena y una mala por partido. Si eliges otra, reemplaza la anterior.</p>`:''}`)}
 function sheetTok(id){if(S.matches.find(x=>x.id===boardM)?.estado==='finalizado'){sheetPost(id);return}const m=S.matches.find(x=>x.id===boardM),p=pl(id),cur=m.board?.[id]||{team:p.equipo||'N'},other=cur.team==='N'?'B':'N',on=cur.x!=null;
   const g=m.goals.filter(x=>x.playerId===id).length;
   sheet(`<div style="display:flex;gap:12px;align-items:center">${av(p)}<div><h2 style="font-size:24px">${esc(p.nombre.toUpperCase())}</h2><div class="muted s">${TEAM[cur.team]} · ${on?'En cancha':'En el cambio'} · ${esc(ROL[p.rol])}${g?` · ${g} gol${g>1?'es':''}`:''}${p.invitado?' · Invitado':''}</div></div></div>
