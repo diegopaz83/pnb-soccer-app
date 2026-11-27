@@ -297,6 +297,7 @@ input.i,select.i{background:rgba(255,255,255,.06);color:var(--ink)}
 .car.mix button.g.on{background:rgba(61,224,255,.1);border-color:#3DE0FF}.car.mix button.b.on{background:rgba(255,181,71,.1);border-color:#FFB547}
 .car.mix button.g.picked{box-shadow:0 0 0 3px rgba(61,224,255,.35),0 0 24px rgba(61,224,255,.5)}.car.mix button.b.picked{box-shadow:0 0 0 3px rgba(255,181,71,.35),0 0 24px rgba(255,181,71,.5)}
 .car.mix button.b:first-of-type,.car.mix button.g+button.b{margin-left:10px}
+.amt{display:flex;align-items:center;gap:12px;margin-top:8px;padding:10px 14px;border-radius:16px;border:1px solid var(--line);background:rgba(255,255,255,.04)}.amt b{font-size:20px;color:#F2F6FF}
 .aw .sh{width:100%;margin-top:12px;min-height:46px;border-radius:14px;border:1px solid rgba(61,224,255,.4);background:transparent;color:#F2F6FF;font-weight:800;font-size:14px}
 </style>
 </head>
@@ -317,7 +318,7 @@ input.i,select.i{background:rgba(255,255,255,.06);color:var(--ink)}
 </defs></svg>
 <script>
 {
-const KEY='fuchibol_club_v12';
+const KEY='fuchibol_club_v13';
 const CUPO={'5 vs 5':14,'7 vs 7':18};
 const ROL={ARQ:'Arquero',DEF:'Defensa',MED:'Medio',DEL:'Delantero'};
 const PIE=['Diestro','Zurdo','Ambidiestro'];
@@ -384,7 +385,7 @@ const DEMO_PROOF='data:image/svg+xml;utf8,'+encodeURIComponent('<svg xmlns="http
 function seed(){
   const P=[['Diego Paz','diego@fuchibol.co','MED',10,'Diestro',1],['Andrés Zapata','andres@fuchibol.co','DEF',4,'Diestro'],['Alejandro Murillo','alejo@fuchibol.co','DEL',9,'Zurdo'],['Camilo Rojas','camilo@fuchibol.co','ARQ',1,'Diestro'],['Julián Ortiz','julian@fuchibol.co','MED',8,'Zurdo'],['Felipe Castaño','felipe@fuchibol.co','DEF',3,'Zurdo'],['Santiago Vélez','santi@fuchibol.co','DEL',11,'Diestro'],['Mauricio Lenis','mauro@fuchibol.co','MED',6,'Diestro'],['Óscar Valencia','oscar@fuchibol.co','DEF',2,'Diestro'],['Juan David Mejía','juanda@fuchibol.co','DEL',7,'Ambidiestro'],['Carlos Ibarra','carlos@fuchibol.co','MED',14,'Diestro'],['Esteban Ríos','esteban@fuchibol.co','ARQ',12,'Diestro'],['Hernán Tovar','hernan@fuchibol.co','DEF',5,'Diestro'],['Ricardo Peña','ricardo@fuchibol.co','MED',16,'Zurdo'],['Daniel Cuero','dani@fuchibol.co','DEL',19,'Diestro'],['Luis F. Gil','luisf@fuchibol.co','DEF',15,'Diestro']]
     .map(([nombre,email,rol,dorsal,pie,admin],i)=>({id:'p'+i,nombre,email,rol,dorsal,pie,admin:!!admin,apodo:'',foto:'',tel:'',equipo:['p0','p2','p3','p5','p7','p9','p13','p15'].includes('p'+i)?'N':'B'}));
-  const canchas=[{id:'c1',nombre:'Sintética Valle del Lili',direccion:'Cra. 98 # 45-20, Cali',formato:'7 vs 7',valor:270000,nequi:'3001234567',titular:'Diego Paz',notas:'Parqueadero gratis'},
+  const canchas=[{id:'c1',nombre:'Sintética Valle del Lili',direccion:'Cra. 98 # 45-20, Cali',formato:'7 vs 7',valor:270000,nequi:'@diegopaz',titular:'Diego Paz',notas:'Parqueadero gratis'},
     {id:'c2',nombre:'Complejo Pasoancho',direccion:'Cl. 13 # 70-15, Cali',formato:'5 vs 5',valor:196000,nequi:'3159876543',titular:'Diego Paz',notas:'Cancha 3, techada'}];
   const all=P.map(p=>p.id);
   const scores=[[2,1],[0,1],[3,3],[2,0],[1,2],[2,2],[3,1],[1,3],[3,2],[4,1],[1,2]];
@@ -418,6 +419,8 @@ const pl=id=>S.players.find(p=>p.id===id);
 const me=()=>S.ses?.mode==='player'?pl(S.ses.id):null;
 const visor=()=>S.ses?.mode==='visor';
 const isAdmin=()=>!!me()?.admin;
+const fmtKey=k=>/^\d{10}$/.test(String(k))?String(k).replace(/(\d{3})(\d{3})(\d{4})/,'$1 $2 $3'):String(k||'');
+const keyBox=c=>`<div class="nequi"><div style="flex:1;min-width:0"><div class="xs" style="color:#C9D3E6">Llave Bre-B · ${esc(c.titular)} · desde cualquier banco</div><div class="d" style="overflow:hidden;text-overflow:ellipsis">${esc(fmtKey(c.nequi))}</div></div><button class="btn sm" data-act="copy" data-t="${esc(c.nequi)}" data-msg="Llave copiada">Copiar llave</button></div>`;
 const cancha=m=>S.canchas.find(c=>c.id===m.canchaId)||{nombre:'Cancha por definir',valor:0,nequi:'',direccion:'',formato:''};
 const payMap=m=>{const o={};S.pays.filter(p=>p.matchId===m.id&&p.estado!=='rechazado').forEach(p=>p.cubre.forEach(id=>{o[id]=o[id]||p}));return o};
 const recogido=m=>S.pays.filter(p=>p.matchId===m.id&&p.estado!=='rechazado').reduce((a,p)=>a+p.monto,0);
@@ -505,7 +508,7 @@ function vInicio(){
     return`<section class="card"><h3>Van · ${m.convocados.length} <small>de ${m.cupo}</small></h3><div style="display:flex;gap:10px;margin-top:10px">${colG('N')}${colG('B')}</div></section>`})();
   const gauge=(()=>{const R_=64,C=Math.PI*R_,f=Math.min(1,pct/100);return`<svg viewBox="0 0 160 92" width="190" height="110" role="img" aria-label="Cancha pagada ${pct}%"><defs><linearGradient id="gg" x1="0" x2="1"><stop offset="0" stop-color="#1D6BFF"/><stop offset="1" stop-color="#3DE0FF"/></linearGradient></defs>${Array.from({length:31},(_,k)=>{const a=Math.PI*(1-k/30),x1=80+76*Math.cos(a),y1=84-76*Math.sin(a),x2=80+(k%5?72:69)*Math.cos(a),y2=84-(k%5?72:69)*Math.sin(a);return`<line x1="${x1.toFixed(1)}" y1="${y1.toFixed(1)}" x2="${x2.toFixed(1)}" y2="${y2.toFixed(1)}" stroke="rgba(255,255,255,.25)" stroke-width="1"/>`}).join('')}<path d="M16 84 A64 64 0 0 1 144 84" fill="none" stroke="rgba(255,255,255,.08)" stroke-width="12" stroke-linecap="round"/><path d="M16 84 A64 64 0 0 1 144 84" fill="none" stroke="${pct>=100?'#3DE0FF':'url(#gg)'}" stroke-width="12" stroke-linecap="round" stroke-dasharray="${(C*f).toFixed(1)} ${C.toFixed(1)}"/><text x="80" y="74" text-anchor="middle" fill="#F2F6FF" font-family="Anton,sans-serif" font-size="30">${pct}%</text><text x="80" y="90" text-anchor="middle" fill="#93A4C8" font-size="8" letter-spacing="1.5">CANCHA PAGA</text></svg>`})();
   const payBlock=`<section class="card"><h3>Cancha ${pct>=100?'<span class="tag ok">Cancha paga</span>':`<small>${cop(rec)} de ${cop(c.valor)}</small>`}</h3><div style="display:flex;justify-content:center;margin-top:6px">${gauge}</div>
-    <div class="nequi"><div style="flex:1"><div class="xs" style="color:#C9D3E6">Nequi · ${esc(c.titular)} · solo Nequi</div><div class="d">${esc(String(c.nequi).replace(/(\d{3})(\d{3})(\d{4})/,'$1 $2 $3'))}</div></div><button class="btn sm" data-act="copy" data-t="${esc(c.nequi)}">Copiar</button></div></section>
+    ${keyBox(c)}</section>
   ${(()=>{const OK='<svg width="12" height="12" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12.5l5 5L20 6.5" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/></svg>',BANG='<svg width="13" height="13" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="11" fill="currentColor"/><path d="M12 6.5v7" stroke="#fff" stroke-width="2.6" stroke-linecap="round"/><circle cx="12" cy="17.3" r="1.5" fill="#fff"/></svg>';
     const r=(id,py)=>{const p=pl(id);if(!p)return'';const tag=!py?`<span class="tag no" style="display:inline-flex;align-items:center;gap:3px;font-size:11px;padding:3px 7px">${BANG}Debe</span>`:py.estado==='verificado'?`<span class="tag ok" style="display:inline-flex;align-items:center;gap:3px;font-size:11px;padding:3px 7px">${OK}Pagó</span>`:`<span class="tag wait" style="font-size:11px;padding:3px 7px">Revisar</span>`;
       return`<div style="display:flex;align-items:center;gap:5px;padding:7px 0;border-bottom:1px solid var(--line)">${av(p,'sm')}<div style="flex:1;min-width:0;line-height:1.15"><div style="font-weight:700;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(first(p))}</div><div class="xs muted" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(ROL[p.rol])}</div></div>${tag}</div>`};
@@ -650,8 +653,9 @@ function drawPay(){const m=S.matches.find(x=>x.id===pd.mid),pm=payMap(m),c=canch
   <div class="step"><i>1</i>¿Por quién pagas?</div>
   ${open.map(id=>{const p=pl(id),on=pd.cubre.has(id);return`<label class="pick ${on?'on':''}"><input type="checkbox" data-act="cover" data-id="${id}" ${on?'checked':''} ${id===yo?'disabled':''}>${av(p,'sm')}<span style="flex:1;font-weight:700">${esc(p.nombre)}${id===yo?' (tú)':''}${p.invitado?' · invitado':''}</span><span class="muted s">${cop(cuota(m))}</span></label>`}).join('')}
   <div class="between" style="margin-top:12px"><span class="muted">${pd.cubre.size} ${pd.cubre.size>1?'personas':'persona'}</span><span class="d" style="font-size:32px">${cop(tot)}</span></div>
-  <div class="step"><i>2</i>Transfiere por Nequi</div>
-  <div class="nequi"><div style="flex:1"><div class="xs" style="color:#C9D3E6">Nequi · ${esc(c.titular)}</div><div class="d">${esc(String(c.nequi).replace(/(\d{3})(\d{3})(\d{4})/,'$1 $2 $3'))}</div></div><button class="btn sm" data-act="copy" data-t="${esc(c.nequi)}">Copiar</button></div>
+  <div class="step"><i>2</i>Transfiere con Bre-B</div>
+  ${keyBox(c)}<div class="amt"><div style="flex:1"><div class="xs muted">Valor a transferir</div><b>${cop(tot)}</b></div><button class="btn sm gray" data-act="copy" data-t="${tot}" data-msg="Valor copiado">Copiar valor</button></div>
+  <p class="xs muted" style="margin:8px 0 0">En la app de tu banco o Nequi: Bre-B › Enviar con llave › pega la llave y el valor.</p>
   <div class="step"><i>3</i>Sube el comprobante</div>
   <button class="drop" data-act="proof">${img(pd.proof)?`<img src="${img(pd.proof)}" alt="Comprobante">`:'Toca para subir la captura<span class="muted xs" style="font-weight:500">Obligatorio · todos lo verán</span>'}</button>
   <input type="file" id="proofIn" accept="image/*" hidden>${img(pd.proof)?'<button class="btn link" data-act="demoproof">Cambiar por comprobante de prueba</button>':'<button class="btn gray" data-act="demoproof">Adjuntar comprobante de prueba (prototipo)</button>'}
@@ -723,14 +727,14 @@ function sheetCancha(id){const c=S.canchas.find(x=>x.id===id)||{id:'',nombre:'',
   sheet(`<h2>${id?'EDITAR':'NUEVA'} CANCHA</h2>${f('nombre','Nombre','text','Ej. Sintética El Ingenio')}${f('direccion','Dirección')}
   <label class="f">Formato</label><div class="opts" id="c-fmt" style="grid-template-columns:1fr 1fr">${Object.entries(CUPO).map(([k,v])=>`<button class="${c.formato===k?'on':''}" data-act="fmt" data-v="${k}">${k} · hasta ${v}</button>`).join('')}</div>
   ${f('valor','Valor de la cancha','number','270000')}<p class="muted s" style="margin:6px 0 0">La cuota se calcula al cerrar cada convocatoria: valor ÷ confirmados.</p>
-  ${f('nequi','Nequi','tel','3001234567')}${f('titular','Titular del Nequi')}${f('notas','Notas','text','Parqueadero, número de cancha…')}
+  ${f('nequi','Llave Bre-B','text','@tullave, celular, cédula o correo')}${f('titular','Titular de la llave')}${f('notas','Notas','text','Parqueadero, número de cancha…')}
   <button class="btn navy" data-act="savecancha" data-id="${esc(c.id)}">Guardar cancha</button>`);
 }
 
 /* ---------- utils ---------- */
 function toast(t){const d=document.createElement('div');d.className='toast';d.textContent=t;document.body.appendChild(d);setTimeout(()=>d.remove(),2200)}
 async function shrink(file,max){const u=URL.createObjectURL(file),im=new Image();await new Promise((r,j)=>{im.onload=r;im.onerror=j;im.src=u});const k=Math.min(1,max/Math.max(im.width,im.height)),cv=document.createElement('canvas');cv.width=Math.round(im.width*k);cv.height=Math.round(im.height*k);cv.getContext('2d').drawImage(im,0,0,cv.width,cv.height);URL.revokeObjectURL(u);return cv.toDataURL('image/jpeg',.8)}
-async function copy(t){try{await navigator.clipboard.writeText(t);toast('Copiado')}catch(e){toast(t)}}
+async function copy(t,msg){try{await navigator.clipboard.writeText(t);toast(msg||'Copiado')}catch(e){toast(t)}}
 function enterAs(id){S.ses={mode:'player',id};tab='inicio';page=null;draft=null;landStep=null;save();render();scrollTo(0,0)}
 function login(e){e=String(e||'').trim().toLowerCase();if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(e)){toast('Escribe un correo válido');return}
   let p=S.players.find(x=>x.email===e);
@@ -797,8 +801,8 @@ document.addEventListener('click',async e=>{
     case'galprev':galGo(-1);break;
     case'galnext':galGo(1);break;
     case'galv':case'galr':{const x=S.pays.find(z=>z.id===id);x.estado=a==='galv'?'verificado':'rechazado';save();drawGal();break}
-    case'copy':copy(t.dataset.t);break;
-    case'copyfaltan':{const m=M(),pm=payMap(m),c=cancha(m);const f=m.convocados.filter(x=>!pm[x]).map(x=>'- '+pl(x).nombre);copy(`Fuchibol ${fShort(m.fecha)} ${fTime(m.hora)} · ${c.nombre}\nCuota ${cop(cuota(m))} por Nequi ${c.nequi}\nFaltan por pagar (${f.length}):\n${f.join('\n')}`);break}
+    case'copy':copy(t.dataset.t,t.dataset.msg);break;
+    case'copyfaltan':{const m=M(),pm=payMap(m),c=cancha(m);const f=m.convocados.filter(x=>!pm[x]).map(x=>'- '+pl(x).nombre);copy(`Fuchibol ${fShort(m.fecha)} ${fTime(m.hora)} · ${c.nombre}\nCuota ${cop(cuota(m))} por Bre-B, llave ${c.nequi}\nFaltan por pagar (${f.length}):\n${f.join('\n')}`);break}
     case'guest':sheet(`<h2>AGREGAR INVITADO</h2><p class="muted s" style="margin:4px 0 0">No tiene cuenta. Ocupa un cupo y paga la cuota fija.</p><label class="f">Nombre<input class="i" id="g-n" placeholder="Ej. Primo de Andrés"></label><label class="f">¿Dónde juega?</label><div class="opts" id="g-r" style="grid-template-columns:repeat(4,minmax(0,1fr))">${Object.entries(ROL).map(([k,l],i)=>`<button class="${i===2?'on':''}" data-act="opt" data-v="${k}">${l}</button>`).join('')}</div><label class="f">Equipo</label><div class="opts" id="g-t" style="grid-template-columns:1fr 1fr"><button class="on" data-act="opt" data-v="N">Negro</button><button data-act="opt" data-v="B">Blanco</button></div><button class="btn navy" data-act="addguest">Agregar</button>`);break;
     case'opt':case'fmt':t.parentElement.querySelectorAll('button').forEach(b=>b.classList.toggle('on',b===t));break;
     case'addguest':{const n=$('#g-n').value.trim();if(!n){toast('Escribe el nombre');return}const m=M();if(m.estado!=='abierta'){toast('Solo con la convocatoria abierta');return}if(m.convocados.length>=m.cupo){toast('No quedan cupos');return}
@@ -819,8 +823,8 @@ document.addEventListener('click',async e=>{
     case'g0':{const m=M();for(let k=m.goals.length-1;k>=0;k--){const g=m.goals[k];if(g.team===t.dataset.t&&(g.playerId||'')===t.dataset.p){m.goals.splice(k,1);break}}save();drawScore(m.id);render();break}
     case'finish':case'reopen':{const m=M();m.estado=a==='finish'?'finalizado':'cerrada';if(a==='finish')S.matches.forEach(x=>{if(x.id!==m.id)delete x.post});curMatch=m.id;save();close();render();toast(a==='finish'?'Partido terminado. Ya pueden pagar.':'Partido reabierto');break}
     case'cancha':sheetCancha(id);break;
-    case'savecancha':{const g=k=>$('#c-'+k).value.trim();if(!g('nombre')||!g('nequi')||!Number(g('valor'))){toast('Nombre, valor y Nequi son obligatorios');return}
-      const c={id:id||'c'+uid(),nombre:g('nombre'),direccion:g('direccion'),formato:$('#c-fmt .on')?.dataset.v||'7 vs 7',valor:Number(g('valor')),nequi:g('nequi').replace(/\D/g,''),titular:g('titular'),notas:g('notas')};
+    case'savecancha':{const g=k=>$('#c-'+k).value.trim();if(!g('nombre')||!g('nequi')||!Number(g('valor'))){toast('Nombre, valor y llave Bre-B son obligatorios');return}
+      const c={id:id||'c'+uid(),nombre:g('nombre'),direccion:g('direccion'),formato:$('#c-fmt .on')?.dataset.v||'7 vs 7',valor:Number(g('valor')),nequi:g('nequi').replace(/\s/g,''),titular:g('titular'),notas:g('notas')};
       const i=S.canchas.findIndex(x=>x.id===c.id);i>=0?S.canchas[i]=c:S.canchas.push(c);save();close();render();toast('Cancha guardada');break}
     case'newm':{if(!S.canchas.length){toast('Primero crea una cancha');return}const d=addDays(new Date().toISOString().slice(0,10),7);
       sheet(`<h2>LANZAR CONVOCATORIA</h2><p class="muted s" style="margin:4px 0 0">La gente confirma con "Yo voy" hasta un día antes. Ahí se cierra y se calcula la cuota.</p>
