@@ -199,6 +199,7 @@ function autoBoard(m,players){
   ['N','B'].forEach(t=>{const ps=m.convocados.map(id=>players.find(p=>p.id===id)).filter(p=>p&&(old[p.id]?.team||p.equipo||'N')===t).sort((a,b)=>o[a.rol]-o[b.rol]);
     ps.forEach((p,k)=>{m.board[p.id]=k<slotsFor(m).length?{team:t,...slotXY(m,t,k)}:{team:t}})});
 }
+const DEMO_PROOF='data:image/svg+xml;utf8,'+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 420"><rect width="300" height="420" rx="18" fill="#ffffff"/><rect width="300" height="90" rx="18" fill="#0B1736"/><text x="150" y="52" fill="#4EA8FF" font-family="Arial" font-size="20" font-weight="700" text-anchor="middle">COMPROBANTE DE PRUEBA</text><text x="150" y="140" fill="#0B1736" font-family="Arial" font-size="15" text-anchor="middle">Transferencia simulada</text><text x="150" y="200" fill="#0B1736" font-family="Arial" font-size="34" font-weight="700" text-anchor="middle">Fuchibol</text><text x="150" y="250" fill="#5B6680" font-family="Arial" font-size="13" text-anchor="middle">Imagen de ejemplo para probar el flujo</text><text x="150" y="272" fill="#5B6680" font-family="Arial" font-size="13" text-anchor="middle">No es un pago real</text><rect x="40" y="320" width="220" height="10" rx="5" fill="#E1E6EF"/><rect x="70" y="345" width="160" height="10" rx="5" fill="#E1E6EF"/></svg>');
 function seed(){
   const P=[['Diego Paz','diego@fuchibol.co','MED',10,'Diestro',1],['Andrés Zapata','andres@fuchibol.co','DEF',4,'Diestro'],['Alejandro Murillo','alejo@fuchibol.co','DEL',9,'Zurdo'],['Camilo Rojas','camilo@fuchibol.co','ARQ',1,'Diestro'],['Julián Ortiz','julian@fuchibol.co','MED',8,'Zurdo'],['Felipe Castaño','felipe@fuchibol.co','DEF',3,'Zurdo'],['Santiago Vélez','santi@fuchibol.co','DEL',11,'Diestro'],['Mauricio Lenis','mauro@fuchibol.co','MED',6,'Diestro'],['Óscar Valencia','oscar@fuchibol.co','DEF',2,'Diestro'],['Juan David Mejía','juanda@fuchibol.co','DEL',7,'Ambidiestro'],['Carlos Ibarra','carlos@fuchibol.co','MED',14,'Diestro'],['Esteban Ríos','esteban@fuchibol.co','ARQ',12,'Diestro'],['Hernán Tovar','hernan@fuchibol.co','DEF',5,'Diestro'],['Ricardo Peña','ricardo@fuchibol.co','MED',16,'Zurdo'],['Daniel Cuero','dani@fuchibol.co','DEL',19,'Diestro'],['Luis F. Gil','luisf@fuchibol.co','DEF',15,'Diestro']]
     .map(([nombre,email,rol,dorsal,pie,admin],i)=>({id:'p'+i,nombre,email,rol,dorsal,pie,admin:!!admin,apodo:'',foto:'',tel:'',equipo:['p0','p2','p3','p5','p7','p9','p13','p15'].includes('p'+i)?'N':'B'}));
@@ -445,7 +446,8 @@ function renderLanding(){
     <button class="role" data-act="land" data-v="player"><span class="ic" style="background:var(--navy);color:#fff"><svg width="22" height="22"><use href="#t-me"/></svg></span><span style="flex:1"><b>Jugador</b><span>Con tu correo. Confirmas, pagas y editas tu ficha.</span></span><span class="muted">›</span></button>
     <button class="role" data-act="as" data-id="${esc(ps.find(p=>p.admin)?.id||'')}"><span class="ic" style="background:var(--sky);color:var(--navy)"><svg width="22" height="22"><use href="#i-shield"/></svg></span><span style="flex:1"><b>Administrador</b><span>Canchas, partidos, invitados, torneos y pagos.</span></span><span class="muted">›</span></button>
     <button class="role" data-act="visor" style="background:transparent;border:1.5px dashed #C3CBDA"><span class="ic" style="background:var(--line);color:var(--mute)"><svg width="22" height="22"><use href="#i-eye"/></svg></span><span style="flex:1"><b>Invitado</b><span>Solo mirar: partido, quién va y resultados.</span></span><span class="muted">›</span></button>
-    <p class="muted xs" style="text-align:center;margin:14px 0 0">Prototipo: los datos se guardan solo en este navegador.</p>`}
+    <div style="margin-top:16px;padding:14px;border-radius:16px;background:#fff;border:1px solid var(--line)"><div class="kick" style="color:var(--mute)">PROBAR RÁPIDO</div><button class="btn navy" data-act="demopay">Simular un pago completo</button><p class="xs muted" style="margin:8px 0 0">Entras como Alejandro, pagas un partido ya jugado con un comprobante de prueba y luego lo verificas como admin.</p></div>
+    <p class="muted xs" style="text-align:center;margin:14px 0 0">Prototipo: los datos se guardan solo en este navegador. <button data-act="reset" style="color:var(--sky);font-weight:700;font-size:12px">Reiniciar datos</button></p>`}
   </div></div>`;
 }
 
@@ -462,7 +464,7 @@ function drawPay(){const m=S.matches.find(x=>x.id===pd.mid),pm=payMap(m),c=canch
   <div class="nequi"><div style="flex:1"><div class="xs" style="color:#C9D3E6">Nequi · ${esc(c.titular)}</div><div class="d">${esc(String(c.nequi).replace(/(\d{3})(\d{3})(\d{4})/,'$1 $2 $3'))}</div></div><button class="btn sm" data-act="copy" data-t="${esc(c.nequi)}">Copiar</button></div>
   <div class="step"><i>3</i>Sube el comprobante</div>
   <button class="drop" data-act="proof">${img(pd.proof)?`<img src="${img(pd.proof)}" alt="Comprobante">`:'Toca para subir la captura<span class="muted xs" style="font-weight:500">Obligatorio · todos lo verán</span>'}</button>
-  <input type="file" id="proofIn" accept="image/*" hidden>
+  <input type="file" id="proofIn" accept="image/*" hidden>${img(pd.proof)?'':'<button class="btn link" data-act="demoproof">Prototipo: usar comprobante de prueba</button>'}
   <button class="btn navy" data-act="sendpay" ${pd.proof?'':'disabled'}>Enviar pago de ${cop(tot)}</button>`)}
 let goalTeam=null;
 function drawScore(id){const m=S.matches.find(x=>x.id===id),s=score(m),a=isAdmin();
@@ -560,7 +562,17 @@ document.addEventListener('click',async e=>{
     case'cover':t.checked?pd.cubre.add(id):pd.cubre.delete(id);drawPay();break;
     case'proof':$('#proofIn').click();break;
     case'photo':$('#photoIn').click();break;
-    case'sendpay':{if(!pd.proof)return;const m=S.matches.find(x=>x.id===pd.mid);S.pays.push({id:uid(),matchId:m.id,payerId:me().id,cubre:[...pd.cubre],monto:cuota(m)*pd.cubre.size,proof:pd.proof,ts:Date.now(),estado:isAdmin()?'verificado':'reportado'});save();close();render();toast('Pago enviado. Ya todos lo ven.');break}
+    case'sendpay':{if(!pd.proof)return;const m=S.matches.find(x=>x.id===pd.mid);const amt=cuota(m)*pd.cubre.size,who=[...pd.cubre];const adm=isAdmin();S.pays.push({id:uid(),matchId:m.id,payerId:me().id,cubre:who,monto:amt,proof:pd.proof,ts:Date.now(),estado:adm?'verificado':'reportado'});save();render();
+      sheet(`<div style="text-align:center"><div style="width:64px;height:64px;margin:6px auto 0;border-radius:50%;background:var(--ok-soft);color:var(--ok);display:grid;place-items:center"><svg width="34" height="34"><use href="#i-ok"/></svg></div><h2 style="margin-top:12px">PAGO ENVIADO</h2><div class="d" style="font-size:40px;margin-top:8px">${cop(amt)}</div><p class="muted s" style="margin:6px 0 0">Por ${who.map(id=>esc(first(pl(id)))).join(', ')} · ${esc(fShort(m.fecha))}</p><span class="tag ${adm?'ok':'wait'}" style="display:inline-block;margin-top:10px">${adm?'Verificado':'Por verificar: el admin lo revisa'}</span></div>
+      <p class="muted s" style="margin:14px 0 0;text-align:center">Tu comprobante ya aparece en la lista para todos.</p>
+      <button class="btn navy" data-act="seeproofs">Ver comprobantes</button>${adm?'':`<button class="btn gray" data-act="demoadmin" data-id="${m.id}">Prototipo: entrar como admin para verificarlo</button>`}`);break}
+    case'demoproof':pd.proof=DEMO_PROOF;drawPay();break;
+    case'seeproofs':close();setTimeout(()=>{const el=[...document.querySelectorAll('.card h3')].find(h=>h.textContent.startsWith('Comprobantes'));el&&el.scrollIntoView({behavior:'smooth',block:'start'})},50);break;
+    case'demoadmin':{const ad=S.players.find(p=>p.admin);S.ses={mode:'player',id:ad.id};curMatch=id;tab='inicio';page=null;draft=null;save();close();render();setTimeout(()=>{const el=[...document.querySelectorAll('.card h3')].find(h=>h.textContent.startsWith('Comprobantes'));el&&el.scrollIntoView({behavior:'smooth',block:'start'})},50);toast('Ahora eres admin: verifica el pago');break}
+    case'demopay':{const p=S.players.find(x=>x.id==='p2')||S.players.find(x=>!x.admin);S.ses={mode:'player',id:p.id};tab='inicio';page=null;draft=null;landStep=null;let d=myDebt();
+      if(!d){const m=finished()[0];S.pays=S.pays.filter(x=>!(x.matchId===m.id&&x.cubre.includes(p.id)));d=m}
+      curMatch=d.id;save();render();pd={mid:d.id,cubre:new Set([p.id]),proof:''};drawPay();break}
+    case'reset':S=seed();save();landStep=null;render();toast('Datos de prueba reiniciados');break;
     case'verify':case'reject':{const p=S.pays.find(x=>x.id===id);p.estado=a==='verify'?'verificado':'rechazado';save();render();break}
     case'zoom':$('#layer').innerHTML=`<div class="lb" data-act="bg"><img src="${img(t.getAttribute('src'))}" alt="Comprobante"></div>`;break;
     case'bg':close();break;
