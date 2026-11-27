@@ -672,14 +672,14 @@ function awards(m){if(!postOpen(m))return'';const P=post(m),y=me(),can=y&&m.conv
     return`<div class="pc ${cls}"><div class="k">${lbl}</div><div class="ph">${av(p)}<span class="bd">${ticon(tg,16)}</span></div><b class="n">${esc(first(p))}</b><small>${esc(tg)} · ${w[1].n} voto${w[1].n>1?'s':''}</small><div class="also">${r.slice(1,3).map(([id,o])=>esc(first(pl(id)))+' '+o.n).join(' · ')}</div></div>`};
   const top3=()=>{const c={};Object.values(P.votes).forEach(v=>['good','bad'].forEach(k=>{const x=v[k];if(!x)return;const key=k+'|'+x.pid+'|'+x.tag;c[key]=(c[key]||0)+1}));
     const r=Object.entries(c).sort((a,b)=>b[1]-a[1]).slice(0,3);
-    if(!r.length)return'<div class="t3e">Silencio total en el camerino. Sé el primero en soltar el chisme.</div>';
-    return`<div class="t3">${r.map(([key,n],i)=>{const[k,pid,tg]=key.split('|'),p=pl(pid);return`<div class="t3r ${k==='good'?'g':'b'}" data-act="tok" data-id="${pid}">${av(p)}<div class="tx"><b>${esc(HEAD[tg]?HEAD[tg](first(p)):first(p)+': '+tg)}</b><small><span class="ch">${ticon(tg,13)}${esc(tg)}</span>lo dicen ${n}</small></div></div>`}).join('')}</div>`};
+    if(!r.length)return'<div class="t3e">Nadie ha calificado todavía. Sé el primero.</div>';
+    return`<div class="t3">${r.map(([key,n],i)=>{const[k,pid,tg]=key.split('|'),p=pl(pid);return`<div class="t3r ${k==='good'?'g':'b'}" data-act="tok" data-id="${pid}">${av(p)}<div class="tx"><b>${esc(HEAD[tg]?HEAD[tg](first(p)):first(p)+': '+tg)}</b><small><span class="ch">${ticon(tg,13)}${esc(tg)}</span>${n} voto${n>1?'s':''}</small></div></div>`}).join('')}</div>`};
   const done=mine.good&&mine.bad;
-  return`<section class="aw"><span class="live"><i></i>EN VIVO DESDE EL CAMERINO</span><h2>EL CHISME DE LA FECHA</h2><p class="sub">Lo que dicen de ustedes. Anónimo, y se borra cuando arranque el próximo partido.</p>
+  return`<section class="aw"><span class="live"><i></i>EN VIVO</span><h2>#TERCER TIEMPO</h2><p class="sub">Lo que dejó el partido. Es anónimo y se borra cuando arranque el próximo.</p>
   ${top3()}
   <div class="bar">${Array.from({length:tot},(_,i)=>`<i class="${i<voters?'on':''}"></i>`).join('')}</div>
-  <div class="meta"><span>Han hablado ${voters} de ${tot}</span><span>${nx?'Cierra '+esc(fShort(nx.fecha)):'Cierra al próximo partido'}</span></div>
-  ${can?(done?'<p class="dn">Ya soltaste tu chisme. Ahora a esperar quién cae.</p>':`<button class="go" data-act="hintpitch">${!mine.good&&!mine.bad?'Suelta tu chisme':'Te falta '+(mine.good?'una mala':'una buena')}</button><p class="hn">Toca a un jugador en la cancha. Nadie sabrá que fuiste tú.</p>`):''}</section>`}
+  <div class="meta"><span>Votaron ${voters} de ${tot}</span><span>${nx?'Cierra '+esc(fShort(nx.fecha)):'Cierra al próximo partido'}</span></div>
+  ${can?(done?'<p class="dn">Ya diste tus dos. A ver quién cae.</p>':`<button class="go" data-act="hintpitch">Llamar al VAR${!mine.good&&!mine.bad?'':' · te falta '+(mine.good?'una mala':'una buena')}</button><p class="hn">Toca a un jugador en la cancha. Nadie sabrá que fuiste tú.</p>`):''}</section>`}
 function awText(m){const P=post(m),c={good:{},bad:{}};Object.values(P.votes).forEach(v=>['good','bad'].forEach(k=>{const x=v[k];if(x)c[k][x.pid]=(c[k][x.pid]||0)+1}));
   const w=k=>{const e=Object.entries(c[k]).sort((a,b)=>b[1]-a[1])[0];return e?first(pl(e[0]))+' ('+e[1]+')':'nadie todavía'};
   const voters=Object.values(P.votes).filter(v=>v.good||v.bad).length;
