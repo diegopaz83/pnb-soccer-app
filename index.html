@@ -137,6 +137,9 @@ input.i:focus,select.i:focus{border-color:var(--sky);outline:0}
 .debt i{width:8px;height:8px;border-radius:50%;background:var(--bad)}
 .tabs .dot{position:absolute;top:6px;right:calc(50% - 18px);width:9px;height:9px;border-radius:50%;background:var(--bad);border:2px solid #fff}
 .tabs button{position:relative}
+.seg{display:flex;background:#E4E9F2;border-radius:14px;padding:4px;gap:4px}
+.seg button{flex:1;min-height:40px;border-radius:10px;font-weight:700;font-size:14px;color:var(--mute)}
+.seg button.on{background:var(--navy);color:#fff}
 .toast{position:fixed;left:50%;top:16px;transform:translateX(-50%);z-index:70;background:var(--navy);color:#fff;font-weight:700;padding:12px 18px;border-radius:14px;animation:up .2s;max-width:90vw;text-align:center}
 .gal{position:fixed;inset:0;z-index:80;background:#06101F;color:#fff;display:flex;flex-direction:column;animation:fd .2s}
 .gal .hd{display:flex;align-items:center;gap:10px;padding:14px 16px 8px;max-width:480px;width:100%;margin:0 auto}
@@ -404,9 +407,10 @@ function vTorneo(){
   ${isAdmin()?`<div style="padding:0 16px"><button class="btn navy" data-act="newt">Nuevo torneo</button></div>`:''}`;
 }
 
-let boardM=null;
+let boardM=null,boardMode='act';
 function vPizarra(){
-  const opts=[...upcoming(),...finished().slice(0,6)];
+  const fin_=finished(),act=[fin_[0],...upcoming().slice(0,2)].filter(Boolean),hist=fin_.slice(1).reverse();
+  const opts=[...act,...hist];
   const m=opts.find(x=>x.id===boardM)||upcoming().find(x=>x.estado==='cerrada')||finished()[0]||opts[0];
   const hero=`<section class="hero" style="min-height:230px"><img src="${IMG.guayos}" alt="" style="object-position:30% 45%"><div class="in">${topbar()}<h1 class="d" style="font-size:36px;margin-top:90px">ALINEACIÓN</h1><p style="margin:4px 0 0;color:#DCE3F2;font-size:14px">${m?esc(fShort(m.fecha))+' · '+esc(cancha(m).formato)+(m.estado==='finalizado'?' · así quedó':isAdmin()?' · arrastra o toca para acomodar':''):'Sin partidos'}</p>${m&&m.estado==='finalizado'?(()=>{const z=score(m);return`<p style="margin:6px 0 0;font-size:14px;font-weight:700;color:#fff;display:flex;align-items:center;gap:8px"><span style="width:12px;height:12px;border-radius:50%;background:#111;border:1.5px solid #fff"></span>Negro <span class="d" style="font-size:22px">${z.N} – ${z.B}</span> Blanco<span style="width:12px;height:12px;border-radius:50%;background:#fff"></span></p>`})():''}</div></section>`;
   if(!m)return hero;
@@ -417,7 +421,12 @@ function vPizarra(){
   const cnt=t=>Object.entries(b).filter(([id,v])=>v.team===t&&inM(id)).length;
   const gcount=id=>m.goals.filter(g=>g.playerId===id).length;
   const s=score(m),fin=m.estado==='finalizado',rc=id=>fin?received(m,id):{good:{},bad:{}};
-  const chips=`<div style="display:flex;gap:6px;overflow-x:auto;padding:14px 16px 0">${opts.map(x=>{const sx=score(x);return`<button class="btn sm ${x.id===m.id?'navy':'gray'}" style="flex:none" data-act="pickb" data-id="${x.id}">${esc(fShort(x.fecha))}${x.estado==='finalizado'?` · ${sx.N}-${sx.B}`:''}</button>`}).join('')}</div>`;
+  if(hist.some(x=>x.id===m.id))boardMode='hist';else if(act.some(x=>x.id===m.id)&&boardMode!=='hist')boardMode='act';
+  const shown=boardMode==='hist'?hist:act;
+  const chipLab=x=>{const sx=score(x);return x.estado==='finalizado'?`${sx.N}-${sx.B}`:x.estado==='abierta'?'Abierta':'Por jugar'};
+  const dShort=d=>dt(d).toLocaleDateString('es-CO',{weekday:'short',day:'numeric',month:'short'}).replace(/\./g,'').replace(/ de /g,' ');
+  const chips=`<div class="seg" style="margin:14px 16px 0">${[['hist','Histórico'],['act','Actualidad']].map(([k,l])=>`<button class="${boardMode===k?'on':''}" data-act="bmode" data-v="${k}">${l}${k==='hist'?` · ${hist.length}`:''}</button>`).join('')}</div>
+    <div id="bchips" style="display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;padding:10px 16px 0">${shown.map(x=>`<button class="btn sm ${x.id===m.id?'navy':'gray'}" style="flex:none;flex-direction:column;gap:0;min-height:46px;line-height:1.15;padding:0 14px" data-act="pickb" data-id="${x.id}"><span>${esc(dShort(x.fecha))}</span><span class="xs" style="font-weight:600;opacity:.8">${chipLab(x)}</span></button>`).join('')||'<span class="muted s">Sin partidos anteriores</span>'}</div>`;
   const row=(t)=>{const ids=bench(t);return`<section class="card"><h3>Cambio ${TEAM[t]} <small>${ids.length}</small></h3>${ids.length?`<div class="bench">${ids.map(id=>`<button data-act="tok" data-id="${id}">${av(pl(id),'sm')}${esc(first(pl(id)))}${gcount(id)?` · <svg width="12" height="12" viewBox="0 0 24 24" aria-hidden="true" style="vertical-align:-1px"><circle cx="12" cy="12" r="10" fill="#fff" stroke="#0B1736" stroke-width="2"/><path d="M12 7.5l4 2.9-1.5 4.7h-5L8 10.4z" fill="#0B1736"/></svg>${gcount(id)>1?gcount(id):''}`:''}</button>`).join('')}</div>`:'<p class="muted s" style="margin:6px 0 0">Nadie en el cambio.</p>'}</section>`};
   const old=fin&&!postOpen(m);
   return hero+chips+`<div class="pitch${old?' old':''}" id="pitch"><img src="${IMG.cancha}" alt="Cancha">
@@ -636,6 +645,7 @@ document.addEventListener('click',async e=>{
     case'toteam':{const m=S.matches.find(x=>x.id===boardM);const ok=placeIn(m,id,t.dataset.v);save();close();render();if(!ok)toast('Cancha llena: queda en el cambio de '+TEAM[t.dataset.v]);break}
     case'tosub':{const m=S.matches.find(x=>x.id===boardM);m.board[id]={team:m.board[id].team};save();close();render();break}
     case'pickb':boardM=id;render();break;
+    case'bmode':{boardMode=t.dataset.v;const f=finished();boardM=boardMode==='hist'?(f[1]?.id||f[0]?.id):(upcoming().find(x=>x.estado==='cerrada')||f[0]||upcoming()[0])?.id;render();if(boardMode==='hist'){const c=$('#bchips');if(c)c.scrollLeft=c.scrollWidth}break}
     case'give':sheetGive(t.dataset.k);break;
     case'gtag':giveTag[t.dataset.k]=t.dataset.v;sheetGive(t.dataset.k);break;
     case'givep':case'givedirect':case'ungive':{const m=S.matches.find(x=>x.id===boardM),y=me().id,P=post(m),v=P.votes[y]=P.votes[y]||{},k=t.dataset.k;
