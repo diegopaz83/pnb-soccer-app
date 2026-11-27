@@ -138,6 +138,15 @@ input.i:focus,select.i:focus{border-color:var(--sky);outline:0}
 .tabs .dot{position:absolute;top:6px;right:calc(50% - 18px);width:9px;height:9px;border-radius:50%;background:var(--bad);border:2px solid #fff}
 .tabs button{position:relative}
 .toast{position:fixed;left:50%;top:16px;transform:translateX(-50%);z-index:70;background:var(--navy);color:#fff;font-weight:700;padding:12px 18px;border-radius:14px;animation:up .2s;max-width:90vw;text-align:center}
+.gal{position:fixed;inset:0;z-index:80;background:#06101F;color:#fff;display:flex;flex-direction:column;animation:fd .2s}
+.gal .hd{display:flex;align-items:center;gap:10px;padding:14px 16px 8px;max-width:480px;width:100%;margin:0 auto}
+.gal .sum{max-width:480px;width:calc(100% - 32px);margin:0 auto;background:rgba(255,255,255,.08);border-radius:14px;padding:10px 14px}
+.gal .tr{flex:1;display:flex;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;max-width:480px;width:100%;margin:10px auto 0}
+.gal .tr::-webkit-scrollbar{display:none}
+.gal .sl{flex:0 0 100%;scroll-snap-align:center;display:flex;flex-direction:column;padding:0 16px;min-height:0}
+.gal .sl img{flex:1;min-height:0;width:100%;object-fit:contain;border-radius:14px;background:#0F1B33}
+.gal .ft{display:flex;align-items:center;gap:10px;padding:10px 16px calc(14px + env(safe-area-inset-bottom));max-width:480px;width:100%;margin:0 auto}
+.gal .nav{width:48px;height:48px;border-radius:50%;background:rgba(255,255,255,.12);color:#fff;font-size:22px;font-weight:800}
 .lb{position:fixed;inset:0;z-index:80;background:rgba(0,0,0,.9);display:grid;place-items:center;padding:20px}.lb img{max-width:100%;max-height:90vh;border-radius:12px}
 .empty{padding:18px;text-align:center;color:var(--mute)}
 /* landing */
@@ -360,7 +369,7 @@ function personRow(id,py){const p=pl(id);if(!p)return'';
   return`<div class="li">${av(p)}<div class="nm">${esc(p.nombre)}<small>${sub}</small></div>${t}</div>`}
 function proofRow(p){const a=isAdmin(),w=pl(p.payerId);
   const t={verificado:'<span class="tag ok">Verificado</span>',reportado:'<span class="tag wait">Por verificar</span>',rechazado:'<span class="tag no">Rechazado</span>'}[p.estado];
-  return`<div class="proof"><img src="${img(p.proof)}" alt="Comprobante" data-act="zoom"><div style="flex:1"><div style="font-weight:800">${esc(w?.nombre||'?')} · ${cop(p.monto)}</div>
+  return`<div class="proof"><img src="${img(p.proof)}" alt="Comprobante" data-act="zoom" data-id="${p.id}"><div style="flex:1"><div style="font-weight:800">${esc(w?.nombre||'?')} · ${cop(p.monto)}</div>
   <div class="muted s">${p.cubre.length>1?'Paga por '+p.cubre.length+': '+p.cubre.map(id=>esc(first(pl(id)))).join(', '):'Su cuota'}</div>
   <div class="muted xs">${new Date(p.ts).toLocaleString('es-CO',{day:'numeric',month:'short',hour:'numeric',minute:'2-digit'})}</div>
   <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-top:6px">${t}${a&&p.estado!=='verificado'?`<button class="btn sm gray" data-act="verify" data-id="${p.id}">Verificar</button>`:''}${a&&p.estado==='reportado'?`<button class="btn sm bad" data-act="reject" data-id="${p.id}">Rechazar</button>`:''}</div></div></div>`}
@@ -512,6 +521,23 @@ function sheetPost(id){const m=S.matches.find(x=>x.id===boardM),p=pl(id),y=me(),
   sheet(`<div style="display:flex;gap:12px;align-items:center">${av(p,'lg')}<div><div class="kick" style="color:var(--mute)">${TEAM[team]} · ${esc(ROL[p.rol])}</div><h2 style="font-size:26px;margin-top:4px">${esc(p.nombre.toUpperCase())}</h2><div class="s muted" style="margin-top:4px">${g} gol${g===1?'':'es'} en este partido</div></div></div>
   ${got?`<div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:12px">${got}</div>`:''}
   ${can?`<label class="f">Dale una buena <span class="xs muted" style="font-weight:500">· desliza</span></label>${chips('good',TAGS_OK)}<label class="f">o una mala</label>${chips('bad',TAGS_BAD)}<p class="xs muted" style="margin:10px 0 0">Tienes una buena y una mala por partido. Si eliges otra, reemplaza la anterior.</p>`:''}`)}
+let galM=null,galIdx=0;
+function openGal(payId){const p0=S.pays.find(x=>x.id===payId);galM=p0.matchId;const list=S.pays.filter(x=>x.matchId===galM).sort((a,b)=>a.ts-b.ts);galIdx=Math.max(0,list.findIndex(x=>x.id===payId));drawGal()}
+function drawGal(){const m=S.matches.find(x=>x.id===galM),c=cancha(m),list=S.pays.filter(x=>x.matchId===galM).sort((a,b)=>a.ts-b.ts);if(!list.length){close();return}
+  galIdx=Math.min(galIdx,list.length-1);
+  const ok=list.filter(x=>x.estado!=='rechazado');let acc=0;const cum=list.map(x=>(acc+=x.estado!=='rechazado'?x.monto:0));
+  const st={verificado:'<span class="tag ok">Verificado</span>',reportado:'<span class="tag wait">Por verificar</span>',rechazado:'<span class="tag no">Rechazado</span>'};
+  $('#layer').innerHTML=`<div class="gal" role="dialog" aria-modal="true" aria-label="Comprobantes">
+  <div class="hd"><div style="flex:1"><div class="kick">COMPROBANTES · ${esc(fShort(m.fecha).toUpperCase())}</div><div class="s" style="color:#C9D3E6">${list.length} comprobantes · ${ok.length} válidos</div></div><button class="nav" data-act="galclose" aria-label="Cerrar">✕</button></div>
+  <div class="sum"><div class="between"><span class="s" style="color:#C9D3E6">Llevamos (hasta este)</span><span class="s" style="color:#C9D3E6">Cancha ${cop(c.valor)}</span></div><div class="d" id="galAcc" style="font-size:34px;margin-top:2px">${cop(cum[galIdx])}</div><div class="bar g" style="background:rgba(255,255,255,.15)"><i id="galBar" style="width:${Math.min(100,Math.round(cum[galIdx]/(c.valor||1)*100))}%"></i></div></div>
+  <div class="tr" id="galTr">${list.map((x,i)=>{const w=pl(x.payerId);return`<div class="sl"><img src="${img(x.proof)}" alt="Comprobante de ${esc(w?.nombre||'')}">
+    <div style="padding:12px 2px 0"><div class="between"><b style="font-size:17px">${esc(w?.nombre||'?')}</b><span class="d" style="font-size:26px">${cop(x.monto)}</span></div>
+    <div class="s" style="color:#C9D3E6;margin-top:2px">${x.cubre.length>1?'Paga por '+x.cubre.length+': '+x.cubre.map(id=>esc(first(pl(id)))).join(', '):'Su cuota'}</div>
+    <div style="display:flex;gap:8px;align-items:center;margin-top:10px;flex-wrap:wrap">${st[x.estado]}${x.estado!=='verificado'?`<button class="btn sm" data-act="galv" data-id="${x.id}">Verificar</button>`:''}${x.estado==='reportado'?`<button class="btn sm bad" data-act="galr" data-id="${x.id}">Rechazar</button>`:''}</div></div></div>`}).join('')}</div>
+  <div class="ft"><button class="nav" data-act="galprev" aria-label="Anterior">‹</button><div style="flex:1;text-align:center;font-weight:800" id="galN">${galIdx+1} de ${list.length}</div><button class="nav" data-act="galnext" aria-label="Siguiente">›</button></div></div>`;
+  const tr=$('#galTr');tr.scrollLeft=galIdx*tr.clientWidth;
+  tr.addEventListener('scroll',()=>{const i=Math.round(tr.scrollLeft/tr.clientWidth);if(i!==galIdx&&i>=0&&i<list.length){galIdx=i;$('#galN').textContent=(i+1)+' de '+list.length;$('#galAcc').textContent=cop(cum[i]);$('#galBar').style.width=Math.min(100,Math.round(cum[i]/(c.valor||1)*100))+'%'}},{passive:true})}
+function galGo(d){const tr=$('#galTr');if(!tr)return;const n=tr.children.length;galIdx=Math.max(0,Math.min(n-1,galIdx+d));tr.scrollTo({left:galIdx*tr.clientWidth,behavior:'smooth'})}
 function sheetTok(id){if(S.matches.find(x=>x.id===boardM)?.estado==='finalizado'){sheetPost(id);return}const m=S.matches.find(x=>x.id===boardM),p=pl(id),cur=m.board?.[id]||{team:p.equipo||'N'},other=cur.team==='N'?'B':'N',on=cur.x!=null;
   const g=m.goals.filter(x=>x.playerId===id).length;
   sheet(`<div style="display:flex;gap:12px;align-items:center">${av(p)}<div><h2 style="font-size:24px">${esc(p.nombre.toUpperCase())}</h2><div class="muted s">${TEAM[cur.team]} · ${on?'En cancha':'En el cambio'} · ${esc(ROL[p.rol])}${g?` · ${g} gol${g>1?'es':''}`:''}${p.invitado?' · Invitado':''}</div></div></div>
@@ -585,8 +611,12 @@ document.addEventListener('click',async e=>{
     case'demoadmin':{const ad=S.players.find(p=>p.admin);S.ses={mode:'player',id:ad.id};curMatch=id;tab='inicio';page=null;draft=null;save();close();render();setTimeout(()=>{const el=[...document.querySelectorAll('.card h3')].find(h=>h.textContent.startsWith('Comprobantes'));el&&el.scrollIntoView({behavior:'smooth',block:'start'})},50);toast('Ahora eres admin: verifica el pago');break}
     case'reset':{const ses=S.ses;S=seed();S.ses=ses&&S.players.find(x=>x.id===ses.id)?ses:null;save();landStep=null;page=null;render();scrollTo(0,0);}toast('Datos de prueba reiniciados');break;
     case'verify':case'reject':{const p=S.pays.find(x=>x.id===id);p.estado=a==='verify'?'verificado':'rechazado';save();render();break}
-    case'zoom':$('#layer').innerHTML=`<div class="lb" data-act="bg"><img src="${img(t.getAttribute('src'))}" alt="Comprobante"></div>`;break;
+    case'zoom':if(isAdmin()&&id){openGal(id);break}$('#layer').innerHTML=`<div class="lb" data-act="bg"><img src="${img(t.getAttribute('src'))}" alt="Comprobante"></div>`;break;
     case'bg':close();break;
+    case'galclose':close();render();break;
+    case'galprev':galGo(-1);break;
+    case'galnext':galGo(1);break;
+    case'galv':case'galr':{const x=S.pays.find(z=>z.id===id);x.estado=a==='galv'?'verificado':'rechazado';save();drawGal();break}
     case'copy':copy(t.dataset.t);break;
     case'copyfaltan':{const m=M(),pm=payMap(m),c=cancha(m);const f=m.convocados.filter(x=>!pm[x]).map(x=>'- '+pl(x).nombre);copy(`Fuchibol ${fShort(m.fecha)} ${fTime(m.hora)} · ${c.nombre}\nCuota ${cop(cuota(m))} por Nequi ${c.nequi}\nFaltan por pagar (${f.length}):\n${f.join('\n')}`);break}
     case'guest':sheet(`<h2>AGREGAR INVITADO</h2><p class="muted s" style="margin:4px 0 0">No tiene cuenta. Ocupa un cupo y paga la cuota fija.</p><label class="f">Nombre<input class="i" id="g-n" placeholder="Ej. Primo de Andrés"></label><label class="f">¿Dónde juega?</label><div class="opts" id="g-r" style="grid-template-columns:repeat(4,minmax(0,1fr))">${Object.entries(ROL).map(([k,l],i)=>`<button class="${i===2?'on':''}" data-act="opt" data-v="${k}">${l}</button>`).join('')}</div><label class="f">Equipo</label><div class="opts" id="g-t" style="grid-template-columns:1fr 1fr"><button class="on" data-act="opt" data-v="N">Negro</button><button data-act="opt" data-v="B">Blanco</button></div><button class="btn navy" data-act="addguest">Agregar</button>`);break;
@@ -634,7 +664,7 @@ document.addEventListener('click',async e=>{
     case'tadmin':{const p=pl(id);p.admin=!p.admin;save();render();break}
   }
 });
-document.addEventListener('keydown',e=>{if(e.key==='Escape')close();if(e.key==='Enter'&&e.target.id==='email')login(e.target.value)});
+document.addEventListener('keydown',e=>{if($('#galTr')){if(e.key==='ArrowLeft')galGo(-1);if(e.key==='ArrowRight')galGo(1)}if(e.key==='Escape')close();if(e.key==='Enter'&&e.target.id==='email')login(e.target.value)});
 document.addEventListener('change',async e=>{const f=e.target.files?.[0];if(!f)return;if(!f.type.startsWith('image/')){toast('Sube una imagen');return}
   try{if(e.target.id==='proofIn'){pd.proof=await shrink(f,900);drawPay()}if(e.target.id==='photoIn'){syncDraft();draft.foto=await shrink(f,360);const i=S.players.findIndex(p=>p.id===me().id);S.players[i].foto=draft.foto;save();render()}}catch(err){toast('No se pudo leer la imagen')}});
 render();
