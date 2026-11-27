@@ -600,7 +600,7 @@ document.addEventListener('click',async e=>{
     case'gtag':giveTag[t.dataset.k]=t.dataset.v;sheetGive(t.dataset.k);break;
     case'givep':case'givedirect':case'ungive':{const m=S.matches.find(x=>x.id===boardM),y=me().id,P=post(m),v=P.votes[y]=P.votes[y]||{},k=t.dataset.k;
       if(a==='ungive')v[k]=null;else{const tag=a==='givep'?giveTag[k]:t.dataset.v;v[k]=(v[k]?.pid===id&&v[k]?.tag===tag)?null:{pid:id,tag}}
-      save();render();if(a==='givedirect')sheetPost(id);else close();toast(v[k]?`${v[k].tag} → ${first(pl(v[k].pid))}`:'Quitado');break}
+      save();render();close();toast(v[k]?`${v[k].tag} → ${first(pl(v[k].pid))}`:'Quitado');break}
     case'auto':{const m=S.matches.find(x=>x.id===boardM);autoBoard(m,S.players);save();render();toast('Equipos armados por posición');break}
     case'score':goalTeam=null;drawScore(id);break;
     case'gteam':goalTeam=t.dataset.v;drawScore(t.dataset.m);break;
