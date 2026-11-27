@@ -475,7 +475,7 @@ function renderLanding(){
 
 /* ---------- sheets ---------- */
 let sheetAt=0;
-function sheet(h){sheetAt=Date.now();$('#layer').innerHTML=`<div class="scrim" data-act="bg"><div class="sheet" role="dialog" aria-modal="true"><div class="grab"></div>${h}</div></div>`}
+function sheet(h){sheetAt=Date.now();const ex=document.querySelector('#layer .scrim .sheet');if(ex){ex.innerHTML=`<div class="grab"></div>${h}`;return}$('#layer').innerHTML=`<div class="scrim" data-act="bg"><div class="sheet" role="dialog" aria-modal="true"><div class="grab"></div>${h}</div></div>`}
 const close=()=>$('#layer').innerHTML='';
 let pd=null;
 function drawPay(){const m=S.matches.find(x=>x.id===pd.mid),pm=payMap(m),c=cancha(m),open=m.convocados.filter(id=>!pm[id]),tot=cuota(m)*pd.cubre.size,yo=me().id;
@@ -489,15 +489,20 @@ function drawPay(){const m=S.matches.find(x=>x.id===pd.mid),pm=payMap(m),c=canch
   <button class="drop" data-act="proof">${img(pd.proof)?`<img src="${img(pd.proof)}" alt="Comprobante">`:'Toca para subir la captura<span class="muted xs" style="font-weight:500">Obligatorio · todos lo verán</span>'}</button>
   <input type="file" id="proofIn" accept="image/*" hidden>${img(pd.proof)?'<button class="btn link" data-act="demoproof">Cambiar por comprobante de prueba</button>':'<button class="btn gray" data-act="demoproof">Adjuntar comprobante de prueba (prototipo)</button>'}
   <button class="btn navy" data-act="sendpay" ${pd.proof?'':'disabled'}>Enviar pago de ${cop(tot)}</button>`)}
-let goalTeam=null;
 function drawScore(id){const m=S.matches.find(x=>x.id===id),s=score(m),a=isAdmin();
-  if(goalTeam){const ids=m.convocados.filter(pid=>(m.board?.[pid]?.team||goalTeam)===goalTeam);
-    sheet(`<h2>GOL DE ${TEAM[goalTeam].toUpperCase()}</h2><p class="muted s" style="margin:4px 0 0">¿Quién lo hizo?</p><div class="pgrid">${ids.map(pid=>`<button data-act="goal" data-p="${pid}" data-m="${m.id}">${av(pl(pid))}${esc(first(pl(pid)))}</button>`).join('')}<button data-act="goal" data-p="" data-m="${m.id}"><span class="av">?</span>Autogol / otro</button></div><button class="btn link" data-act="gback" data-m="${m.id}">Cancelar</button>`);return}
+  const prev=document.querySelector('.sheet')?.scrollTop||0;
+  const teamOf=pid=>m.board?.[pid]?.team||pl(pid)?.equipo||'N';
+  const BALL='<svg width="14" height="14" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10" fill="#fff" stroke="#0B1736" stroke-width="2"/><path d="M12 7.5l4 2.9-1.5 4.7h-5L8 10.4z" fill="#0B1736"/></svg>';
+  const col=t=>{const ids=m.convocados.filter(pid=>teamOf(pid)===t);const og=m.goals.filter(g=>g.team===t&&!g.playerId).length;
+    const row=(pid,label,n)=>`<div style="display:flex;gap:4px;margin-top:6px"><button ${a?`data-act="g1" data-t="${t}" data-p="${pid}" data-m="${m.id}"`:'disabled'} style="flex:1;min-width:0;display:flex;align-items:center;gap:6px;padding:8px;border-radius:12px;background:${n?(t==='N'?'#111':'#fff'):'var(--bg)'};color:${n&&t==='N'?'#fff':'var(--ink)'};border:${t==='B'&&n?'2px solid var(--navy)':'2px solid transparent'};text-align:left;min-height:46px">${pid?av(pl(pid),'sm'):'<span class="av sm">?</span>'}<span style="flex:1;min-width:0;font-weight:700;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(label)}</span>${n?`<span style="display:flex;align-items:center;gap:2px;font-weight:800">${BALL}${n>1?n:''}</span>`:''}</button>${a&&n?`<button data-act="g0" data-t="${t}" data-p="${pid}" data-m="${m.id}" aria-label="Quitar gol" style="width:34px;border-radius:10px;background:var(--bad-soft);color:var(--bad);font-weight:800;font-size:18px">−</button>`:''}</div>`;
+    return`<div style="flex:1;min-width:0"><div style="display:flex;align-items:center;gap:6px;justify-content:center;margin-bottom:4px"><span class="kit ${t}" style="width:16px;height:16px;margin:0;border-width:2px;border-color:var(--navy);box-shadow:none"></span><b>${TEAM[t]}</b></div>
+      ${ids.map(pid=>row(pid,first(pl(pid)),m.goals.filter(g=>g.playerId===pid&&g.team===t).length)).join('')}${row('','Autogol / otro',og)}</div>`};
   sheet(`<h2>MARCADOR</h2><p class="muted s" style="margin:4px 0 0">${esc(fShort(m.fecha))} · ${esc(cancha(m).nombre)}${m.estado==='finalizado'?' · Final':''}</p>
-  <div class="vs" style="margin-top:16px"><div><div class="kit N" style="width:40px;height:40px;border-color:var(--line)"></div><b>Negro</b></div><div class="d" style="font-size:56px">${s.N} – ${s.B}</div><div><div class="kit B" style="width:40px;height:40px;border-color:var(--navy)"></div><b>Blanco</b></div></div>
-  ${a?`<div class="goalbtns"><button class="gN" data-act="gteam" data-v="N" data-m="${m.id}">+ Gol Negro</button><button class="gB" data-act="gteam" data-v="B" data-m="${m.id}">+ Gol Blanco</button></div>`:''}
-  <div style="margin-top:12px">${m.goals.map((g,i)=>`<div class="li"><span class="kit ${g.team}" style="width:24px;height:24px;margin:0;border-width:2px;border-color:var(--navy);box-shadow:none"></span><div class="nm">${g.playerId?esc(pl(g.playerId)?.nombre||'?'):'Autogol / otro'}<small>Gol ${i+1} · ${TEAM[g.team]}</small></div>${a?`<button class="btn sm gray" data-act="ungoal" data-m="${m.id}" data-i="${i}">Quitar</button>`:''}</div>`).join('')||'<div class="empty">Sin goles todavía.</div>'}</div>
-  ${a?(m.estado!=='finalizado'?`<button class="btn navy" data-act="finish" data-m="${m.id}">Terminar partido</button>`:`<button class="btn link" data-act="reopen" data-m="${m.id}">Reabrir partido</button>`):''}`)}
+  <div class="vs" style="margin:14px 0 4px"><b>Negro</b><div class="d" style="font-size:56px">${s.N} – ${s.B}</div><b>Blanco</b></div>
+  ${a?'<p class="xs muted" style="text-align:center;margin:0 0 6px">Toca al jugador cada vez que haga un gol. Con − lo quitas.</p>':''}
+  <div style="display:flex;gap:10px">${col('N')}${col('B')}</div>
+  ${a?(m.estado!=='finalizado'?`<button class="btn navy" data-act="finish" data-m="${m.id}">Terminar partido</button>`:`<button class="btn gray" data-act="bg">Listo</button><button class="btn link" data-act="reopen" data-m="${m.id}">Reabrir partido</button>`):''}`);
+  const sh=document.querySelector('.sheet');if(sh)sh.scrollTop=prev}
 let giveTag={good:TAGS_OK[0],bad:TAGS_BAD[0]};
 const carousel=(k,list,isOn,act,extra)=>`<div class="car ${k}">${list.map(t=>`<button class="${isOn(t)?'on':''}" data-act="${act}" data-k="${k}" data-v="${esc(t)}" ${extra||''}><span class="ic">${ticon(t)}</span><b>${esc(t)}</b><small>${esc(TDESC[t]||'')}</small></button>`).join('')}</div>`;
 function postCards(m){if(!postOpen(m))return'';const y=me(),P=post(m),mine=y&&P.votes[y.id]||{},can=y&&m.convocados.includes(y.id);
@@ -635,11 +640,9 @@ document.addEventListener('click',async e=>{
       if(a==='ungive')v[k]=null;else{const tag=a==='givep'?giveTag[k]:t.dataset.v;v[k]=(v[k]?.pid===id&&v[k]?.tag===tag)?null:{pid:id,tag}}
       save();render();close();toast(v[k]?`${v[k].tag} → ${first(pl(v[k].pid))}`:'Quitado');break}
     case'auto':{const m=S.matches.find(x=>x.id===boardM);autoBoard(m,S.players);save();render();toast('Equipos armados por posición');break}
-    case'score':goalTeam=null;drawScore(id);break;
-    case'gteam':goalTeam=t.dataset.v;drawScore(t.dataset.m);break;
-    case'gback':goalTeam=null;drawScore(t.dataset.m);break;
-    case'goal':{const m=M();m.goals.push({id:uid(),playerId:t.dataset.p,team:goalTeam});goalTeam=null;save();drawScore(m.id);render();toast('Gol anotado');break}
-    case'ungoal':{const m=M();m.goals.splice(Number(t.dataset.i),1);save();drawScore(m.id);render();break}
+    case'score':drawScore(id);break;
+    case'g1':{const m=M();m.goals.push({id:uid(),playerId:t.dataset.p,team:t.dataset.t});save();drawScore(m.id);render();break}
+    case'g0':{const m=M();for(let k=m.goals.length-1;k>=0;k--){const g=m.goals[k];if(g.team===t.dataset.t&&(g.playerId||'')===t.dataset.p){m.goals.splice(k,1);break}}save();drawScore(m.id);render();break}
     case'finish':case'reopen':{const m=M();m.estado=a==='finish'?'finalizado':'cerrada';if(a==='finish')S.matches.forEach(x=>{if(x.id!==m.id)delete x.post});curMatch=m.id;save();close();render();toast(a==='finish'?'Partido terminado. Ya pueden pagar.':'Partido reabierto');break}
     case'cancha':sheetCancha(id);break;
     case'savecancha':{const g=k=>$('#c-'+k).value.trim();if(!g('nombre')||!g('nequi')||!Number(g('valor'))){toast('Nombre, valor y Nequi son obligatorios');return}
