@@ -239,6 +239,35 @@ input.i,select.i{background:rgba(255,255,255,.06);color:var(--ink)}
 .land{background:var(--page)}
 .step i{background:var(--neon);color:#04121F}
 .btn.navy[data-act=pickm],.btn.navy[data-act=pickb]{background:rgba(61,224,255,.12);border:1px solid var(--neon);color:var(--neon)}
+
+.aw{position:relative;margin:14px 16px 0;padding:16px;border-radius:22px;overflow:hidden;background:radial-gradient(120% 80% at 0% 0%,rgba(61,224,255,.18),transparent 55%),radial-gradient(120% 80% at 100% 100%,rgba(255,181,71,.16),transparent 55%),rgba(10,20,46,.85);border:1px solid rgba(61,224,255,.25)}
+.aw .live{display:inline-flex;align-items:center;gap:6px;font-size:10px;font-weight:800;letter-spacing:1.5px;color:#3DE0FF}
+.aw .live i{width:7px;height:7px;border-radius:50%;background:#3DE0FF;animation:blink 1.2s infinite}
+@keyframes blink{50%{opacity:.25}}
+.aw h2{font-family:'Bebas Neue',Impact,sans-serif;font-size:30px;line-height:.95;letter-spacing:.5px;margin:8px 0 2px;color:#F2F6FF}
+.aw .pod{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}
+.aw .pc{position:relative;border-radius:18px;padding:14px 10px 12px;text-align:center;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08)}
+.aw .pc.g{box-shadow:inset 0 0 0 1px rgba(61,224,255,.35)}.aw .pc.b{box-shadow:inset 0 0 0 1px rgba(255,181,71,.35)}
+.aw .pc .k{font-size:10px;font-weight:800;letter-spacing:1.5px}.aw .pc.g .k{color:#3DE0FF}.aw .pc.b .k{color:#FFB547}
+.aw .ph{position:relative;width:72px;height:72px;margin:10px auto 8px}
+.aw .ph .av{width:72px;height:72px;border-radius:50%;font-size:22px;object-fit:cover}
+.aw .pc.g .ph .av{box-shadow:0 0 0 3px #3DE0FF,0 0 26px rgba(61,224,255,.55);animation:glowg 2.4s ease-in-out infinite}
+.aw .pc.b .ph .av{box-shadow:0 0 0 3px #FFB547,0 0 26px rgba(255,181,71,.5);animation:glowb 2.4s ease-in-out infinite}
+@keyframes glowg{50%{box-shadow:0 0 0 3px #3DE0FF,0 0 40px rgba(61,224,255,.85)}}@keyframes glowb{50%{box-shadow:0 0 0 3px #FFB547,0 0 40px rgba(255,181,71,.8)}}
+.aw .ph .bd{position:absolute;right:-6px;bottom:-4px;width:30px;height:30px;border-radius:50%;display:grid;place-items:center;border:2px solid #0A142E}
+.aw .pc.g .bd{background:#3DE0FF;color:#04121F}.aw .pc.b .bd{background:#FFB547;color:#1F1405}
+.aw .ph .q{width:72px;height:72px;border-radius:50%;display:grid;place-items:center;font:700 30px 'Bebas Neue',sans-serif;color:#93A4C8;border:2px dashed rgba(147,164,200,.5)}
+.aw .pc b.n{display:block;font-size:16px;color:#F2F6FF}.aw .pc small{display:block;font-size:11px;color:#93A4C8;margin-top:2px}
+.aw .also{font-size:11px;color:#93A4C8;margin-top:6px;min-height:14px}
+.aw .bar{display:flex;gap:3px;margin-top:14px}.aw .bar i{flex:1;height:6px;border-radius:3px;background:rgba(255,255,255,.1)}.aw .bar i.on{background:#3DE0FF}
+.aw .meta{display:flex;justify-content:space-between;font-size:11px;color:#93A4C8;margin-top:6px}
+.aw .mine{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}
+.aw .mine div{border-radius:12px;padding:8px 10px;font-size:11px;color:#93A4C8;background:rgba(255,255,255,.04);border:1px dashed rgba(255,255,255,.15)}
+.aw .mine div b{display:block;font-size:13px;color:#F2F6FF;margin-top:2px}
+.aw .mine div.ok{border-style:solid}.aw .mine div.ok.g{border-color:rgba(61,224,255,.5)}.aw .mine div.ok.b{border-color:rgba(255,181,71,.5)}
+.aw .cta{display:flex;align-items:center;justify-content:center;gap:8px;margin-top:12px;font-size:13px;font-weight:800;color:#3DE0FF;animation:nudge 1.6s ease-in-out infinite}
+@keyframes nudge{50%{transform:translateY(4px)}}
+.aw .sh{width:100%;margin-top:12px;min-height:46px;border-radius:14px;border:1px solid rgba(61,224,255,.4);background:transparent;color:#F2F6FF;font-weight:800;font-size:14px}
 </style>
 </head>
 <body>
@@ -511,7 +540,7 @@ function vPizarra(){
     <div id="bchips" style="${boardMode==='act'?`display:grid;grid-template-columns:repeat(${Math.max(1,shown.length)},minmax(0,1fr))`:'display:flex;overflow-x:auto'};gap:6px;scrollbar-width:none;padding:10px 16px 0">${shown.map(x=>`<button class="btn sm ${x.id===m.id?'navy':'gray'}" style="${boardMode==='act'?'width:100%;':'flex:none;'}flex-direction:column;gap:0;min-height:46px;line-height:1.15;padding:0 14px" data-act="pickb" data-id="${x.id}"><span>${esc(dShort(x.fecha))}</span><span class="xs" style="font-weight:600;opacity:.8">${chipLab(x)}</span></button>`).join('')||'<span class="muted s">Sin partidos anteriores</span>'}</div>`;
   const row=(t)=>{const ids=bench(t);return`<section class="card"><h3>Cambio ${TEAM[t]} <small>${ids.length}</small></h3>${ids.length?`<div class="bench">${ids.map(id=>`<button data-act="tok" data-id="${id}">${av(pl(id),'sm')}${esc(first(pl(id)))}${gcount(id)?` · <svg width="12" height="12" viewBox="0 0 24 24" aria-hidden="true" style="vertical-align:-1px"><circle cx="12" cy="12" r="10" fill="#fff" stroke="#0B1736" stroke-width="2"/><path d="M12 7.5l4 2.9-1.5 4.7h-5L8 10.4z" fill="#0B1736"/></svg>${gcount(id)>1?gcount(id):''}`:''}</button>`).join('')}</div>`:'<p class="muted s" style="margin:6px 0 0">Nadie en el cambio.</p>'}</section>`};
   const old=fin&&!postOpen(m);
-  return hero+chips+`<div class="pitch${old?' old':''}${isAdmin()&&!fin?' edit':''}" id="pitch"><img src="${IMG.cancha}" alt="Cancha">
+  return hero+chips+(fin?awards(m):'')+`<div class="pitch${old?' old':''}${isAdmin()&&!fin?' edit':''}" id="pitch"><img src="${IMG.cancha}" alt="Cancha">
     <span class="plabel" style="top:12px;background:#111;color:#fff">NEGRO · ${cnt('N')} JUG.</span>${bench('N').length?'<span class="blabel" style="top:12px">CAMBIO</span>':''}${bench('B').length?'<span class="blabel" style="bottom:12px">CAMBIO</span>':''}<span class="plabel" style="bottom:12px;background:#fff;color:var(--navy)">BLANCO · ${cnt('B')} JUG.</span>
     ${[...on,...['N','B'].flatMap(t=>bench(t).map((id,k)=>[id,{team:t,bn:1,x:92,y:t==='N'?13+k*8.5:86-k*8.5}]))].map(([id,v])=>{const p=pl(id);if(!p)return'';const f=img(p.foto),g=gcount(id);return`<div class="tk ${v.team}${v.bn?' bn':''}${postOpen(m)&&me()&&me().id===id?' me':''}" data-id="${id}" style="left:${v.x}%;top:${v.y}%"><div class="c">${f?`<img src="${f}" alt="">`:esc(p.dorsal||ini(p.nombre))}</div>${g?`<b class="goalb"><svg width="12" height="12" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10" fill="#fff" stroke="#0B1736" stroke-width="2"/><path d="M12 7.5l4 2.9-1.5 4.7h-5L8 10.4z" fill="#0B1736"/></svg>${g>1?g:''}</b>`:''}<span>${esc(first(p))}</span>${(()=>{const r=rc(id),g=topTag(r.good),b2=topTag(r.bad);return (g?`<em class="rt${lastPop===id+'good'?' pop':''}" style="background:#3DE0FF;color:#04121F;display:flex;align-items:center;gap:3px">${ticon(g[0],11)}${esc(g[0])}</em>`:'')+(b2?`<em class="rt${lastPop===id+'bad'?' pop':''}" style="background:#FFB547;color:#1F1405;display:flex;align-items:center;gap:3px">${ticon(b2[0],11)}${esc(b2[0])}</em>`:'')})()}</div>`}).join('')}</div>
   <p class="muted xs" style="margin:8px 16px 0">${fin?(postOpen(m)?'Postpartido: toca a un jugador (también los del cambio) para darle una buena o una mala. Máximo una de cada una.':'Así quedó el partido.'):'Los que no están en la cancha son el cambio de su equipo.'}</p>
@@ -597,6 +626,26 @@ function drawScore(id){const m=S.matches.find(x=>x.id===id),s=score(m),a=isAdmin
   const sh=document.querySelector('.sheet');if(sh)sh.scrollTop=prev}
 let giveTag={good:TAGS_OK[0],bad:TAGS_BAD[0]};
 const carousel=(k,list,isOn,act,extra)=>`<div class="car ${k}">${list.map(t=>`<button class="${isOn(t)?'on':''}" data-act="${act}" data-k="${k}" data-v="${esc(t)}" ${extra||''}><span class="ic">${ticon(t)}</span><b>${esc(t)}</b><small>${esc(TDESC[t]||'')}</small></button>`).join('')}</div>`;
+function awards(m){if(!postOpen(m))return'';const P=post(m),y=me(),can=y&&m.convocados.includes(y.id),mine=y&&P.votes[y.id]||{};
+  const t={good:{},bad:{}};Object.values(P.votes).forEach(v=>['good','bad'].forEach(k=>{const x=v[k];if(!x)return;const o=t[k][x.pid]=t[k][x.pid]||{n:0,tags:{}};o.n++;o.tags[x.tag]=(o.tags[x.tag]||0)+1}));
+  const rank=k=>Object.entries(t[k]).sort((a,b)=>b[1].n-a[1].n);
+  const voters=Object.values(P.votes).filter(v=>v.good||v.bad).length,tot=m.convocados.length,nx=upcoming()[0];
+  const pc=(k)=>{const r=rank(k),w=r[0],cls=k==='good'?'g':'b',lbl=k==='good'?'EL MÁS BESTIA':'EL MÁS PAQUETE';
+    if(!w)return`<div class="pc ${cls}"><div class="k">${lbl}</div><div class="ph"><div class="q">?</div></div><b class="n">Sin dueño</b><small>todavía</small><div class="also"></div></div>`;
+    const p=pl(w[0]),tg=topTag(w[1].tags)[0];
+    return`<div class="pc ${cls}"><div class="k">${lbl}</div><div class="ph">${av(p)}<span class="bd">${ticon(tg,16)}</span></div><b class="n">${esc(first(p))}</b><small>${esc(tg)} · ${w[1].n} voto${w[1].n>1?'s':''}</small><div class="also">${r.slice(1,3).map(([id,o])=>esc(first(pl(id)))+' '+o.n).join(' · ')}</div></div>`};
+  const mv=k=>{const x=mine[k];return`<div class="${x?'ok ':''}${k==='good'?'g':'b'}">${k==='good'?'Tu buena':'Tu mala'}<b>${x?esc(x.tag)+' → '+esc(first(pl(x.pid))):'Pendiente'}</b></div>`};
+  const done=mine.good&&mine.bad;
+  return`<section class="aw"><span class="live"><i></i>PREMIOS EN VIVO</span><h2>¿QUIÉN LA ROMPIÓ?<br>¿QUIÉN FUE EL PAQUETE?</h2>
+  <div class="pod">${pc('good')}${pc('bad')}</div>
+  <div class="bar">${Array.from({length:tot},(_,i)=>`<i class="${i<voters?'on':''}"></i>`).join('')}</div>
+  <div class="meta"><span>Votaron ${voters} de ${tot}</span><span>${nx?'Cierra '+esc(fShort(nx.fecha)):'Cierra al próximo partido'}</span></div>
+  ${can?`<div class="mine">${mv('good')}${mv('bad')}</div>${done?'':`<div class="cta">Toca a cualquiera en la cancha <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M12 5v14M5 12l7 7 7-7"/></svg></div>`}`:''}
+  <button class="sh" data-act="shareaw">Mandar los premios al grupo</button></section>`}
+function awText(m){const P=post(m),c={good:{},bad:{}};Object.values(P.votes).forEach(v=>['good','bad'].forEach(k=>{const x=v[k];if(x)c[k][x.pid]=(c[k][x.pid]||0)+1}));
+  const w=k=>{const e=Object.entries(c[k]).sort((a,b)=>b[1]-a[1])[0];return e?first(pl(e[0]))+' ('+e[1]+')':'nadie todavía'};
+  const voters=Object.values(P.votes).filter(v=>v.good||v.bad).length;
+  return`Premios Fuchibol · ${fShort(m.fecha)}\nEl más bestia: ${w('good')}\nEl más paquete: ${w('bad')}\nVotaron ${voters} de ${m.convocados.length}. Los que faltan, entren a la app y voten.`}
 function postCards(m){if(!postOpen(m))return'';const y=me(),P=post(m),mine=y&&P.votes[y.id]||{},can=y&&m.convocados.includes(y.id);
   const agg={};Object.values(P.votes).forEach(v=>['good','bad'].forEach(k=>{const x=v[k];if(!x)return;const key=k+'|'+x.pid+'|'+x.tag;agg[key]=(agg[key]||0)+1}));
   const rows=k=>{const by={};Object.entries(agg).filter(([key])=>key.startsWith(k)).forEach(([key,c])=>{const[,pid,tag]=key.split('|');(by[pid]=by[pid]||[]).push([tag,c])});
@@ -756,6 +805,7 @@ document.addEventListener('click',async e=>{
       if(cierreDe(m)<=new Date()){toast('La fecha debe ser al menos en 2 días');return}
       S.matches.push(m);curMatch=m.id;save();page=null;tab='inicio';render();
       sheet(`<h2>CONVOCATORIA PUBLICADA</h2><p class="muted s" style="margin:4px 0 0">Mándala al grupo de WhatsApp para que la gente entre y confirme.</p><div style="white-space:pre-line;background:var(--bg);border-radius:14px;padding:14px;margin-top:12px;font-size:14px">${esc(shareText(m))}</div><button class="btn navy" data-act="copy" data-t="${esc(shareText(m))}">Copiar mensaje</button><button class="btn link" data-act="bg">Listo</button>`);break}
+    case'shareaw':{const m=S.matches.find(x=>x.id===boardM);copy(awText(m));break}
     case'share':{const m=M()||S.matches.find(x=>x.id===id);copy(shareText(S.matches.find(x=>x.id===id)));break}
     case'closeconv':{const m=S.matches.find(x=>x.id===id);sheet(`<h2>CERRAR CONVOCATORIA</h2><p class="muted s" style="margin:6px 0 0">Van ${m.convocados.length}. La cuota queda en <b>${cop(cuotaCalc(cancha(m).valor,m.convocados.length))}</b> (${cop(cancha(m).valor)} ÷ ${m.convocados.length}). Nadie más podrá entrar ni bajarse. Se paga al terminar el partido.</p><button class="btn navy" data-act="closeok" data-id="${m.id}">Cerrar y fijar cuota</button><button class="btn link" data-act="bg">Cancelar</button>`);break}
     case'closeok':{const m=S.matches.find(x=>x.id===id);closeConv(m);save();close();render();toast('Convocatoria cerrada. Cuota fijada.');break}
