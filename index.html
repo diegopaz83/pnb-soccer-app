@@ -94,12 +94,20 @@ h1,h2,h3{margin:0}
 .res:first-of-type{border-top:0}
 .res .vs .d{font-size:30px}
 /* pitch */
-.pitch{position:relative;margin:14px 16px 0;aspect-ratio:939/1400;border-radius:22px;overflow:hidden;background:var(--navy2);touch-action:none;user-select:none}
+.pitch{position:relative;margin:14px 16px 0;aspect-ratio:939/1400;border-radius:22px;overflow:hidden;background:var(--navy2);touch-action:pan-y;user-select:none}
 .pitch>img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;pointer-events:none}
 .pitch.old>img{filter:grayscale(1) brightness(.85)}.pitch.old .tk .c{filter:grayscale(.6)}
 .goalb{position:absolute;z-index:5;top:-6px;right:10px;display:flex;align-items:center;gap:2px;background:#fff;color:var(--navy);border-radius:99px;padding:1px 5px 1px 2px;font-size:10px;font-weight:800;box-shadow:0 1px 4px rgba(0,0,0,.35)}
 .pitch::after{content:"";position:absolute;inset:0;background:rgba(11,23,54,.15);pointer-events:none}
-.tk{position:absolute;margin:-21px 0 0 -38px;display:flex;flex-direction:column;align-items:center;gap:3px;width:76px;touch-action:none;cursor:grab}
+.tk{position:absolute;margin:-21px 0 0 -38px;display:flex;flex-direction:column;align-items:center;gap:3px;width:76px;touch-action:manipulation;cursor:pointer}
+.pitch.edit .tk{touch-action:none;cursor:grab}
+.tk.bn{width:58px;margin:-15px 0 0 -29px}.tk.bn .c{width:30px;height:30px;font-size:11px;border-width:2px;opacity:.9}.tk.bn span{font-size:10px;max-width:58px}
+.tk.me .c{border-style:dashed!important;border-color:#93A4C8!important;opacity:.55;filter:grayscale(1)}.tk.me span{background:rgba(147,164,200,.35)}
+.blabel{position:absolute;z-index:3;right:8px;font-size:10px;font-weight:800;letter-spacing:1px;color:#C9D6F2;background:rgba(6,13,30,.7);padding:3px 7px;border-radius:99px}
+.car button.picked{animation:pick .42s ease-out;border-color:currentColor}
+@keyframes pick{0%{transform:scale(1)}35%{transform:scale(1.12)}70%{transform:scale(.96)}100%{transform:scale(1.04)}}
+.car.good button.picked{box-shadow:0 0 0 3px rgba(61,224,255,.35),0 0 24px rgba(61,224,255,.5)}.car.bad button.picked{box-shadow:0 0 0 3px rgba(255,181,71,.35),0 0 24px rgba(255,181,71,.5)}
+.rt.pop{animation:pop .5s ease-out}@keyframes pop{0%{transform:scale(.3);opacity:0}60%{transform:scale(1.2);opacity:1}100%{transform:scale(1)}}
 .tk .c{position:relative;z-index:2;width:42px;height:42px;border-radius:50%;display:grid;place-items:center;font-weight:800;font-size:13px;box-shadow:0 3px 10px rgba(0,0,0,.45);overflow:hidden;border:2px solid}
 .tk.N .c{background:#111;color:#fff;border-color:var(--sky)}.tk.B .c{background:#fff;color:var(--navy);border-color:#fff}
 .tk .c img{width:100%;height:100%;object-fit:cover}
@@ -481,7 +489,7 @@ function vTorneo(){
   ${isAdmin()?`<div style="padding:0 16px"><button class="btn navy" data-act="newt">Nuevo torneo</button></div>`:''}`;
 }
 
-let boardM=null,boardMode='act';
+let boardM=null,boardMode='act',lastPop=null;
 function vPizarra(){
   const fin_=finished(),act=inicioList(),hist=fin_.slice(1);
   const opts=[...act,...hist];
@@ -503,11 +511,11 @@ function vPizarra(){
     <div id="bchips" style="${boardMode==='act'?`display:grid;grid-template-columns:repeat(${Math.max(1,shown.length)},minmax(0,1fr))`:'display:flex;overflow-x:auto'};gap:6px;scrollbar-width:none;padding:10px 16px 0">${shown.map(x=>`<button class="btn sm ${x.id===m.id?'navy':'gray'}" style="${boardMode==='act'?'width:100%;':'flex:none;'}flex-direction:column;gap:0;min-height:46px;line-height:1.15;padding:0 14px" data-act="pickb" data-id="${x.id}"><span>${esc(dShort(x.fecha))}</span><span class="xs" style="font-weight:600;opacity:.8">${chipLab(x)}</span></button>`).join('')||'<span class="muted s">Sin partidos anteriores</span>'}</div>`;
   const row=(t)=>{const ids=bench(t);return`<section class="card"><h3>Cambio ${TEAM[t]} <small>${ids.length}</small></h3>${ids.length?`<div class="bench">${ids.map(id=>`<button data-act="tok" data-id="${id}">${av(pl(id),'sm')}${esc(first(pl(id)))}${gcount(id)?` · <svg width="12" height="12" viewBox="0 0 24 24" aria-hidden="true" style="vertical-align:-1px"><circle cx="12" cy="12" r="10" fill="#fff" stroke="#0B1736" stroke-width="2"/><path d="M12 7.5l4 2.9-1.5 4.7h-5L8 10.4z" fill="#0B1736"/></svg>${gcount(id)>1?gcount(id):''}`:''}</button>`).join('')}</div>`:'<p class="muted s" style="margin:6px 0 0">Nadie en el cambio.</p>'}</section>`};
   const old=fin&&!postOpen(m);
-  return hero+chips+`<div class="pitch${old?' old':''}" id="pitch"><img src="${IMG.cancha}" alt="Cancha">
-    <span class="plabel" style="top:12px;background:#111;color:#fff">NEGRO · ${cnt('N')} JUG.</span><span class="plabel" style="bottom:12px;background:#fff;color:var(--navy)">BLANCO · ${cnt('B')} JUG.</span>
-    ${on.map(([id,v])=>{const p=pl(id);if(!p)return'';const f=img(p.foto),g=gcount(id);return`<div class="tk ${v.team}" data-id="${id}" style="left:${v.x}%;top:${v.y}%"><div class="c">${f?`<img src="${f}" alt="">`:esc(p.dorsal||ini(p.nombre))}</div>${g?`<b class="goalb"><svg width="12" height="12" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10" fill="#fff" stroke="#0B1736" stroke-width="2"/><path d="M12 7.5l4 2.9-1.5 4.7h-5L8 10.4z" fill="#0B1736"/></svg>${g>1?g:''}</b>`:''}<span>${esc(first(p))}</span>${(()=>{const r=rc(id),g=topTag(r.good),b2=topTag(r.bad);return (g?`<em class="rt" style="background:#E3F4EA;color:#3DE0FF;display:flex;align-items:center;gap:3px">${ticon(g[0],11)}${esc(g[0])}</em>`:'')+(b2?`<em class="rt" style="background:#D92D20;color:#fff;display:flex;align-items:center;gap:3px">${ticon(b2[0],11)}${esc(b2[0])}</em>`:'')})()}</div>`}).join('')}</div>
-  <p class="muted xs" style="margin:8px 16px 0">${fin?(postOpen(m)?'Postpartido: da máximo una buena y una mala. Se borra cuando arranque el próximo partido.':'Así quedó el partido.'):'Los que no están en la cancha son el cambio de su equipo.'}</p>
-  ${fin?postCards(m):''}${row('N')}${row('B')}
+  return hero+chips+`<div class="pitch${old?' old':''}${isAdmin()&&!fin?' edit':''}" id="pitch"><img src="${IMG.cancha}" alt="Cancha">
+    <span class="plabel" style="top:12px;background:#111;color:#fff">NEGRO · ${cnt('N')} JUG.</span>${bench('N').length?'<span class="blabel" style="top:12px">CAMBIO</span>':''}${bench('B').length?'<span class="blabel" style="bottom:12px">CAMBIO</span>':''}<span class="plabel" style="bottom:12px;background:#fff;color:var(--navy)">BLANCO · ${cnt('B')} JUG.</span>
+    ${[...on,...['N','B'].flatMap(t=>bench(t).map((id,k)=>[id,{team:t,bn:1,x:92,y:t==='N'?13+k*8.5:86-k*8.5}]))].map(([id,v])=>{const p=pl(id);if(!p)return'';const f=img(p.foto),g=gcount(id);return`<div class="tk ${v.team}${v.bn?' bn':''}${postOpen(m)&&me()&&me().id===id?' me':''}" data-id="${id}" style="left:${v.x}%;top:${v.y}%"><div class="c">${f?`<img src="${f}" alt="">`:esc(p.dorsal||ini(p.nombre))}</div>${g?`<b class="goalb"><svg width="12" height="12" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10" fill="#fff" stroke="#0B1736" stroke-width="2"/><path d="M12 7.5l4 2.9-1.5 4.7h-5L8 10.4z" fill="#0B1736"/></svg>${g>1?g:''}</b>`:''}<span>${esc(first(p))}</span>${(()=>{const r=rc(id),g=topTag(r.good),b2=topTag(r.bad);return (g?`<em class="rt${lastPop===id+'good'?' pop':''}" style="background:#3DE0FF;color:#04121F;display:flex;align-items:center;gap:3px">${ticon(g[0],11)}${esc(g[0])}</em>`:'')+(b2?`<em class="rt${lastPop===id+'bad'?' pop':''}" style="background:#FFB547;color:#1F1405;display:flex;align-items:center;gap:3px">${ticon(b2[0],11)}${esc(b2[0])}</em>`:'')})()}</div>`}).join('')}</div>
+  <p class="muted xs" style="margin:8px 16px 0">${fin?(postOpen(m)?'Postpartido: toca a un jugador (también los del cambio) para darle una buena o una mala. Máximo una de cada una.':'Así quedó el partido.'):'Los que no están en la cancha son el cambio de su equipo.'}</p>
+  
   ${isAdmin()&&!fin?`<div style="padding:0 16px"><button class="btn navy" data-act="auto">Alinear automático por posición</button></div>`:''}`;
 }
 
@@ -661,7 +669,7 @@ function bindPitch(){const pitch=$('#pitch');if(!pitch)return;const adm=isAdmin(
     tk.addEventListener('pointermove',e=>{if(!adm||!down)return;if(Math.hypot(e.clientX-sx,e.clientY-sy)>6)mv=true;if(!mv)return;const r=pitch.getBoundingClientRect();tk.style.left=Math.max(6,Math.min(94,(e.clientX-r.left)/r.width*100))+'%';tk.style.top=Math.max(5,Math.min(95,(e.clientY-r.top)/r.height*100))+'%'});
     tk.addEventListener('pointerup',()=>{down=false;tk.classList.remove('drag');const m=S.matches.find(x=>x.id===boardM),id=tk.dataset.id;
       if(mv&&adm&&m.estado!=='finalizado'){const b=m.board[id];b.x=parseFloat(tk.style.left);b.y=parseFloat(tk.style.top);const nt=b.y<50?'N':'B';if(nt!==b.team){b.team=nt;save();render()}else save()}});
-    tk.addEventListener('click',()=>{if(mv)return;sheetTok(tk.dataset.id)});
+    tk.addEventListener('click',()=>{if(mv)return;if(tk.classList.contains('me')){toast('Eres tú: no te puedes calificar');return}sheetTok(tk.dataset.id)});
     tk.addEventListener('pointercancel',()=>{down=false;tk.classList.remove('drag')})})}
 
 /* ---------- events ---------- */
@@ -725,7 +733,7 @@ document.addEventListener('click',async e=>{
     case'bmode':{boardMode=t.dataset.v;const f=finished();boardM=boardMode==='hist'?(f[1]?.id||f[0]?.id):(upcoming().find(x=>x.estado==='cerrada')||f[0]||upcoming()[0])?.id;render();break}
     case'give':sheetGive(t.dataset.k);break;
     case'gtag':giveTag[t.dataset.k]=t.dataset.v;sheetGive(t.dataset.k);break;
-    case'givep':case'givedirect':case'ungive':{const m=S.matches.find(x=>x.id===boardM),y=me().id,P=post(m),v=P.votes[y]=P.votes[y]||{},k=t.dataset.k;
+    case'givep':case'givedirect':case'ungive':{if(a==='givedirect'&&!t.dataset.done){t.dataset.done='1';t.classList.add('picked');setTimeout(()=>t.click(),430);return}lastPop=t.dataset.id+t.dataset.k;setTimeout(()=>{lastPop=null},900);const m=S.matches.find(x=>x.id===boardM),y=me().id,P=post(m),v=P.votes[y]=P.votes[y]||{},k=t.dataset.k;
       if(a==='ungive')v[k]=null;else{const tag=a==='givep'?giveTag[k]:t.dataset.v;v[k]=(v[k]?.pid===id&&v[k]?.tag===tag)?null:{pid:id,tag}}
       save();render();close();toast(v[k]?`${v[k].tag} → ${first(pl(v[k].pid))}`:'Quitado');break}
     case'auto':{const m=S.matches.find(x=>x.id===boardM);autoBoard(m,S.players);save();render();toast('Equipos armados por posición');break}
