@@ -362,6 +362,11 @@ a.btn.wa{display:flex;align-items:center;justify-content:center;gap:8px;text-dec
 .trow .hdl{flex:none;width:28px;height:32px;display:grid;place-items:center;color:#93A4C8;touch-action:none;cursor:grab;border-radius:8px}
 .trow.lift{opacity:.3}
 .trow.ghost{position:fixed;z-index:70;pointer-events:none;background:#14244A;border:1px solid #3DE0FF;border-radius:12px;padding:6px 8px;box-shadow:0 12px 30px rgba(0,0,0,.5);transform:rotate(-2deg)}
+.pwrap{display:flex;gap:6px;margin:14px 12px 0}.pwrap .pitch{margin:0;flex:1;min-width:0}
+.bcol{flex:none;width:66px;display:flex;flex-direction:column;justify-content:space-between;padding:4px 0}
+.bgrp{display:flex;flex-direction:column;align-items:center;gap:12px}.bgrp .bt{font-size:9px;font-weight:900;letter-spacing:1.5px;color:#93A4C8}
+.tk.bs{position:relative;margin:0;left:auto;top:auto;width:66px}.tk.bs span{max-width:64px;overflow:hidden;text-overflow:ellipsis}
+.tk.bs .goalb{left:calc(50% + 9px)}
 .aw .sh{width:100%;margin-top:12px;min-height:46px;border-radius:14px;border:1px solid rgba(61,224,255,.4);background:transparent;color:#F2F6FF;font-weight:800;font-size:14px}
 </style>
 </head>
@@ -555,6 +560,12 @@ function showCall(){const el=$('#call'),y0=me(),up=y0&&S.matches.find(x=>x.estad
   <div class="cq">¿VAS A IR?</div>
   ${full?`<p class="cf">Ya está completa. Si dices que sí, quedas de ${esp(m).length+1} en la lista de espera y entras apenas alguien se baje.</p>`:''}<p class="cteam2">Juegas con <b>${TEAM[y.equipo||'N']}</b>, tu equipo habitual.</p>
   <div class="cbtn"><button class="no" data-act="callno" data-m="${m.id}">No</button><button class="si" data-act="callsi" data-m="${m.id}">${full?'Anótame en espera':'Sí, voy'}</button></div></div></div>`}
+function needsAuto(m){const b=m.board||{},n=slotsFor(m).length;
+  for(const t of['N','B']){const ids=m.convocados.filter(id=>(b[id]?.team||pl(id)?.equipo||'N')===t),onf=ids.filter(id=>b[id]?.x!=null);
+    if(ids.some(id=>!b[id]))return true;if(onf.length<Math.min(n,ids.length)||onf.length>n)return true;
+    if(onf.some(id=>(t==='N')!==(b[id].y<50)))return true;
+    const arq=ids.filter(id=>pl(id)?.rol==='ARQ');if(arq.length&&!arq.some(id=>{const s0=slotXY(m,t,0);return b[id]?.x!=null&&Math.abs(b[id].x-s0.x)<3&&Math.abs(b[id].y-s0.y)<3}))return true}
+  return Object.keys(b).some(id=>!m.convocados.includes(id))}
 function bindTeams(){const box=$('#teams');if(!box)return;const m=curM();
   box.querySelectorAll('.trow.dr .hdl').forEach(h=>{h.addEventListener('pointerdown',e=>{e.preventDefault();const row=h.closest('.trow'),id=row.dataset.drag,r=row.getBoundingClientRect();
     const gh=row.cloneNode(true);gh.classList.add('ghost');gh.style.width=r.width+'px';gh.style.left=r.left+'px';gh.style.top=r.top+'px';document.body.appendChild(gh);row.classList.add('lift');
@@ -689,6 +700,7 @@ function vPizarra(){
   const hero=`<section class="hero" style="min-height:230px"><img src="${IMG.guayos}" alt="" style="object-position:30% 45%"><div class="in">${topbar()}<h1 class="d" style="font-size:36px;margin-top:90px">ALINEACIÓN</h1><p style="margin:4px 0 0;color:#DCE3F2;font-size:14px">${m?esc(fShort(m.fecha))+' · '+esc(cancha(m).formato)+(m.estado==='finalizado'?' · así quedó':isAdmin()?' · arrastra o toca para acomodar':''):'Sin partidos'}</p>${m&&m.estado==='finalizado'?(()=>{const z=score(m);return`<p style="margin:6px 0 0;font-size:14px;font-weight:700;color:#fff;display:flex;align-items:center;gap:8px"><span style="width:12px;height:12px;border-radius:50%;background:#111;border:1.5px solid #fff"></span>Negro <span class="d" style="font-size:22px">${z.N} – ${z.B}</span> Blanco<span style="width:12px;height:12px;border-radius:50%;background:#fff"></span></p>`})():''}</div></section>`;
   if(!m)return hero;
   boardM=m.id;
+  if(m.estado!=='finalizado'&&needsAuto(m)){autoBoard(m,S.players);save()}
   const b=m.board||{},inM=id=>m.convocados.includes(id);
   const on=Object.entries(b).filter(([id,v])=>v.x!=null&&inM(id));
   const bench=t=>Object.entries(b).filter(([id,v])=>v.x==null&&v.team===t&&inM(id)).map(([id])=>id);
@@ -703,12 +715,14 @@ function vPizarra(){
     <div id="bchips" style="${boardMode==='act'?`display:grid;grid-template-columns:repeat(${Math.max(1,shown.length)},minmax(0,1fr))`:'display:flex;overflow-x:auto'};gap:6px;scrollbar-width:none;padding:10px 16px 0">${shown.map(x=>`<button class="btn sm ${x.id===m.id?'navy':'gray'}" style="${boardMode==='act'?'width:100%;':'flex:none;'}flex-direction:column;gap:0;min-height:46px;line-height:1.15;padding:0 14px" data-act="pickb" data-id="${x.id}"><span>${esc(dShort(x.fecha))}</span><span class="xs" style="font-weight:600;opacity:.8">${chipLab(x)}</span></button>`).join('')||'<span class="muted s">Sin partidos anteriores</span>'}</div>`;
   const row=(t)=>{const ids=bench(t);return`<section class="card"><h3>Cambio ${TEAM[t]} <small>${ids.length}</small></h3>${ids.length?`<div class="bench">${ids.map(id=>`<button data-act="tok" data-id="${id}">${av(pl(id),'sm')}${esc(first(pl(id)))}${gcount(id)?` · <svg width="12" height="12" viewBox="0 0 24 24" aria-hidden="true" style="vertical-align:-1px"><circle cx="12" cy="12" r="10" fill="#fff" stroke="#0B1736" stroke-width="2"/><path d="M12 7.5l4 2.9-1.5 4.7h-5L8 10.4z" fill="#0B1736"/></svg>${gcount(id)>1?gcount(id):''}`:''}</button>`).join('')}</div>`:'<p class="muted s" style="margin:6px 0 0">Nadie en el cambio.</p>'}</section>`};
   const old=fin&&!postOpen(m);
-  return hero+chips+(fin?awards(m):'')+`<div class="pitch${old?' old':''}${isAdmin()&&!fin?' edit':''}" id="pitch"><img src="${IMG.cancha}" alt="Cancha">
-    <span class="plabel" style="top:12px;background:#111;color:#fff">NEGRO · ${cnt('N')} JUG.</span>${bench('N').length?'<span class="blabel" style="top:12px">CAMBIO</span>':''}${bench('B').length?'<span class="blabel" style="bottom:12px">CAMBIO</span>':''}<span class="plabel" style="bottom:12px;background:#fff;color:var(--navy)">BLANCO · ${cnt('B')} JUG.</span>
-    ${[...on,...['N','B'].flatMap(t=>bench(t).map((id,k)=>[id,{team:t,bn:1,x:89,y:t==='N'?13+k*8.5:86-k*8.5}]))].map(([id,v])=>{const p=pl(id);if(!p)return'';const f=img(p.foto),g=gcount(id);return`<div class="tk ${v.team}${v.bn?' bn':''}${postOpen(m)&&me()&&me().id===id?' me':''}${postOpen(m)&&me()&&ratedBy(m,me().id).includes(id)?' rated':''}" data-id="${id}" style="left:${v.x}%;top:${v.y}%"><div class="c">${f?`<img src="${f}" alt="">`:esc(p.dorsal||ini(p.nombre))}</div>${g?`<b class="goalb">${BALL}${g>1?`<i>${g}</i>`:''}</b>`:''}<span>${esc(first(p))}</span>${(()=>{const r=rc(id),g=topTag(r.good),b2=topTag(r.bad);return (g?`<em class="rt${lastPop===id+'good'?' pop':''}" style="background:#3DE0FF;color:#04121F;display:flex;align-items:center;gap:3px">${ticon(g[0],11)}${esc(g[0])}</em>`:'')+(b2?`<em class="rt${lastPop===id+'bad'?' pop':''}" style="background:#FFB547;color:#1F1405;display:flex;align-items:center;gap:3px">${ticon(b2[0],11)}${esc(b2[0])}</em>`:'')})()}</div>`}).join('')}</div>
-  <p class="muted xs" style="margin:8px 16px 0">${fin?(postOpen(m)?'Postpartido: toca a un jugador (también los del cambio) para darle una buena o una mala. Máximo una de cada una.':'Así quedó el partido.'):'Los que no están en la cancha son el cambio de su equipo.'}</p>
-  
-  ${isAdmin()&&!fin?`<div style="padding:0 16px"><button class="btn navy" data-act="auto">Alinear automático por posición</button></div>`:''}`;
+  const tokH=(id,v,cls='')=>{const p=pl(id);if(!p)return'';const f=img(p.foto),g=gcount(id);return`<div class="tk ${v.team}${cls}${postOpen(m)&&me()&&me().id===id?' me':''}${postOpen(m)&&me()&&ratedBy(m,me().id).includes(id)?' rated':''}" data-id="${id}" ${v.x!=null?`style="left:${v.x}%;top:${v.y}%"`:''}><div class="c">${f?`<img src="${f}" alt="">`:esc(p.dorsal||ini(p.nombre))}</div>${g?`<b class="goalb">${BALL}${g>1?`<i>${g}</i>`:''}</b>`:''}<span>${esc(first(p))}</span>${(()=>{const r=rc(id),g=topTag(r.good),b2=topTag(r.bad);return (g?`<em class="rt${lastPop===id+'good'?' pop':''}" style="background:#3DE0FF;color:#04121F;display:flex;align-items:center;gap:3px">${ticon(g[0],11)}${esc(g[0])}</em>`:'')+(b2?`<em class="rt${lastPop===id+'bad'?' pop':''}" style="background:#FFB547;color:#1F1405;display:flex;align-items:center;gap:3px">${ticon(b2[0],11)}${esc(b2[0])}</em>`:'')})()}</div>`};
+  const bN=bench('N'),bB=bench('B'),hasB=bN.length||bB.length;
+  const bcol=hasB?`<div class="bcol" id="bcol"><div class="bgrp N"><span class="bt">CAMBIO</span>${bN.map(id=>tokH(id,{team:'N'},' bs')).join('')}</div><div class="bgrp B">${bB.map(id=>tokH(id,{team:'B'},' bs')).join('')}<span class="bt">CAMBIO</span></div></div>`:'';
+  return hero+chips+(fin?awards(m):'')+`<div class="pwrap${hasB?' wb':''}"><div class="pitch${old?' old':''}${isAdmin()&&!fin?' edit':''}" id="pitch"><img src="${IMG.cancha}" alt="Cancha">
+    <span class="plabel" style="top:12px;background:#111;color:#fff">NEGRO · ${cnt('N')} JUG.</span><span class="plabel" style="bottom:12px;background:#fff;color:var(--navy)">BLANCO · ${cnt('B')} JUG.</span>
+    ${on.map(([id,v])=>tokH(id,v)).join('')}</div>${bcol}</div>
+  <p class="muted xs" style="margin:8px 16px 0">${fin?(postOpen(m)?'Toca a cualquier jugador, también a los del cambio, para ponerle una etiqueta.':'Así quedó el partido.'):'Al lado de la cancha está el cambio de cada equipo. La alineación se acomoda sola según las posiciones.'}</p>
+  ${isAdmin()&&!fin?`<div style="padding:0 16px"><button class="btn navy" data-act="auto">Volver a alinear por posición</button></div>`:''}`;
 }
 
 let draft=null;
@@ -876,6 +890,7 @@ function placeIn(m,id,t){const used=new Set(Object.entries(m.board).filter(([k,b
   m.board[id]={team:t};return false}
 
 function bindPitch(){const pitch=$('#pitch');if(!pitch)return;const adm=isAdmin();
+  document.querySelectorAll('#bcol .tk').forEach(tk=>tk.addEventListener('click',()=>{if(tk.classList.contains('me')){toast('Eres tú: no te puedes calificar');return}sheetTok(tk.dataset.id)}));
   pitch.querySelectorAll('.tk').forEach(tk=>{let sx,sy,mv=false,down=false;
     tk.addEventListener('pointerdown',e=>{sx=e.clientX;sy=e.clientY;mv=false;down=true;if(adm){tk.setPointerCapture(e.pointerId);tk.classList.add('drag')}});
     tk.addEventListener('pointermove',e=>{if(!adm||!down)return;if(Math.hypot(e.clientX-sx,e.clientY-sy)>6)mv=true;if(!mv)return;const r=pitch.getBoundingClientRect();tk.style.left=Math.max(6,Math.min(94,(e.clientX-r.left)/r.width*100))+'%';tk.style.top=Math.max(5,Math.min(95,(e.clientY-r.top)/r.height*100))+'%'});
