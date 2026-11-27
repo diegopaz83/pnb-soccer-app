@@ -69,7 +69,9 @@ h1,h2,h3{margin:0}
 .proof img{width:56px;height:72px;border-radius:10px;object-fit:cover;flex:none;background:var(--bg);cursor:zoom-in}
 /* tabs */
 .tabs{position:fixed;bottom:0;left:0;right:0;z-index:30;padding:0 0 env(safe-area-inset-bottom);pointer-events:none}
-.tabs .in{max-width:480px;margin:0 auto;background:#fff;border-top:1px solid var(--line);display:grid;grid-template-columns:repeat(4,minmax(0,1fr));padding:6px 6px 10px;pointer-events:auto}
+.tabs .in{max-width:480px;margin:0 auto;background:#fff;border-top:1px solid var(--line);display:grid;grid-template-columns:repeat(var(--nt,4),minmax(0,1fr));padding:6px 6px 10px;pointer-events:auto}
+.tabs button.adm{color:#2463B0}.tabs button.adm.on{color:var(--navy)}
+.admbadge{display:inline-flex;align-items:center;gap:4px;height:22px;padding:0 8px;border-radius:99px;background:var(--sky);color:var(--navy);font-size:10.5px;font-weight:800;letter-spacing:.6px}
 .tabs button{display:flex;flex-direction:column;align-items:center;gap:3px;min-height:52px;justify-content:center;font-size:12px;font-weight:700;color:#8892A8}
 .tabs button.on{color:var(--navy);font-weight:800}
 .tabs svg{width:24px;height:24px}
@@ -182,6 +184,7 @@ input.i:focus,select.i:focus{border-color:var(--sky);outline:0}
 <symbol id="i-pin" viewBox="0 0 24 24"><path d="M12 22s7-6.5 7-12a7 7 0 10-14 0c0 5.5 7 12 7 12z" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="10" r="2.5" fill="currentColor"/></symbol>
 <symbol id="i-out" viewBox="0 0 24 24"><path d="M15 4h4v16h-4M10 8l-4 4 4 4M6 12h10" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
 <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z" fill="none" stroke="currentColor" stroke-width="2.2"/></symbol>
+<symbol id="t-gear" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3.2" fill="none" stroke="currentColor" stroke-width="2.2"/><path d="M12 2.5v2.6M12 18.9v2.6M2.5 12h2.6M18.9 12h2.6M5.3 5.3l1.9 1.9M16.8 16.8l1.9 1.9M5.3 18.7l1.9-1.9M16.8 7.2l1.9-1.9" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/><circle cx="12" cy="12" r="6.5" fill="none" stroke="currentColor" stroke-width="2.2"/></symbol>
 <symbol id="i-eye" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3" fill="none" stroke="currentColor" stroke-width="2.2"/><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12z" fill="none" stroke="currentColor" stroke-width="2.2"/></symbol>
 </defs></svg>
 <script>
@@ -304,15 +307,15 @@ function av(p,cls=''){if(!p)return`<span class="av ${cls}">?</span>`;const f=img
 const nowTxt=()=>{const d=new Date();return 'Hoy · '+d.toLocaleDateString('es-CO',{weekday:'short',day:'numeric',month:'short'}).replace(/\./g,'')+' · '+d.toLocaleTimeString('es-CO',{hour:'numeric',minute:'2-digit'}).replace(/\s?a\.?\s?m\.?/i,' am').replace(/\s?p\.?\s?m\.?/i,' pm')};
 setInterval(()=>document.querySelectorAll('.now').forEach(e=>e.textContent=nowTxt()),30000);
 const crest=s=>`<svg width="${s}" height="${Math.round(s*74/64)}" aria-hidden="true"><use href="#crest"/></svg>`;
-function topbar(){const m=me(),d=myDebt();return`<div class="top">${crest(28)}<span style="display:flex;flex-direction:column;line-height:1"><span class="d brand">FUCHIBOL</span><span class="now" style="font-size:11px;font-weight:700;color:#DCE3F2;margin-top:3px;white-space:nowrap">${nowTxt()}</span></span><span class="sp"></span>${d?`<button class="debt" data-act="paynow" data-id="${d.id}"><i></i>Pagar ${cop(cuota(d))}</button>`:''}${m?`<button data-act="tab" data-v="yo" aria-label="Mi perfil">${av(m,'sky')}</button>`:`<button class="ghostbtn" data-act="logout"><svg width="16" height="16"><use href="#i-out"/></svg>Salir</button>`}</div>`}
+function topbar(){const m=me(),d=myDebt();return`<div class="top">${crest(28)}<span style="display:flex;flex-direction:column;line-height:1"><span class="d brand">FUCHIBOL</span>${isAdmin()?'<span class="admbadge" style="margin-top:4px;align-self:flex-start">ADMIN</span>':''}<span class="now" style="font-size:11px;font-weight:700;color:#DCE3F2;margin-top:3px;white-space:nowrap">${nowTxt()}</span></span><span class="sp"></span>${d?`<button class="debt" data-act="paynow" data-id="${d.id}"><i></i>Pagar ${cop(cuota(d))}</button>`:''}${m?`<button data-act="tab" data-v="yo" aria-label="Mi perfil">${av(m,'sky')}</button>`:`<button class="ghostbtn" data-act="logout"><svg width="16" height="16"><use href="#i-out"/></svg>Salir</button>`}</div>`}
 
 /* ---------- render ---------- */
 function render(){
   autoClose();
   if(!S.ses){renderLanding();return}
-  const body=page==='admin'?vAdmin():({inicio:vInicio,torneo:vTorneo,pizarra:vPizarra,yo:vYo})[tab]();
-  const T=[['inicio','t-home','Convocatoria'],['pizarra','t-board','Pizarra'],['yo','t-me',visor()?'Salir':'Yo'],['torneo','t-cup','Torneo']];const dbt=myDebt();
-  $('#app').innerHTML=`<div class="app">${body}</div><nav class="tabs"><div class="in">${T.map(([v,i,l])=>`<button class="${tab===v&&!page?'on':''}" data-act="${v==='yo'&&visor()?'logout':'tab'}" data-v="${v}"><svg><use href="#${i}"/></svg>${l}${v==='inicio'&&dbt?'<span class="dot"></span>':''}</button>`).join('')}</div></nav>`;
+  if(tab==='admin'&&!isAdmin())tab='inicio';const body=({inicio:vInicio,torneo:vTorneo,pizarra:vPizarra,yo:vYo,admin:vAdmin})[tab]();
+  const T=[['inicio','t-home','Convocatoria'],['pizarra','t-board','Pizarra'],['yo','t-me',visor()?'Salir':'Yo'],['torneo','t-cup','Torneo'],...(isAdmin()?[['admin','t-gear','Admin']]:[])];const dbt=myDebt();
+  $('#app').innerHTML=`<div class="app">${body}</div><nav class="tabs"><div class="in" style="--nt:${T.length}">${T.map(([v,i,l])=>`<button class="${tab===v?'on':''}${v==='admin'?' adm':''}" data-act="${v==='yo'&&visor()?'logout':'tab'}" data-v="${v}"><svg><use href="#${i}"/></svg>${l}${v==='inicio'&&dbt?'<span class="dot"></span>':''}</button>`).join('')}</div></nav>`;
   if(tab==='pizarra'&&!page)bindPitch();
 }
 
@@ -455,13 +458,12 @@ function vYo(){
     <label class="f">Mi equipo habitual</label>${opt('equipo',[['N','Negro'],['B','Blanco']])}<p class="xs muted" style="margin:6px 0 0">Es el que sale marcado al decir "Yo voy". En cada partido puedes jugar en el otro.</p>
     <div style="display:grid;grid-template-columns:1fr 1.6fr;gap:10px"><label class="f">Número<input class="i" id="f-dorsal" type="number" inputmode="numeric" min="0" max="99" value="${esc(d.dorsal??'')}"></label><label class="f">Celular<input class="i" id="f-tel" type="tel" inputmode="tel" value="${esc(d.tel||'')}"></label></div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px"><button class="btn gray" data-act="photo">Cambiar foto</button><button class="btn" data-act="saveyo">Guardar</button></div></section>
-  ${p.admin?`<section class="card" style="padding:4px 16px"><button class="li" data-act="admin" style="min-height:52px"><span class="nm">Administrar canchas, partidos y torneos</span><span class="muted">›</span></button></section>`:''}
 
   <div style="padding:0 16px"><button class="btn link" data-act="logout">Cerrar sesión · ${esc(p.email)}</button></div>`;
 }
 
 function vAdmin(){
-  return `<section class="hero"><img src="${IMG.esquina}" alt="" style="object-position:40% 55%"><div class="in"><button class="back" data-act="noadmin" style="color:#fff">‹ Volver</button><h1 class="d" style="font-size:36px;margin-top:40px">ADMINISTRAR</h1></div></section>
+  return `<section class="hero"><img src="${IMG.esquina}" alt="" style="object-position:40% 55%"><div class="in">${topbar()}<h1 class="d" style="font-size:36px;margin-top:40px">ADMINISTRAR</h1></div></section>
   <section class="card"><h3>Canchas <button class="btn sm navy" data-act="cancha">+ Nueva</button></h3>${S.canchas.map(c=>`<button class="li" data-act="cancha" data-id="${c.id}"><div class="nm">${esc(c.nombre)}<small>${esc(c.formato)} · hasta ${CUPO[c.formato]} · ${cop(c.valor)}</small></div><span class="muted">›</span></button>`).join('')}</section>
   <section class="card"><h3>Partidos <button class="btn sm navy" data-act="newm">+ Nuevo</button></h3>${[...S.matches].sort((a,b)=>b.fecha.localeCompare(a.fecha)).slice(0,8).map(m=>{const s=score(m);return`<button class="li" data-act="score" data-id="${m.id}"><div class="nm">${esc(fShort(m.fecha))} · ${esc(fTime(m.hora))}<small>${esc(cancha(m).nombre)} · ${m.convocados.length}/${m.cupo} · ${m.estado==='finalizado'?`Final ${s.N}-${s.B}`:m.estado==='abierta'?'Convocatoria abierta':'Cerrada · cuota '+cop(m.cuota)}</small></div><span class="muted">›</span></button>`}).join('')}</section>
   <section class="card"><h3>Torneos <button class="btn sm navy" data-act="newt">+ Nuevo</button></h3>${S.torneos.map(t=>`<div class="li"><div class="nm">${esc(t.nombre)}<small>Desde ${esc(fDM(t.inicio))} · ${t.semanas} semanas</small></div></div>`).join('')||'<div class="empty">Sin torneos.</div>'}</section>
@@ -604,7 +606,7 @@ document.addEventListener('click',async e=>{
     case'visor':S.ses={mode:'visor'};tab='inicio';page=null;save();render();break;
     case'login':login($('#email').value);break;
     case'logout':S.ses=null;landStep=null;page=null;save();render();scrollTo(0,0);break;
-    case'admin':page='admin';render();scrollTo(0,0);break;
+    case'admin':tab='admin';render();scrollTo(0,0);break;
     case'noadmin':page=null;render();break;
     case'pickm':curMatch=id;render();break;
     case'filt':filt=t.dataset.v;render();break;
