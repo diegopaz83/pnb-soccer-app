@@ -941,8 +941,10 @@ document.addEventListener('click',async e=>{
       <div class="fsave"><button class="btn navy" data-act="createm">Publicar y llamar</button></div>`);break}
     case'install':{if(!installEv)return;installEv.prompt();const r=await installEv.userChoice;installEv=null;render();toast(r.outcome==='accepted'?'¡Instalada!':'Cuando quieras la instalas');break}
     case'callteam':callTeam=t.dataset.v;showCall();break;
-    case'demofill':{const m=S.matches.find(x=>x.id===id),keep=['p2','p6','p10'],pool=S.players.filter(p=>!p.invitado&&!m.convocados.includes(p.id)&&!keep.includes(p.id)&&p.id!==me().id);
-      while(m.convocados.length<m.cupo&&pool.length){const p=pool.shift();m.convocados.push(p.id);m.board[p.id]={team:p.equipo||'N'};m.nov=(m.nov||[]).filter(x=>x!==p.id)}save();render();toast(m.convocados.length>=m.cupo?'Convocatoria completa':'No hay más jugadores de prueba');break}
+    case'demofill':{const m=S.matches.find(x=>x.id===id),keep=['p2'],pool=S.players.filter(p=>!p.invitado&&!m.convocados.includes(p.id)&&!keep.includes(p.id)&&p.id!==me().id);
+      while(m.convocados.length<m.cupo&&pool.length){const p=pool.shift();m.convocados.push(p.id);m.board[p.id]={team:p.equipo||'N'};m.nov=(m.nov||[]).filter(x=>x!==p.id)}
+      let k=1;while(m.convocados.length<m.cupo){const g={id:'g'+uid(),nombre:'Invitado de prueba '+k++,rol:'MED',pie:'Diestro',dorsal:'',invitado:true,invitadoPor:me().id,email:'',foto:'',apodo:'',equipo:'B'};S.players.push(g);m.convocados.push(g.id);m.board[g.id]={team:'B'}}
+      save();render();toast('Convocatoria completa: '+m.convocados.length+' de '+m.cupo);break}
     case'subiok':{const m=S.matches.find(x=>x.id===t.dataset.m);delete m.subio[me().id];save();render();break}
     case'callsi':{const m=S.matches.find(x=>x.id===t.dataset.m),y=me().id;if(m.convocados.length>=m.cupo){toEsp(m,y,callTeam||'N');callTeam=null;save();render();toast('Quedaste de '+(inEsp(m,y)+1)+' en la lista de espera');return}m.nov=(m.nov||[]).filter(x=>x!==y);if(!m.convocados.includes(y))m.convocados.push(y);m.board[y]={team:callTeam||'N'};callTeam=null;save();render();toast('¡Listo! Vas con '+TEAM[m.board[y].team]);break}
     case'callno':{const m=S.matches.find(x=>x.id===t.dataset.m),y=me().id;m.nov=[...new Set([...(m.nov||[]),y])];callTeam=null;save();render();toast('Anotado: no vas. Si cambias de idea, toca "Yo voy".');break}
