@@ -287,7 +287,7 @@ function autoClose(){let ch=false;S.matches.forEach(m=>{if(m.estado==='abierta'&
 function shareText(m){const c=cancha(m);return `Convocatoria Fuchibol\n${fShort(m.fecha)} · ${fTime(m.hora)}\n${c.nombre} (${c.formato}) · ${c.direccion}\nCupos: ${m.cupo}. Entra a la app y toca "Yo voy".\nSe cierra ${fCierre(m)}. La cuota es la cancha (${cop(c.valor)}) dividida entre los que confirmen y se paga después del partido. Si confirmas y no vas, igual pagas.`}
 const porCobrar=m=>m.estado==='finalizado'&&m.convocados.some(id=>!payMap(m)[id]);
 function myDebt(){const y=me();if(!y)return null;return finished().find(m=>m.convocados.includes(y.id)&&!payMap(m)[y.id])||null}
-function inicioList(){return S.matches.filter(m=>m.estado!=='finalizado'||porCobrar(m)).sort((a,b)=>(a.fecha+a.hora).localeCompare(b.fecha+b.hora))}
+function inicioList(){const pc=finished().find(porCobrar);const up=upcoming();return[...(pc?[pc]:[]),...up].slice(0,3)}
 function curM(){const u=inicioList();if(!u.length)return null;const f=u.find(x=>x.id===curMatch);if(f)return f;const d=myDebt()||u.find(x=>x.estado!=='finalizado')||u[0];curMatch=d.id;return d}
 function activeT(){const t=[...S.torneos].sort((a,b)=>b.inicio.localeCompare(a.inicio))[0];if(!t)return null;const fin=addDays(t.inicio,t.semanas*7-1);return{...t,fin}}
 function tally(ms){let N=0,B=0,E=0;ms.forEach(m=>{const s=score(m);s.N>s.B?N++:s.B>s.N?B++:E++});return{N,B,E}}
@@ -363,7 +363,7 @@ function vInicio(){
     <div style="margin-top:auto"><div class="kick">${esc(kick)}</div>
     <div class="vs" style="margin-top:14px"><div><div class="kit N"></div><div class="d tname">NEGRO</div></div><div>${center}</div><div><div class="kit B"></div><div class="d tname">BLANCO</div></div></div>
     <a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(c.direccion)}" target="_blank" rel="noopener" style="display:flex;justify-content:center;align-items:center;gap:6px;margin-top:14px;color:#fff;text-decoration:none;font-size:14px;font-weight:600"><svg width="16" height="16"><use href="#i-pin"/></svg>${esc(c.nombre)} · ${esc(c.formato)} ›</a></div></div></section>
-  ${list.length>1?`<div style="display:flex;gap:6px;overflow-x:auto;padding:30px 16px 0;margin-bottom:-14px">${list.map(x=>`<button class="btn sm ${x.id===m.id?'navy':'gray'}" style="flex:none" data-act="pickm" data-id="${x.id}">${esc(fShort(x.fecha))} · ${lab(x)}</button>`).join('')}</div>`:''}
+  ${list.length>1?`<div style="display:grid;grid-template-columns:repeat(${list.length},minmax(0,1fr));gap:6px;padding:30px 16px 0;margin-bottom:-14px">${list.map(x=>`<button class="btn sm ${x.id===m.id?'navy':'gray'}" style="width:100%;flex-direction:column;gap:0;min-height:46px;line-height:1.15;padding:0 6px" data-act="pickm" data-id="${x.id}"><span>${esc(dt(x.fecha).toLocaleDateString('es-CO',{weekday:'short',day:'numeric',month:'short'}).replace(/\./g,'').replace(/ de /g,' '))}</span><span class="xs" style="font-weight:600;opacity:.8">${lab(x)}</span></button>`).join('')}</div>`:''}
   <section class="card lift" ${list.length>1?'style="margin-top:22px"':''}>${stepper}${act}</section>
   ${admCard}${st==='finalizado'?payBlock:goers}
   ${t?`<button class="ribbon" data-act="tab" data-v="torneo"><div style="flex:1"><div class="kick">${esc(t.nombre)}</div><div class="s" style="color:#C9D3E6">${tm.length} de ${t.semanas} fechas jugadas</div></div><div class="d">NEGRO ${tt.N} – ${tt.B} BLANCO</div></button>`:''}`;
