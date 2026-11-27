@@ -639,8 +639,8 @@ function awards(m){if(!postOpen(m))return'';const P=post(m),y=me(),can=y&&m.conv
   return`<section class="aw"><span class="live"><i></i>PREMIOS EN VIVO</span><h2>¿QUIÉN LA ROMPIÓ?<br>¿QUIÉN FUE EL PAQUETE?</h2>
   <div class="pod">${pc('good')}${pc('bad')}</div>
   <div class="bar">${Array.from({length:tot},(_,i)=>`<i class="${i<voters?'on':''}"></i>`).join('')}</div>
-  <div class="meta"><span>Votaron ${voters} de ${tot}</span><span>${nx?'Cierra '+esc(fShort(nx.fecha)):'Cierra al próximo partido'}</span></div>
-  ${can?`<div class="mine">${mv('good')}${mv('bad')}</div>${done?'':`<div class="cta">Toca a cualquiera en la cancha <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M12 5v14M5 12l7 7 7-7"/></svg></div>`}`:''}
+  <div class="meta"><span>Votaron ${voters} de ${tot} · anónimo</span><span>${nx?'Cierra '+esc(fShort(nx.fecha)):'Cierra al próximo partido'}</span></div>
+  ${can?`${done?'':`<div class="cta">Toca a cualquiera en la cancha <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M12 5v14M5 12l7 7 7-7"/></svg></div>`}`:''}
   <button class="sh" data-act="shareaw">Mandar los premios al grupo</button></section>`}
 function awText(m){const P=post(m),c={good:{},bad:{}};Object.values(P.votes).forEach(v=>['good','bad'].forEach(k=>{const x=v[k];if(x)c[k][x.pid]=(c[k][x.pid]||0)+1}));
   const w=k=>{const e=Object.entries(c[k]).sort((a,b)=>b[1]-a[1])[0];return e?first(pl(e[0]))+' ('+e[1]+')':'nadie todavía'};
