@@ -298,8 +298,10 @@ const topTag=o=>Object.entries(o).sort((a,b)=>b[1]-a[1])[0];
 
 
 function av(p,cls=''){if(!p)return`<span class="av ${cls}">?</span>`;const f=img(p.foto);return f?`<img class="av ${cls}" src="${f}" alt="">`:`<span class="av ${cls}">${esc(ini(p.nombre))}</span>`}
+const nowTxt=()=>{const d=new Date();return 'Hoy · '+d.toLocaleDateString('es-CO',{weekday:'short',day:'numeric',month:'short'}).replace(/\./g,'')+' · '+d.toLocaleTimeString('es-CO',{hour:'numeric',minute:'2-digit'}).replace(/\s?a\.?\s?m\.?/i,' am').replace(/\s?p\.?\s?m\.?/i,' pm')};
+setInterval(()=>document.querySelectorAll('.now').forEach(e=>e.textContent=nowTxt()),30000);
 const crest=s=>`<svg width="${s}" height="${Math.round(s*74/64)}" aria-hidden="true"><use href="#crest"/></svg>`;
-function topbar(){const m=me(),d=myDebt();return`<div class="top">${crest(28)}<span class="d brand">FUCHIBOL</span><span class="sp"></span>${d?`<button class="debt" data-act="paynow" data-id="${d.id}"><i></i>Pagar ${cop(cuota(d))}</button>`:''}${m?`<button data-act="tab" data-v="yo" aria-label="Mi perfil">${av(m,'sky')}</button>`:`<button class="ghostbtn" data-act="logout"><svg width="16" height="16"><use href="#i-out"/></svg>Salir</button>`}</div>`}
+function topbar(){const m=me(),d=myDebt();return`<div class="top">${crest(28)}<span style="display:flex;flex-direction:column;line-height:1"><span class="d brand">FUCHIBOL</span><span class="now" style="font-size:11px;font-weight:700;color:#DCE3F2;margin-top:3px;white-space:nowrap">${nowTxt()}</span></span><span class="sp"></span>${d?`<button class="debt" data-act="paynow" data-id="${d.id}"><i></i>Pagar ${cop(cuota(d))}</button>`:''}${m?`<button data-act="tab" data-v="yo" aria-label="Mi perfil">${av(m,'sky')}</button>`:`<button class="ghostbtn" data-act="logout"><svg width="16" height="16"><use href="#i-out"/></svg>Salir</button>`}</div>`}
 
 /* ---------- render ---------- */
 function render(){
@@ -431,7 +433,7 @@ function vYo(){
   const p=me();if(!p)return'';if(!draft||draft.id!==p.id)draft={...p};const d=draft,s=stats(p.id);
   const opt=(k,list)=>`<div class="opts" style="grid-template-columns:repeat(${list.length},minmax(0,1fr))">${list.map(([v,l])=>`<button class="${d[k]===v?'on':''}" data-act="set" data-k="${k}" data-v="${v}">${l}</button>`).join('')}</div>`;
   return `<section class="hero"><img src="${IMG.estadio}" alt="" style="object-position:76% 40%"><div class="num">${esc(d.dorsal||'')}</div><div class="in">
-    <div class="top">${crest(28)}<span class="d brand">FUCHIBOL</span><span class="sp"></span><button class="ghostbtn" data-act="logout"><svg width="16" height="16"><use href="#i-out"/></svg>Cerrar sesión</button></div>
+    <div class="top">${crest(28)}<span style="display:flex;flex-direction:column;line-height:1"><span class="d brand">FUCHIBOL</span><span class="now" style="font-size:11px;font-weight:700;color:#DCE3F2;margin-top:3px;white-space:nowrap">${nowTxt()}</span></span><span class="sp"></span><button class="ghostbtn" data-act="logout"><svg width="16" height="16"><use href="#i-out"/></svg>Cerrar sesión</button></div>
     <div style="display:flex;align-items:flex-end;gap:26px;margin-top:70px"><button data-act="photo" aria-label="Cambiar foto">${av(d,'lg')}</button><div><div class="kick">${esc(ROL[d.rol]||'')} · ${esc(d.pie||'')}</div><div class="d" style="font-size:40px;margin-top:4px">${esc(d.nombre.toUpperCase())}</div></div></div>
     <div class="pstats"><div><div class="d">${s.pj}</div><span>PARTIDOS</span></div><div><div class="d">${s.gol}</div><span>GOLES</span></div><div><div class="d">${s.gan}</div><span>GANADOS</span></div><div><div class="d">${s.deb?s.deb:'OK'}</div><span>${s.deb?'POR PAGAR':'AL DÍA'}</span></div></div>
     <input type="file" id="photoIn" accept="image/*" hidden></div></section>
