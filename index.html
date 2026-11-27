@@ -350,6 +350,7 @@ a.btn.wa{display:flex;align-items:center;justify-content:center;gap:8px;text-dec
 .cupo.big{margin-top:16px}.cupo.big .cuh b{font-size:20px}
 .espbox{margin-top:14px;padding:14px;border-radius:16px;border:1px dashed rgba(255,181,71,.5);background:rgba(255,181,71,.08)}.espbox b{display:block;color:#FFB547;font-size:15px}.espbox span{display:block;font-size:12px;color:#C9D6F2;margin-top:4px}
 .csg.e .csh b{color:#FFB547}
+.call .cteam2{margin:8px 0 0;font-size:13px;color:#93A4C8}.call .cteam2 b{color:#F2F6FF}
 .aw .sh{width:100%;margin-top:12px;min-height:46px;border-radius:14px;border:1px solid rgba(61,224,255,.4);background:transparent;color:#F2F6FF;font-weight:800;font-size:14px}
 </style>
 </head>
@@ -529,14 +530,14 @@ const pendingCall=()=>{const y=me();if(!y||visor()||y.invitado)return null;retur
 let callTeam=null;
 function showCall(){const el=$('#call'),y0=me(),up=y0&&S.matches.find(x=>x.estado!=='finalizado'&&x.subio?.[y0.id]);
   if(up){const tm=up.board?.[y0.id]?.team||'N';el.innerHTML=`<div class="call"><img src="${IMG.estadio}" alt=""><div class="cin"><div class="cl">LISTA DE ESPERA</div><div class="cd" style="margin-top:12px">¡ENTRASTE!</div><div class="cc">Se bajó alguien y pasaste de la lista de espera al partido del ${esc(fShort(up.fecha))} · ${esc(fTime(up.hora))}.<br><span>Vas con ${TEAM[tm]}. Si no puedes, bájate antes de ${esc(fCierre(up))}.</span></div>${cupoBar(up,1)}<div class="cbtn" style="grid-template-columns:1fr"><button class="si" data-act="subiok" data-m="${up.id}">¡De una!</button></div></div></div>`;return}
-  const m=pendingCall();if(!m){el.innerHTML='';return}const y=me(),c=cancha(m),full=m.convocados.length>=m.cupo;callTeam=callTeam||y.equipo||'N';
+  const m=pendingCall();if(!m){el.innerHTML='';return}const y=me(),c=cancha(m),full=m.convocados.length>=m.cupo;callTeam=y.equipo||'N';
   const d=new Date(m.fecha+'T12:00:00'),dia=d.toLocaleDateString('es-CO',{weekday:'long'}).toUpperCase(),fe=d.toLocaleDateString('es-CO',{day:'numeric',month:'short'}).replace('.','').toUpperCase();
   el.innerHTML=`<div class="call"><img src="${IMG.estadio}" alt=""><div class="cin"><div class="cl">LLAMADO · ${esc(first(y)).toUpperCase()}</div>
   <div class="ct">CONVOCATORIA</div><div class="cd">${dia} ${fe}<br>${esc(fTime(m.hora))}</div>
   <div class="cc">${esc(c.nombre)} · ${esc(c.formato)}<br><span>Se cierra ${esc(fCierre(m))}</span></div>
   ${cupoBar(m,1)}
   <div class="cq">¿VAS A IR?</div>
-  ${full?`<p class="cf">Ya está completa. Si dices que sí, quedas de ${esp(m).length+1} en la lista de espera y entras apenas alguien se baje.</p>`:''}<div class="cteam">${['N','B'].map(t=>`<button class="${callTeam===t?'on':''}" data-act="callteam" data-v="${t}">${TEAM[t]}</button>`).join('')}</div>
+  ${full?`<p class="cf">Ya está completa. Si dices que sí, quedas de ${esp(m).length+1} en la lista de espera y entras apenas alguien se baje.</p>`:''}<p class="cteam2">Juegas con <b>${TEAM[y.equipo||'N']}</b>, tu equipo habitual.</p>
   <div class="cbtn"><button class="no" data-act="callno" data-m="${m.id}">No</button><button class="si" data-act="callsi" data-m="${m.id}">${full?'Anótame en espera':'Sí, voy'}</button></div></div></div>`}
 function render(){
   autoClose();
@@ -871,10 +872,9 @@ document.addEventListener('click',async e=>{
     case'noadmin':page=null;render();break;
     case'pickm':curMatch=id;render();break;
     case'filt':filt=t.dataset.v;render();break;
-    case'join':{const m=M(),yo=me();if(m.estado!=='abierta'){toast('La convocatoria ya cerró');return}if(m.convocados.length>=m.cupo){const def=yo.equipo||'N';sheet(`<h2>ESTÁ COMPLETA</h2>${cupoBar(m)}<p class="s" style="margin:12px 0 0">Ya hay ${m.cupo} confirmados. Te anoto en la <b>lista de espera</b>: quedas de ${esp(m).length+1} y entras solo apenas alguien se baje.</p><label class="f">¿Con qué equipo?</label><div class="goalbtns" style="margin-top:8px">${['N','B'].map(t=>`<button class="g${t}" data-act="espok" data-v="${t}" data-m="${m.id}" style="${t===def?'outline:3px solid var(--sky);outline-offset:2px':''}">${TEAM[t]}${t===def?' · el tuyo':''}</button>`).join('')}</div>`);return}const def=yo.equipo||'N';const tc=t=>m.convocados.filter(id=>(m.board?.[id]?.team)===t).length;
-      sheet(`<h2>YO VOY</h2><p class="muted s" style="margin:4px 0 0">${esc(fShort(m.fecha))} · ${esc(fTime(m.hora))} · ${esc(cancha(m).nombre)}</p><label class="f">¿Con qué equipo juegas?</label><div class="goalbtns" style="margin-top:8px">${['N','B'].map(t=>`<button class="g${t}" data-act="joinok" data-v="${t}" data-m="${m.id}" style="${t===def?'outline:3px solid var(--sky);outline-offset:2px':''}">${TEAM[t]}${t===def?' · el tuyo':''}<span style="display:block;font-size:12px;font-weight:600;opacity:.75">van ${tc(t)}</span></button>`).join('')}</div><p class="xs muted" style="margin:12px 0 0">Te puedes bajar hasta ${esc(fCierre(m))}. Después, si confirmaste, pagas aunque no vayas.</p>`);break}
-    case'espok':{const m=M(),y=me().id;toEsp(m,y,t.dataset.v);save();close();render();toast('Quedaste de '+(inEsp(m,y)+1)+' en la lista de espera');break}
-    case'espout':{const m=M(),y=me().id;m.espera=esp(m).filter(x=>x.id!==y);save();render();toast('Saliste de la lista de espera');break}
+    case'join':{const m=M(),yo=me();if(m.estado!=='abierta'){toast('La convocatoria ya cerró');return}const tm=yo.equipo||'N';
+      if(m.convocados.length>=m.cupo){toEsp(m,yo.id,tm);save();render();toast('Está completa. Quedaste de '+(inEsp(m,yo.id)+1)+' en la lista de espera');return}
+      m.nov=(m.nov||[]).filter(x=>x!==yo.id);if(!m.convocados.includes(yo.id))m.convocados.push(yo.id);m.board[yo.id]={team:tm};save();render();toast('Listo, vas con '+TEAM[tm]);break}
     case'joinok':{const m=M(),y=me().id;m.nov=(m.nov||[]).filter(x=>x!==y);if(!m.convocados.includes(y)){m.convocados.push(y);m.board[y]={team:t.dataset.v}}else{m.board[y]={team:t.dataset.v}}save();close();render();toast('Listo, vas con '+TEAM[t.dataset.v]);break}
     case'swapteam':{const m=M(),y=me().id;const nt=(m.board[y]?.team||'N')==='N'?'B':'N';m.board[y]={team:nt};save();render();toast('Ahora vas con '+TEAM[nt]);break}
     case'leave':{const m=M();if(m.estado!=='abierta'){toast('Ya cerró: igual debes pagar');return}
