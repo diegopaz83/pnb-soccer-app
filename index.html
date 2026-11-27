@@ -13,9 +13,9 @@
    PICTURE: night-pitch photography heroes under a navy veil; real pitch as the board
    COLOUR/TYPE: navy #0B1736, sky #4EA8FF, white cards on cool grey; Anton display + Inter
    LAYOUT: 480px phone column, photo hero per tab, overlapping cards, bottom tabs, sheets */
-:root{color-scheme:light;--navy:#0B1736;--navy2:#13234A;--sky:#4EA8FF;--sky-soft:#EAF4FF;--bg:#F3F5F9;--ink:#0B1736;--mute:#5B6680;--line:#E1E6EF;--ok:#1E7A4A;--ok-soft:#E3F4EA;--bad:#B42318;--bad-soft:#FDECEA;--warn:#8A5A00;--warn-soft:#FFF4DB}
+:root{color-scheme:dark;--navy:#0B1736;--navy2:#13234A;--neon:#3DE0FF;--sky:#3DE0FF;--sky-soft:rgba(61,224,255,.14);--bg:rgba(255,255,255,.05);--page:#060D1E;--ink:#F2F6FF;--mute:#93A4C8;--line:rgba(255,255,255,.1);--glass:rgba(16,30,64,.62);--ok:#3DE0FF;--ok-soft:rgba(61,224,255,.14);--bad:#FFB547;--bad-soft:rgba(255,181,71,.15);--warn:#C9D6F2;--warn-soft:rgba(255,255,255,.1)}
 *{box-sizing:border-box;min-width:0;-webkit-tap-highlight-color:transparent}
-html,body{margin:0;background:#dfe4ee;color:var(--ink);font:16px/1.45 Inter,system-ui,sans-serif;overflow-x:clip}
+html,body{margin:0;background:#03070F;color:var(--ink);font:16px/1.45 Inter,system-ui,sans-serif;overflow-x:clip}
 button,input,select{font:inherit;color:inherit}button{cursor:pointer;border:0;background:none;padding:0}
 :focus-visible{outline:3px solid var(--sky);outline-offset:2px}
 h1,h2,h3{margin:0}
@@ -47,7 +47,7 @@ h1,h2,h3{margin:0}
 .muted{color:var(--mute)}.s{font-size:14px}.xs{font-size:12px}
 .between{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
 .bar{height:8px;border-radius:99px;background:var(--line);overflow:hidden;margin-top:10px}.bar i{display:block;height:100%;border-radius:99px;background:var(--navy);transition:width .5s}
-.bar.g i{background:#1E9E5A}
+.bar.g i{background:#3DE0FF}
 .btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;min-height:54px;border-radius:16px;background:var(--sky);color:var(--navy);font-weight:800;font-size:17px;margin-top:14px}
 .btn:disabled{opacity:.45}
 .btn.navy{background:var(--navy);color:#fff}.btn.soft{background:var(--ok-soft);color:var(--ok)}.btn.gray{background:var(--bg);color:var(--ink)}
@@ -170,6 +170,67 @@ input.i:focus,select.i:focus{border-color:var(--sky);outline:0}
 .pstats .d{font-size:28px}.pstats span{font-size:11px;font-weight:700;color:#C9D3E6}
 @keyframes up{from{transform:translateY(24px);opacity:0}}@keyframes fd{from{opacity:0}}
 @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+/* ===== theme: azul noche + vidrio + neón ===== */
+.app{background:var(--page)}
+.app::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;background:url(img/cancha.jpg) center/cover;filter:grayscale(1) brightness(.35);opacity:.55}
+.app::after{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;background:linear-gradient(180deg,rgba(6,13,30,.55),rgba(6,13,30,.92) 70%),#0B2A6B;mix-blend-mode:multiply}
+.app>*{position:relative;z-index:1}
+.hero{background:var(--page)}
+.hero>img{filter:grayscale(1) contrast(1.15) brightness(.85)}
+.hero::before{content:"";position:absolute;inset:0;background:#1846B8;mix-blend-mode:color;opacity:.85;z-index:0}
+.hero::after{z-index:0;background:linear-gradient(180deg,rgba(6,13,30,.45) 0%,rgba(6,13,30,.05) 32%,rgba(6,13,30,.5) 68%,var(--page) 100%)}
+.card{background:var(--glass);border:1px solid var(--line);box-shadow:none;backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px)}
+.card.lift{box-shadow:0 10px 30px rgba(0,0,0,.35)}
+.av{background:rgba(255,255,255,.12);color:#fff}
+.av.sky{background:var(--neon);color:#04121F}
+.av.lg{background:rgba(255,255,255,.08);border-color:var(--neon)}
+.btn{background:var(--neon);color:#04121F;box-shadow:0 6px 24px rgba(61,224,255,.28)}
+.btn.navy{background:rgba(255,255,255,.12);color:#fff;box-shadow:none;border:1px solid rgba(255,255,255,.14)}
+.btn.gray{background:rgba(255,255,255,.07);color:var(--ink);box-shadow:none}
+.btn.soft{background:var(--ok-soft);color:var(--neon);box-shadow:none}
+.btn.link{box-shadow:none;color:var(--mute)}
+.btn.bad{background:var(--bad-soft);color:var(--bad);box-shadow:none}
+.btn.sm{box-shadow:none}
+.ribbon{background:var(--glass);border:1px solid var(--line);backdrop-filter:blur(14px)}
+.nequi{background:rgba(0,0,0,.28);border:1px solid var(--line)}
+.tag.ok{background:var(--ok-soft);color:var(--neon)}
+.tag.no{background:var(--bad-soft);color:var(--bad)}
+.tag.wait{background:rgba(255,255,255,.1);color:#C9D6F2}
+.tag.inv{background:rgba(255,255,255,.08);color:var(--mute)}
+.bar{background:rgba(255,255,255,.08)}
+.bar i{background:linear-gradient(90deg,#1D6BFF,var(--neon))}
+.tabs .in{background:rgba(6,13,30,.88);border-top:1px solid var(--line);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px)}
+.tabs button{color:#6F80A6}
+.tabs button.on{color:var(--neon)}
+.tabs button.adm{color:#9DB6FF}.tabs button.adm.on{color:var(--neon)}
+.tabs .dot{border-color:#060D1E;background:var(--bad)}
+.sheet{background:#0C1834;border-top:1px solid var(--line)}
+.grab{background:rgba(255,255,255,.2)}
+input.i,select.i{background:rgba(255,255,255,.06);color:var(--ink)}
+.seg{background:rgba(255,255,255,.07)}
+.seg button.on{background:rgba(255,255,255,.14);color:#fff;box-shadow:none}
+.opts button{background:rgba(255,255,255,.07)}
+.opts button.on{background:var(--neon);color:#04121F}
+.pick{border-color:var(--line)}
+.pick.on{border-color:var(--neon);background:var(--sky-soft)}
+.drop{border-color:var(--neon);background:var(--sky-soft);color:var(--neon)}
+.role{background:var(--glass);border-color:var(--line)}
+.who button{background:var(--glass);border-color:var(--line)}
+.car.good button.on{background:rgba(61,224,255,.1);border-color:var(--neon)}.car.bad button.on{background:rgba(255,181,71,.1);border-color:var(--bad)}
+.car.good .ic{background:var(--ok-soft);color:var(--neon)}.car.bad .ic{background:var(--bad-soft);color:var(--bad)}
+.toast{background:var(--neon);color:#04121F}
+.debt{background:var(--neon);color:#04121F;box-shadow:0 0 18px rgba(61,224,255,.5)}
+.admbadge{background:rgba(61,224,255,.16);color:var(--neon);border:1px solid rgba(61,224,255,.4)}
+.kick{color:var(--neon)}
+.kit.B{border-color:var(--neon)}
+.gB{border-color:#fff!important}
+.pitch::after{background:rgba(11,42,107,.25)}
+.tk.N .c{border-color:var(--neon)}
+.segbar{display:flex;gap:3px;margin-top:8px}.segbar i{flex:1;height:12px;border-radius:4px;background:rgba(255,255,255,.08)}.segbar i.on{background:linear-gradient(90deg,#1D6BFF,var(--neon))}.segbar.full i.on{background:var(--neon);box-shadow:0 0 10px rgba(61,224,255,.45)}
+.land{background:var(--page)}
+.step i{background:var(--neon);color:#04121F}
+.btn.navy[data-act=pickm],.btn.navy[data-act=pickb]{background:rgba(61,224,255,.12);border:1px solid var(--neon);color:var(--neon)}
 </style>
 </head>
 <body>
@@ -329,8 +390,8 @@ function vInicio(){
   const pend=m.convocados.filter(id=>!pm[id]),okk=m.convocados.filter(id=>pm[id]);
   const t=activeT();const tm=t?S.matches.filter(x=>x.estado==='finalizado'&&x.fecha>=t.inicio&&x.fecha<=t.fin):[];const tt=tally(tm);
   const kick=st==='abierta'?`CONVOCATORIA ABIERTA · CIERRA ${fCierre(m).toUpperCase()}`:st==='cerrada'?'CONVOCATORIA CERRADA · A JUGAR':(pct>=100?'PARTIDO TERMINADO · CANCHA PAGA':'PARTIDO TERMINADO · POR PAGAR');
-  const step=(n,l,on,done)=>`<div style="flex:none;width:84px;text-align:center;position:relative;z-index:1"><div style="width:30px;height:30px;margin:0 auto;border-radius:50%;display:grid;place-items:center;font-size:13px;font-weight:800;background:${done?'#1E7A4A':on?'var(--sky)':'var(--line)'};color:${done||on?'#fff':'var(--mute)'}">${done?'<svg width="15" height="15" style="color:#fff"><use href="#i-ok"/></svg>':n}</div><div class="xs" style="font-weight:${on?800:600};color:${on?'var(--ink)':'var(--mute)'};margin-top:5px;white-space:nowrap">${l}</div></div>`;
-  const link=(done,on)=>`<div style="flex:1;height:0;margin:15px -22px 0;border-top:3px ${done?'solid #1E7A4A':on?'dashed var(--sky)':'dashed var(--line)'}"></div>`;
+  const step=(n,l,on,done)=>`<div style="flex:none;width:84px;text-align:center;position:relative;z-index:1"><div style="width:30px;height:30px;margin:0 auto;border-radius:50%;display:grid;place-items:center;font-size:13px;font-weight:800;background:${done?'#3DE0FF':on?'var(--sky)':'var(--line)'};color:${done||on?'#fff':'var(--mute)'}">${done?'<svg width="15" height="15" style="color:#fff"><use href="#i-ok"/></svg>':n}</div><div class="xs" style="font-weight:${on?800:600};color:${on?'var(--ink)':'var(--mute)'};margin-top:5px;white-space:nowrap">${l}</div></div>`;
+  const link=(done,on)=>`<div style="flex:1;height:0;margin:15px -22px 0;border-top:3px ${done?'solid #3DE0FF':on?'dashed var(--sky)':'dashed var(--line)'}"></div>`;
   const d1=st!=='abierta',d2=st==='finalizado',d3=st==='finalizado'&&pct>=100;
   const stepper=`<div style="display:flex;align-items:flex-start;margin-bottom:14px">${step(1,'Convocatoria',st==='abierta',d1)}${link(d2,st==='cerrada')}${step(2,'Partido',st==='cerrada',d2)}${link(d3,st==='finalizado'&&!d3)}${step(3,'Pago',st==='finalizado'&&!d3,d3)}</div>`;
   const mt=yo?(m.board?.[yo.id]?.team||yo.equipo||'N'):'N';
@@ -347,9 +408,9 @@ function vInicio(){
   }else{
     const allPaid=pend.length===0,pp=Math.round(okk.length/Math.max(1,m.convocados.length)*100);
     act=`<div style="font-size:22px;font-weight:800;letter-spacing:-.01em">${!inn?'Pago del partido':mine?(mine.estado==='verificado'?'Estás al día':'Pago enviado'):'Falta tu pago'}</div>
-    <div style="color:var(--ok);font-weight:600;margin-top:6px;line-height:1.35">Cancha: ${cop(rec)} recaudados de ${cop(c.valor)}<br>${okk.length} de ${m.convocados.length} convocados ya pagaron</div>
+    <div style="color:#C9D6F2;font-weight:500;margin-top:6px;line-height:1.35">Cancha: ${cop(rec)} recaudados de ${cop(c.valor)}<br>${okk.length} de ${m.convocados.length} convocados ya pagaron</div>
     <div style="text-align:right;font-size:13px;color:var(--mute);margin-top:12px">${okk.length} de ${m.convocados.length} pagados</div>
-    <div class="bar" style="margin-top:6px"><i style="width:${pp}%;background:${allPaid?'#1E9E5A':'var(--bad)'}"></i></div>`;
+    <div class="segbar ${allPaid?'full':''}">${m.convocados.map((_,k)=>`<i class="${k<okk.length?'on':''}"></i>`).join('')}</div>`;
     if(inn&&!mine)act+=`<button class="btn" data-act="pay">Pagar Cuota · ${cop(q)}</button>`;
     else if(inn&&mine)act+=`<button class="btn soft" disabled style="opacity:1"><svg><use href="#i-ok"/></svg>${mine.estado==='verificado'?'Estás al día':'Pago enviado, falta verificar'}</button>`;
   }
@@ -359,12 +420,13 @@ function vInicio(){
   const tcount=t=>m.convocados.filter(id=>m.board?.[id]?.team===t).length;
   const goers=(()=>{const colG=t=>{const ids=m.convocados.filter(id=>(m.board?.[id]?.team||pl(id)?.equipo||'N')===t);return`<div style="flex:1;min-width:0"><div style="display:flex;align-items:center;justify-content:space-between;gap:6px;padding:8px 10px;border-radius:12px;background:${t==='N'?'#111':'#fff'};color:${t==='N'?'#fff':'var(--navy)'};border:1.5px solid ${t==='N'?'#111':'var(--navy)'}"><b style="font-size:14px">${TEAM[t]}</b><span class="d" style="font-size:22px">${ids.length}</span></div>${ids.map(id=>{const p=pl(id);return p?`<div style="display:flex;align-items:center;gap:6px;padding:6px 2px;border-bottom:1px solid var(--line)">${av(p,'sm')}<div style="min-width:0;flex:1;line-height:1.15"><div style="font-weight:700;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(first(p))}</div><div class="xs muted">${esc(ROL[p.rol])}${p.invitado?' · Inv.':''}</div></div></div>`:''}).join('')||'<p class="xs muted" style="margin:8px 2px">Nadie aún</p>'}</div>`};
     return`<section class="card"><h3>Van · ${m.convocados.length} <small>de ${m.cupo}</small></h3><div style="display:flex;gap:10px;margin-top:10px">${colG('N')}${colG('B')}</div></section>`})();
-  const payBlock=`<section class="card"><h3>Cancha ${pct>=100?'<span class="tag ok">Cancha paga</span>':`<small style="color:var(--ok);font-weight:700">${cop(rec)} de ${cop(c.valor)}</small>`}</h3><div class="bar"><i style="width:${pct}%;background:${pct>=100?'#1E9E5A':'var(--bad)'}"></i></div>
+  const gauge=(()=>{const R_=64,C=Math.PI*R_,f=Math.min(1,pct/100);return`<svg viewBox="0 0 160 92" width="190" height="110" role="img" aria-label="Cancha pagada ${pct}%"><defs><linearGradient id="gg" x1="0" x2="1"><stop offset="0" stop-color="#1D6BFF"/><stop offset="1" stop-color="#3DE0FF"/></linearGradient></defs>${Array.from({length:31},(_,k)=>{const a=Math.PI*(1-k/30),x1=80+76*Math.cos(a),y1=84-76*Math.sin(a),x2=80+(k%5?72:69)*Math.cos(a),y2=84-(k%5?72:69)*Math.sin(a);return`<line x1="${x1.toFixed(1)}" y1="${y1.toFixed(1)}" x2="${x2.toFixed(1)}" y2="${y2.toFixed(1)}" stroke="rgba(255,255,255,.25)" stroke-width="1"/>`}).join('')}<path d="M16 84 A64 64 0 0 1 144 84" fill="none" stroke="rgba(255,255,255,.08)" stroke-width="12" stroke-linecap="round"/><path d="M16 84 A64 64 0 0 1 144 84" fill="none" stroke="${pct>=100?'#3DE0FF':'url(#gg)'}" stroke-width="12" stroke-linecap="round" stroke-dasharray="${(C*f).toFixed(1)} ${C.toFixed(1)}"/><text x="80" y="74" text-anchor="middle" fill="#F2F6FF" font-family="Anton,sans-serif" font-size="30">${pct}%</text><text x="80" y="90" text-anchor="middle" fill="#93A4C8" font-size="8" letter-spacing="1.5">CANCHA PAGA</text></svg>`})();
+  const payBlock=`<section class="card"><h3>Cancha ${pct>=100?'<span class="tag ok">Cancha paga</span>':`<small>${cop(rec)} de ${cop(c.valor)}</small>`}</h3><div style="display:flex;justify-content:center;margin-top:6px">${gauge}</div>
     <div class="nequi"><div style="flex:1"><div class="xs" style="color:#C9D3E6">Nequi · ${esc(c.titular)} · solo Nequi</div><div class="d">${esc(String(c.nequi).replace(/(\d{3})(\d{3})(\d{4})/,'$1 $2 $3'))}</div></div><button class="btn sm" data-act="copy" data-t="${esc(c.nequi)}">Copiar</button></div></section>
   ${(()=>{const OK='<svg width="12" height="12" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12.5l5 5L20 6.5" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/></svg>',BANG='<svg width="13" height="13" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="11" fill="currentColor"/><path d="M12 6.5v7" stroke="#fff" stroke-width="2.6" stroke-linecap="round"/><circle cx="12" cy="17.3" r="1.5" fill="#fff"/></svg>';
     const r=(id,py)=>{const p=pl(id);if(!p)return'';const tag=!py?`<span class="tag no" style="display:inline-flex;align-items:center;gap:3px;font-size:11px;padding:3px 7px">${BANG}Debe</span>`:py.estado==='verificado'?`<span class="tag ok" style="display:inline-flex;align-items:center;gap:3px;font-size:11px;padding:3px 7px">${OK}Pagó</span>`:`<span class="tag wait" style="font-size:11px;padding:3px 7px">Revisar</span>`;
       return`<div style="display:flex;align-items:center;gap:5px;padding:7px 0;border-bottom:1px solid var(--line)">${av(p,'sm')}<div style="flex:1;min-width:0;line-height:1.15"><div style="font-weight:700;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(first(p))}</div><div class="xs muted" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(ROL[p.rol])}</div></div>${tag}</div>`};
-    const head=(l,n,dark)=>`<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 12px;border-radius:12px;background:${dark?'#111':'#fff'};color:${dark?'#fff':'var(--navy)'};border:1.5px solid ${dark?'#111':'var(--navy)'}"><b style="font-size:15px">${l}</b><span class="d" style="font-size:26px">${n}</span></div>`;
+    const head=(l,n,dark)=>`<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 12px;border-radius:12px;background:${dark?'rgba(61,224,255,.12)':'rgba(255,181,71,.12)'};color:${dark?'var(--neon)':'var(--bad)'};border:1px solid ${dark?'rgba(61,224,255,.35)':'rgba(255,181,71,.35)'}"><b style="font-size:15px">${l}</b><span class="d" style="font-size:26px">${n}</span></div>`;
     return`<section class="card"><h3>Pagos · ${okk.length} de ${m.convocados.length}</h3><div style="display:flex;gap:8px;margin-top:10px;margin-inline:-4px"><div style="flex:1;min-width:0">${head('Pagaron',okk.length,true)}${okk.map(id=>r(id,pm[id])).join('')||'<p class="xs muted" style="margin:8px 2px">Nadie aún</p>'}</div><div style="flex:1;min-width:0">${head('Deben',pend.length,false)}${pend.map(id=>r(id,null)).join('')||'<p class="xs muted" style="margin:8px 2px">Nadie, cancha paga</p>'}</div></div></section>`})()}
   <section class="card"><h3>Comprobantes <small>todos los ven</small></h3>${S.pays.filter(p=>p.matchId===m.id).sort((a,b)=>b.ts-a.ts).map(proofRow).join('')||'<div class="empty">Aún no hay pagos.</div>'}</section>`;
   const center=st==='finalizado'?`<div class="d" style="font-size:56px">${sc.N} – ${sc.B}</div><div style="font-size:13px;font-weight:700;color:#DCE3F2;margin-top:4px">FINAL · ${esc(fShort(m.fecha).toUpperCase())}</div>`
@@ -443,7 +505,7 @@ function vPizarra(){
   const old=fin&&!postOpen(m);
   return hero+chips+`<div class="pitch${old?' old':''}" id="pitch"><img src="${IMG.cancha}" alt="Cancha">
     <span class="plabel" style="top:12px;background:#111;color:#fff">NEGRO · ${cnt('N')} JUG.</span><span class="plabel" style="bottom:12px;background:#fff;color:var(--navy)">BLANCO · ${cnt('B')} JUG.</span>
-    ${on.map(([id,v])=>{const p=pl(id);if(!p)return'';const f=img(p.foto),g=gcount(id);return`<div class="tk ${v.team}" data-id="${id}" style="left:${v.x}%;top:${v.y}%"><div class="c">${f?`<img src="${f}" alt="">`:esc(p.dorsal||ini(p.nombre))}</div>${g?`<b class="goalb"><svg width="12" height="12" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10" fill="#fff" stroke="#0B1736" stroke-width="2"/><path d="M12 7.5l4 2.9-1.5 4.7h-5L8 10.4z" fill="#0B1736"/></svg>${g>1?g:''}</b>`:''}<span>${esc(first(p))}</span>${(()=>{const r=rc(id),g=topTag(r.good),b2=topTag(r.bad);return (g?`<em class="rt" style="background:#E3F4EA;color:#1E7A4A;display:flex;align-items:center;gap:3px">${ticon(g[0],11)}${esc(g[0])}</em>`:'')+(b2?`<em class="rt" style="background:#D92D20;color:#fff;display:flex;align-items:center;gap:3px">${ticon(b2[0],11)}${esc(b2[0])}</em>`:'')})()}</div>`}).join('')}</div>
+    ${on.map(([id,v])=>{const p=pl(id);if(!p)return'';const f=img(p.foto),g=gcount(id);return`<div class="tk ${v.team}" data-id="${id}" style="left:${v.x}%;top:${v.y}%"><div class="c">${f?`<img src="${f}" alt="">`:esc(p.dorsal||ini(p.nombre))}</div>${g?`<b class="goalb"><svg width="12" height="12" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10" fill="#fff" stroke="#0B1736" stroke-width="2"/><path d="M12 7.5l4 2.9-1.5 4.7h-5L8 10.4z" fill="#0B1736"/></svg>${g>1?g:''}</b>`:''}<span>${esc(first(p))}</span>${(()=>{const r=rc(id),g=topTag(r.good),b2=topTag(r.bad);return (g?`<em class="rt" style="background:#E3F4EA;color:#3DE0FF;display:flex;align-items:center;gap:3px">${ticon(g[0],11)}${esc(g[0])}</em>`:'')+(b2?`<em class="rt" style="background:#D92D20;color:#fff;display:flex;align-items:center;gap:3px">${ticon(b2[0],11)}${esc(b2[0])}</em>`:'')})()}</div>`}).join('')}</div>
   <p class="muted xs" style="margin:8px 16px 0">${fin?(postOpen(m)?'Postpartido: da máximo una buena y una mala. Se borra cuando arranque el próximo partido.':'Así quedó el partido.'):'Los que no están en la cancha son el cambio de su equipo.'}</p>
   ${fin?postCards(m):''}${row('N')}${row('B')}
   ${isAdmin()&&!fin?`<div style="padding:0 16px"><button class="btn navy" data-act="auto">Alinear automático por posición</button></div>`:''}`;
@@ -516,7 +578,7 @@ function drawScore(id){const m=S.matches.find(x=>x.id===id),s=score(m),a=isAdmin
   const teamOf=pid=>m.board?.[pid]?.team||pl(pid)?.equipo||'N';
   const BALL='<svg width="14" height="14" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10" fill="#fff" stroke="#0B1736" stroke-width="2"/><path d="M12 7.5l4 2.9-1.5 4.7h-5L8 10.4z" fill="#0B1736"/></svg>';
   const col=t=>{const ids=m.convocados.filter(pid=>teamOf(pid)===t);const og=m.goals.filter(g=>g.team===t&&!g.playerId).length;
-    const row=(pid,label,n)=>`<div style="display:flex;gap:4px;margin-top:6px"><button ${a?`data-act="g1" data-t="${t}" data-p="${pid}" data-m="${m.id}"`:'disabled'} style="flex:1;min-width:0;display:flex;align-items:center;gap:6px;padding:8px;border-radius:12px;background:${n?(t==='N'?'#111':'#fff'):'var(--bg)'};color:${n&&t==='N'?'#fff':'var(--ink)'};border:${t==='B'&&n?'2px solid var(--navy)':'2px solid transparent'};text-align:left;min-height:46px">${pid?av(pl(pid),'sm'):'<span class="av sm">?</span>'}<span style="flex:1;min-width:0;font-weight:700;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(label)}</span>${n?`<span style="display:flex;align-items:center;gap:2px;font-weight:800">${BALL}${n>1?n:''}</span>`:''}</button>${a&&n?`<button data-act="g0" data-t="${t}" data-p="${pid}" data-m="${m.id}" aria-label="Quitar gol" style="width:34px;border-radius:10px;background:var(--bad-soft);color:var(--bad);font-weight:800;font-size:18px">−</button>`:''}</div>`;
+    const row=(pid,label,n)=>`<div style="display:flex;gap:4px;margin-top:6px"><button ${a?`data-act="g1" data-t="${t}" data-p="${pid}" data-m="${m.id}"`:'disabled'} style="flex:1;min-width:0;display:flex;align-items:center;gap:6px;padding:8px;border-radius:12px;background:${n?(t==='N'?'#111':'#fff'):'var(--bg)'};color:${n?(t==='N'?'#fff':'#0B1736'):'var(--ink)'};border:${t==='B'&&n?'2px solid var(--navy)':'2px solid transparent'};text-align:left;min-height:46px">${pid?av(pl(pid),'sm'):'<span class="av sm">?</span>'}<span style="flex:1;min-width:0;font-weight:700;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(label)}</span>${n?`<span style="display:flex;align-items:center;gap:2px;font-weight:800">${BALL}${n>1?n:''}</span>`:''}</button>${a&&n?`<button data-act="g0" data-t="${t}" data-p="${pid}" data-m="${m.id}" aria-label="Quitar gol" style="width:34px;border-radius:10px;background:var(--bad-soft);color:var(--bad);font-weight:800;font-size:18px">−</button>`:''}</div>`;
     return`<div style="flex:1;min-width:0"><div style="display:flex;align-items:center;gap:6px;justify-content:center;margin-bottom:4px"><span class="kit ${t}" style="width:16px;height:16px;margin:0;border-width:2px;border-color:var(--navy);box-shadow:none"></span><b>${TEAM[t]}</b></div>
       ${ids.map(pid=>row(pid,first(pl(pid)),m.goals.filter(g=>g.playerId===pid&&g.team===t).length)).join('')}${row('','Autogol / otro',og)}</div>`};
   sheet(`<h2>MARCADOR</h2><p class="muted s" style="margin:4px 0 0">${esc(fShort(m.fecha))} · ${esc(cancha(m).nombre)}${m.estado==='finalizado'?' · Final':''}</p>
