@@ -292,6 +292,7 @@ input.i,select.i{background:rgba(255,255,255,.06);color:var(--ink)}
 .aw .t3r .who .av{width:30px;height:30px;font-size:11px}
 .aw .t3r .n{font:700 24px 'Bebas Neue',Impact,sans-serif;color:#F2F6FF;min-width:18px;text-align:right}
 .aw .t3e{margin-top:12px;font-size:13px;color:#93A4C8}
+.tk.rated::before{content:'';position:absolute;z-index:5;top:-3px;left:calc(50% - 22px);width:12px;height:12px;border-radius:50%;background:#3DE0FF;border:2px solid #0A142E}.tk.bn.rated::before{left:calc(50% - 17px)}
 .aw .sh{width:100%;margin-top:12px;min-height:46px;border-radius:14px;border:1px solid rgba(61,224,255,.4);background:transparent;color:#F2F6FF;font-weight:800;font-size:14px}
 </style>
 </head>
@@ -312,7 +313,7 @@ input.i,select.i{background:rgba(255,255,255,.06);color:var(--ink)}
 </defs></svg>
 <script>
 {
-const KEY='fuchibol_club_v9';
+const KEY='fuchibol_club_v10';
 const CUPO={'5 vs 5':14,'7 vs 7':18};
 const ROL={ARQ:'Arquero',DEF:'Defensa',MED:'Medio',DEL:'Delantero'};
 const PIE=['Diestro','Zurdo','Ambidiestro'];
@@ -395,8 +396,10 @@ function seed(){
   let rs=7;const rnd=()=>(rs=(rs*9301+49297)%233280)/233280;
   const lastM=matches.filter(m=>m.estado==='finalizado').pop();const votes={};
   lastM.convocados.forEach(v=>{if(['p2','p5','p6'].includes(v)||rnd()<.3)return;const o=lastM.convocados.filter(x=>x!==v);
-    votes[v]={good:rnd()<.85?{pid:['p14','p4','p11','p6'].filter(x=>x!==v)[Math.floor(rnd()*3)],tag:TAGS_OK[Math.floor(rnd()*4)]}:null,
-              bad:rnd()<.75?{pid:['p13','p15','p9'].filter(x=>x!==v)[Math.floor(rnd()*2)],tag:TAGS_BAD[Math.floor(rnd()*4)]}:null}});
+    const vv=votes[v]={};
+    if(rnd()<.85){const t=['p14','p4','p11','p6'].filter(x=>x!==v)[Math.floor(rnd()*3)];(vv[t]=vv[t]||{}).good=TAGS_OK[Math.floor(rnd()*4)]}
+    if(rnd()<.75){const t=['p13','p15','p9'].filter(x=>x!==v)[Math.floor(rnd()*2)];(vv[t]=vv[t]||{}).bad=TAGS_BAD[Math.floor(rnd()*4)]}
+    if(rnd()<.4){const t=o[Math.floor(rnd()*o.length)];(vv[t]=vv[t]||{}).good=vv[t].good||TAGS_OK[Math.floor(rnd()*4)]}});
   lastM.post={votes};
   const torneos=[{id:'t1',nombre:'Torneo de noviembre',inicio:'2026-11-08',semanas:6}];
   return {players:P,canchas,matches,pays,torneos,ses:null};
@@ -433,7 +436,9 @@ function stats(id){const f=finished();const pj=f.filter(m=>m.convocados.includes
   const deb=finished().filter(m=>m.convocados.includes(id)&&!payMap(m)[id]).length;return{pj:pj.length,gol,gan,deb}}
 function post(m){m.post=m.post||{votes:{}};return m.post}
 const postOpen=m=>m&&m.estado==='finalizado'&&finished()[0]?.id===m.id;
-function received(m,pid){const o={good:{},bad:{}};if(!postOpen(m))return o;Object.values(post(m).votes).forEach(v=>['good','bad'].forEach(k=>{const x=v[k];if(x&&x.pid===pid)o[k][x.tag]=(o[k][x.tag]||0)+1}));return o}
+function flat(m){const r=[];Object.entries(post(m).votes).forEach(([v,o])=>Object.entries(o||{}).forEach(([pid,x])=>['good','bad'].forEach(k=>{if(x&&x[k])r.push({v,pid,k,tag:x[k]})})));return r}
+function received(m,pid){const o={good:{},bad:{}};if(!postOpen(m))return o;flat(m).filter(x=>x.pid===pid).forEach(x=>o[x.k][x.tag]=(o[x.k][x.tag]||0)+1);return o}
+const ratedBy=(m,y)=>Object.entries(post(m).votes[y]||{}).filter(([,x])=>x&&(x.good||x.bad)).map(([pid])=>pid);
 const topTag=o=>Object.entries(o).sort((a,b)=>b[1]-a[1])[0];
 
 
@@ -578,7 +583,7 @@ function vPizarra(){
   const old=fin&&!postOpen(m);
   return hero+chips+(fin?awards(m):'')+`<div class="pitch${old?' old':''}${isAdmin()&&!fin?' edit':''}" id="pitch"><img src="${IMG.cancha}" alt="Cancha">
     <span class="plabel" style="top:12px;background:#111;color:#fff">NEGRO · ${cnt('N')} JUG.</span>${bench('N').length?'<span class="blabel" style="top:12px">CAMBIO</span>':''}${bench('B').length?'<span class="blabel" style="bottom:12px">CAMBIO</span>':''}<span class="plabel" style="bottom:12px;background:#fff;color:var(--navy)">BLANCO · ${cnt('B')} JUG.</span>
-    ${[...on,...['N','B'].flatMap(t=>bench(t).map((id,k)=>[id,{team:t,bn:1,x:92,y:t==='N'?13+k*8.5:86-k*8.5}]))].map(([id,v])=>{const p=pl(id);if(!p)return'';const f=img(p.foto),g=gcount(id);return`<div class="tk ${v.team}${v.bn?' bn':''}${postOpen(m)&&me()&&me().id===id?' me':''}" data-id="${id}" style="left:${v.x}%;top:${v.y}%"><div class="c">${f?`<img src="${f}" alt="">`:esc(p.dorsal||ini(p.nombre))}</div>${g?`<b class="goalb"><svg width="12" height="12" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10" fill="#fff" stroke="#0B1736" stroke-width="2"/><path d="M12 7.5l4 2.9-1.5 4.7h-5L8 10.4z" fill="#0B1736"/></svg>${g>1?g:''}</b>`:''}<span>${esc(first(p))}</span>${(()=>{const r=rc(id),g=topTag(r.good),b2=topTag(r.bad);return (g?`<em class="rt${lastPop===id+'good'?' pop':''}" style="background:#3DE0FF;color:#04121F;display:flex;align-items:center;gap:3px">${ticon(g[0],11)}${esc(g[0])}</em>`:'')+(b2?`<em class="rt${lastPop===id+'bad'?' pop':''}" style="background:#FFB547;color:#1F1405;display:flex;align-items:center;gap:3px">${ticon(b2[0],11)}${esc(b2[0])}</em>`:'')})()}</div>`}).join('')}</div>
+    ${[...on,...['N','B'].flatMap(t=>bench(t).map((id,k)=>[id,{team:t,bn:1,x:92,y:t==='N'?13+k*8.5:86-k*8.5}]))].map(([id,v])=>{const p=pl(id);if(!p)return'';const f=img(p.foto),g=gcount(id);return`<div class="tk ${v.team}${v.bn?' bn':''}${postOpen(m)&&me()&&me().id===id?' me':''}${postOpen(m)&&me()&&ratedBy(m,me().id).includes(id)?' rated':''}" data-id="${id}" style="left:${v.x}%;top:${v.y}%"><div class="c">${f?`<img src="${f}" alt="">`:esc(p.dorsal||ini(p.nombre))}</div>${g?`<b class="goalb"><svg width="12" height="12" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10" fill="#fff" stroke="#0B1736" stroke-width="2"/><path d="M12 7.5l4 2.9-1.5 4.7h-5L8 10.4z" fill="#0B1736"/></svg>${g>1?g:''}</b>`:''}<span>${esc(first(p))}</span>${(()=>{const r=rc(id),g=topTag(r.good),b2=topTag(r.bad);return (g?`<em class="rt${lastPop===id+'good'?' pop':''}" style="background:#3DE0FF;color:#04121F;display:flex;align-items:center;gap:3px">${ticon(g[0],11)}${esc(g[0])}</em>`:'')+(b2?`<em class="rt${lastPop===id+'bad'?' pop':''}" style="background:#FFB547;color:#1F1405;display:flex;align-items:center;gap:3px">${ticon(b2[0],11)}${esc(b2[0])}</em>`:'')})()}</div>`}).join('')}</div>
   <p class="muted xs" style="margin:8px 16px 0">${fin?(postOpen(m)?'Postpartido: toca a un jugador (también los del cambio) para darle una buena o una mala. Máximo una de cada una.':'Así quedó el partido.'):'Los que no están en la cancha son el cambio de su equipo.'}</p>
   
   ${isAdmin()&&!fin?`<div style="padding:0 16px"><button class="btn navy" data-act="auto">Alinear automático por posición</button></div>`:''}`;
@@ -663,48 +668,30 @@ function drawScore(id){const m=S.matches.find(x=>x.id===id),s=score(m),a=isAdmin
 let giveTag={good:TAGS_OK[0],bad:TAGS_BAD[0]};
 const carousel=(k,list,isOn,act,extra)=>`<div class="car ${k}">${list.map(t=>`<button class="${isOn(t)?'on':''}" data-act="${act}" data-k="${k}" data-v="${esc(t)}" ${extra||''}><span class="ic">${ticon(t)}</span><b>${esc(t)}</b><small>${esc(TDESC[t]||'')}</small></button>`).join('')}</div>`;
 function awards(m){if(!postOpen(m))return'';const P=post(m),y=me(),can=y&&m.convocados.includes(y.id),mine=y&&P.votes[y.id]||{};
-  const t={good:{},bad:{}};Object.values(P.votes).forEach(v=>['good','bad'].forEach(k=>{const x=v[k];if(!x)return;const o=t[k][x.pid]=t[k][x.pid]||{n:0,tags:{}};o.n++;o.tags[x.tag]=(o.tags[x.tag]||0)+1}));
+  const F=flat(m),t={good:{},bad:{}};F.forEach(x=>{const o=t[x.k][x.pid]=t[x.k][x.pid]||{n:0,tags:{}};o.n++;o.tags[x.tag]=(o.tags[x.tag]||0)+1});
   const rank=k=>Object.entries(t[k]).sort((a,b)=>b[1].n-a[1].n);
-  const voters=Object.values(P.votes).filter(v=>v.good||v.bad).length,tot=m.convocados.length,nx=upcoming()[0];
+  const voters=new Set(F.map(x=>x.v)).size,tot=m.convocados.length,nx=upcoming()[0];
   const pc=(k)=>{const r=rank(k),w=r[0],cls=k==='good'?'g':'b',lbl=k==='good'?'EL MÁS BESTIA':'EL MÁS PAQUETE';
     if(!w)return`<div class="pc ${cls}"><div class="k">${lbl}</div><div class="ph"><div class="q">?</div></div><b class="n">Sin dueño</b><small>todavía</small><div class="also"></div></div>`;
     const p=pl(w[0]),tg=topTag(w[1].tags)[0];
     return`<div class="pc ${cls}"><div class="k">${lbl}</div><div class="ph">${av(p)}<span class="bd">${ticon(tg,16)}</span></div><b class="n">${esc(first(p))}</b><small>${esc(tg)} · ${w[1].n} voto${w[1].n>1?'s':''}</small><div class="also">${r.slice(1,3).map(([id,o])=>esc(first(pl(id)))+' '+o.n).join(' · ')}</div></div>`};
-  const top3=()=>{const c={};Object.values(P.votes).forEach(v=>['good','bad'].forEach(k=>{const x=v[k];if(!x)return;const key=k+'|'+x.pid+'|'+x.tag;c[key]=(c[key]||0)+1}));
+  const top3=()=>{const c={};F.forEach(x=>{const key=x.k+'|'+x.pid+'|'+x.tag;c[key]=(c[key]||0)+1});
     const r=Object.entries(c).sort((a,b)=>b[1]-a[1]).slice(0,3);
     if(!r.length)return'<div class="t3e">Nadie ha calificado todavía. Sé el primero.</div>';
     return`<div class="t3">${r.map(([key,n],i)=>{const[k,pid,tg]=key.split('|'),p=pl(pid);return`<div class="t3r ${k==='good'?'g':'b'}" data-act="tok" data-id="${pid}">${av(p)}<div class="tx"><b>${esc(HEAD[tg]?HEAD[tg](first(p)):first(p)+': '+tg)}</b><small><span class="ch">${ticon(tg,13)}${esc(tg)}</span>${n} voto${n>1?'s':''}</small></div></div>`}).join('')}</div>`};
-  const done=mine.good&&mine.bad;
+  const left=can?m.convocados.filter(id=>id!==y.id&&!ratedBy(m,y.id).includes(id)).length:0,done=can&&!left;
   return`<section class="aw"><span class="live"><i></i>EN VIVO</span><h2>#TERCER TIEMPO</h2><p class="sub">Lo que dejó el partido. Es anónimo y se borra cuando arranque el próximo.</p>
   ${top3()}
   <div class="bar">${Array.from({length:tot},(_,i)=>`<i class="${i<voters?'on':''}"></i>`).join('')}</div>
   <div class="meta"><span>Votaron ${voters} de ${tot}</span><span>${nx?'Cierra '+esc(fShort(nx.fecha)):'Cierra al próximo partido'}</span></div>
-  ${can?(done?'<p class="dn">Ya diste tus dos. A ver quién cae.</p>':`<button class="go" data-act="hintpitch">Llamar al VAR${!mine.good&&!mine.bad?'':' · te falta '+(mine.good?'una mala':'una buena')}</button><p class="hn">Toca a un jugador en la cancha. Nadie sabrá que fuiste tú.</p>`):''}</section>`}
-function awText(m){const P=post(m),c={good:{},bad:{}};Object.values(P.votes).forEach(v=>['good','bad'].forEach(k=>{const x=v[k];if(x)c[k][x.pid]=(c[k][x.pid]||0)+1}));
-  const w=k=>{const e=Object.entries(c[k]).sort((a,b)=>b[1]-a[1])[0];return e?first(pl(e[0]))+' ('+e[1]+')':'nadie todavía'};
-  const voters=Object.values(P.votes).filter(v=>v.good||v.bad).length;
-  return`Premios Fuchibol · ${fShort(m.fecha)}\nEl más bestia: ${w('good')}\nEl más paquete: ${w('bad')}\nVotaron ${voters} de ${m.convocados.length}. Los que faltan, entren a la app y voten.`}
-function postCards(m){if(!postOpen(m))return'';const y=me(),P=post(m),mine=y&&P.votes[y.id]||{},can=y&&m.convocados.includes(y.id);
-  const agg={};Object.values(P.votes).forEach(v=>['good','bad'].forEach(k=>{const x=v[k];if(!x)return;const key=k+'|'+x.pid+'|'+x.tag;agg[key]=(agg[key]||0)+1}));
-  const rows=k=>{const by={};Object.entries(agg).filter(([key])=>key.startsWith(k)).forEach(([key,c])=>{const[,pid,tag]=key.split('|');(by[pid]=by[pid]||[]).push([tag,c])});
-    return Object.entries(by).sort((a,b)=>b[1].reduce((x,y)=>x+y[1],0)-a[1].reduce((x,y)=>x+y[1],0)).map(([pid,tags])=>`<div class="li" style="align-items:flex-start">${av(pl(pid),'sm')}<div class="nm">${esc(first(pl(pid)))}<div style="display:flex;flex-wrap:wrap;gap:4px;margin-top:4px">${tags.sort((a,b)=>b[1]-a[1]).map(([tg,c])=>`<span class="tag ${k==='good'?'ok':'no'}" style="display:inline-flex;align-items:center;gap:4px">${ticon(tg,14)}${esc(tg)}${c>1?' · '+c:''}</span>`).join('')}</div></div></div>`).join('')};
-  const mineBtn=k=>{const x=mine[k];return`<button class="btn sm ${k==='good'?'gray':'bad'}" style="width:100%;margin-top:0;min-height:48px" data-act="give" data-k="${k}">${x?`${esc(x.tag)} → ${esc(first(pl(x.pid)))}`:(k==='good'?'+ Dar una buena':'+ Dar una mala')}</button>`};
-  return`<section class="card"><h3>Postpartido <small>se borra al arrancar el próximo</small></h3>
-    ${can?`<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px">${mineBtn('good')}${mineBtn('bad')}</div>`:'<p class="xs muted" style="margin:8px 0 0">Solo los que jugaron pueden dar.</p>'}
-    ${rows('good')?`<div class="grp" style="color:var(--ok)">LO BUENO</div>${rows('good')}`:''}${rows('bad')?`<div class="grp" style="color:var(--bad)">LO MALO</div>${rows('bad')}`:''}
-    ${!rows('good')&&!rows('bad')?'<div class="empty">Nadie ha dicho nada todavía.</div>':''}</section>`}
-function sheetGive(k){const m=S.matches.find(x=>x.id===boardM),y=me().id,mine=post(m).votes[y]?.[k],list=k==='good'?TAGS_OK:TAGS_BAD;if(mine)giveTag[k]=mine.tag;
-  sheet(`<h2>${k==='good'?'UNA BUENA':'UNA MALA'}</h2><p class="muted s" style="margin:4px 0 0">Solo una por partido. Elige qué y a quién.</p>
-  ${carousel(k,list,t=>giveTag[k]===t,'gtag')}
-  <label class="f">¿A quién?</label><div class="pgrid">${m.convocados.filter(id=>id!==y).map(id=>`<button data-act="givep" data-k="${k}" data-id="${id}" style="${mine?.pid===id?'outline:3px solid var(--sky)':''}">${av(pl(id))}${esc(first(pl(id)))}</button>`).join('')}</div>
-  ${mine?`<button class="btn link" data-act="ungive" data-k="${k}">Quitar la que di</button>`:''}`)}
-function sheetPost(id){const m=S.matches.find(x=>x.id===boardM),p=pl(id),y=me(),open=postOpen(m),can=y&&m.convocados.includes(y.id)&&open&&y.id!==id,mine=y&&post(m).votes[y.id]||{};
+  ${can?(done?'<p class="dn">Ya calificaste a todos. A ver quién cae.</p>':`<button class="go" data-act="hintpitch">Llamar al VAR · te falta${left>1?'n':''} ${left}</button><p class="hn">Toca a cualquier jugador en la cancha y dale una buena y/o una mala. Nadie sabrá que fuiste tú.</p>`):''}</section>`}
+function sheetPost(id){const m=S.matches.find(x=>x.id===boardM),p=pl(id),y=me(),open=postOpen(m),can=y&&m.convocados.includes(y.id)&&open&&y.id!==id,mine=y&&post(m).votes[y.id]?.[id]||{};
   const g=m.goals.filter(x=>x.playerId===id).length,team=m.board?.[id]?.team||'N',r=received(m,id);
-  const chips=(k,list)=>carousel(k,list,t=>mine[k]?.pid===id&&mine[k]?.tag===t,'givedirect',`data-id="${id}"`);
+  const chips=(k,list)=>carousel(k,list,t=>mine[k]===t,'givedirect',`data-id="${id}"`);
   const got=[...Object.entries(r.good).map(([t,c])=>`<span class="tag ok" style="display:inline-flex;align-items:center;gap:4px">${ticon(t,14)}${esc(t)}${c>1?' · '+c:''}</span>`),...Object.entries(r.bad).map(([t,c])=>`<span class="tag no" style="display:inline-flex;align-items:center;gap:4px">${ticon(t,14)}${esc(t)}${c>1?' · '+c:''}</span>`)].join('');
   sheet(`<div style="display:flex;gap:12px;align-items:center">${av(p,'lg')}<div><div class="kick" style="color:var(--mute)">${TEAM[team]} · ${esc(ROL[p.rol])}</div><h2 style="font-size:26px;margin-top:4px">${esc(p.nombre.toUpperCase())}</h2><div class="s muted" style="margin-top:4px">${g} gol${g===1?'':'es'} en este partido</div></div></div>
   ${got?`<div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:12px">${got}</div>`:''}
-  ${can?`<label class="f">Dale una buena <span class="xs muted" style="font-weight:500">· desliza</span></label>${chips('good',tagsFor(id,'good'))}<label class="f">o una mala</label>${chips('bad',tagsFor(id,'bad'))}<p class="xs muted" style="margin:10px 0 0">Tienes una buena y una mala por partido. Si eliges otra, reemplaza la anterior.</p>`:''}`)}
+  ${can?`<label class="f">Dale una buena <span class="xs muted" style="font-weight:500">· desliza</span></label>${chips('good',tagsFor(id,'good'))}<label class="f">o una mala</label>${chips('bad',tagsFor(id,'bad'))}<p class="xs muted" style="margin:10px 0 0">A cada jugador le puedes dar una buena y una mala. Si eliges otra, reemplaza la anterior.</p>`:''}`)}
 let galM=null,galIdx=0;
 function openGal(payId){const p0=S.pays.find(x=>x.id===payId);galM=p0.matchId;const list=S.pays.filter(x=>x.matchId===galM).sort((a,b)=>a.ts-b.ts);galIdx=Math.max(0,list.findIndex(x=>x.id===payId));drawGal()}
 function drawGal(){const m=S.matches.find(x=>x.id===galM),c=cancha(m),list=S.pays.filter(x=>x.matchId===galM).sort((a,b)=>a.ts-b.ts);if(!list.length){close();return}
@@ -818,11 +805,9 @@ document.addEventListener('click',async e=>{
     case'tosub':{const m=S.matches.find(x=>x.id===boardM);m.board[id]={team:m.board[id].team};save();close();render();break}
     case'pickb':boardM=id;render();break;
     case'bmode':{boardMode=t.dataset.v;const f=finished();boardM=boardMode==='hist'?(f[1]?.id||f[0]?.id):(upcoming().find(x=>x.estado==='cerrada')||f[0]||upcoming()[0])?.id;render();break}
-    case'give':sheetGive(t.dataset.k);break;
-    case'gtag':giveTag[t.dataset.k]=t.dataset.v;sheetGive(t.dataset.k);break;
-    case'givep':case'givedirect':case'ungive':{if(a==='givedirect'&&!t.dataset.done){t.dataset.done='1';t.classList.add('picked');setTimeout(()=>t.click(),430);return}lastPop=t.dataset.id+t.dataset.k;setTimeout(()=>{lastPop=null},900);const m=S.matches.find(x=>x.id===boardM),y=me().id,P=post(m),v=P.votes[y]=P.votes[y]||{},k=t.dataset.k;
-      if(a==='ungive')v[k]=null;else{const tag=a==='givep'?giveTag[k]:t.dataset.v;v[k]=(v[k]?.pid===id&&v[k]?.tag===tag)?null:{pid:id,tag}}
-      save();render();close();toast(v[k]?`${v[k].tag} → ${first(pl(v[k].pid))}`:'Quitado');break}
+    case'givep':case'givedirect':case'ungive':{if(a==='givedirect'&&!t.dataset.done){t.dataset.done='1';t.classList.add('picked');setTimeout(()=>t.click(),430);return}lastPop=t.dataset.id+t.dataset.k;setTimeout(()=>{lastPop=null},900);const m=S.matches.find(x=>x.id===boardM),y=me().id,P=post(m),V=P.votes[y]=P.votes[y]||{},v=V[id]=V[id]||{},k=t.dataset.k;
+      if(a==='ungive')v[k]=null;else{const tag=t.dataset.v;v[k]=v[k]===tag?null:tag}
+      save();render();close();toast(v[k]?`${v[k]} → ${first(pl(id))}`:'Quitado');break}
     case'auto':{const m=S.matches.find(x=>x.id===boardM);autoBoard(m,S.players);save();render();toast('Equipos armados por posición');break}
     case'score':drawScore(id);break;
     case'g1':{const m=M();m.goals.push({id:uid(),playerId:t.dataset.p,team:t.dataset.t});save();drawScore(m.id);render();break}
@@ -844,7 +829,6 @@ document.addEventListener('click',async e=>{
       S.matches.push(m);curMatch=m.id;save();page=null;tab='inicio';render();
       sheet(`<h2>CONVOCATORIA PUBLICADA</h2><p class="muted s" style="margin:4px 0 0">Mándala al grupo de WhatsApp para que la gente entre y confirme.</p><div style="white-space:pre-line;background:var(--bg);border-radius:14px;padding:14px;margin-top:12px;font-size:14px">${esc(shareText(m))}</div><button class="btn navy" data-act="copy" data-t="${esc(shareText(m))}">Copiar mensaje</button><button class="btn link" data-act="bg">Listo</button>`);break}
     case'hintpitch':{const pt=document.getElementById('pitch');if(pt){pt.scrollIntoView({behavior:'smooth',block:'start'});pt.classList.remove('hint');void pt.offsetWidth;pt.classList.add('hint');setTimeout(()=>pt.classList.remove('hint'),2400)}break}
-    case'shareaw':{const m=S.matches.find(x=>x.id===boardM);copy(awText(m));break}
     case'share':{const m=M()||S.matches.find(x=>x.id===id);copy(shareText(S.matches.find(x=>x.id===id)));break}
     case'closeconv':{const m=S.matches.find(x=>x.id===id);sheet(`<h2>CERRAR CONVOCATORIA</h2><p class="muted s" style="margin:6px 0 0">Van ${m.convocados.length}. La cuota queda en <b>${cop(cuotaCalc(cancha(m).valor,m.convocados.length))}</b> (${cop(cancha(m).valor)} ÷ ${m.convocados.length}). Nadie más podrá entrar ni bajarse. Se paga al terminar el partido.</p><button class="btn navy" data-act="closeok" data-id="${m.id}">Cerrar y fijar cuota</button><button class="btn link" data-act="bg">Cancelar</button>`);break}
     case'closeok':{const m=S.matches.find(x=>x.id===id);closeConv(m);save();close();render();toast('Convocatoria cerrada. Cuota fijada.');break}
