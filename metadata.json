@@ -1,0 +1,7 @@
+{
+  "name": "PF SOCCER - Escuela de Fútbol",
+  "description": "Gestión oficial de jugadores, convocatorias, alineación táctica interactiva con drag & drop, histórico de partidos y tabla de goleadores de PF SOCCER.",
+  "requestFramePermissions": ["camera"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
+
