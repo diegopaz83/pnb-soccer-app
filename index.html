@@ -367,6 +367,10 @@ a.btn.wa{display:flex;align-items:center;justify-content:center;gap:8px;text-dec
 .bgrp{display:flex;flex-direction:column;align-items:center;gap:12px}.bgrp .bt{font-size:9px;font-weight:900;letter-spacing:1.5px;color:#93A4C8}
 .tk.bs{position:relative;margin:0;left:auto;top:auto;width:66px}.tk.bs span{max-width:64px;overflow:hidden;text-overflow:ellipsis}
 .tk.bs .goalb{left:calc(50% + 9px)}
+.call a.si{display:flex;align-items:center;justify-content:center;text-decoration:none;min-height:60px;border-radius:18px;font-size:18px;font-weight:900}
+.hoyteam{display:flex;align-items:center;gap:8px;margin-top:16px;font-size:15px;color:#C9D6F2}.hoyteam b{color:#F2F6FF}
+.hoyteam i{width:16px;height:16px;border-radius:50%;border:2px solid #fff}.hoyteam.N i{background:#111}.hoyteam.B i{background:#fff}
+.hoyfoot{margin:12px 0 0;font-size:12px;color:#93A4C8;text-align:center}
 .aw .sh{width:100%;margin-top:12px;min-height:46px;border-radius:14px;border:1px solid rgba(61,224,255,.4);background:transparent;color:#F2F6FF;font-weight:800;font-size:14px}
 </style>
 </head>
@@ -547,10 +551,19 @@ const callStatus=m=>{if(!m.llamados)return'';const nv=m.nov||[],sr=m.llamados.fi
   const grp=(l,ids,cls)=>`<div class="csg ${cls}"><div class="csh"><b>${ids.length}</b>${l}</div><div class="csn">${ids.length?ids.map(id=>esc(first(pl(id)))).join(' · '):'—'}</div></div>`;
   const sr2=sr.filter(id=>inEsp(m,id)<0);
   return`<div class="cs">${grp('Van',m.convocados,'v')}${esp(m).length?grp('En espera',esp(m).map(x=>x.id),'e'):''}${grp('No van',nv,'n')}${grp('Sin responder',sr2,'s')}</div>`};
+const localISO=()=>{const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')};
+const hoyMatch=y=>{if(visor())return null;const k=localISO();return S.matches.find(m=>m.fecha===k&&m.estado!=='finalizado'&&m.convocados.includes(y.id)&&!(S.hoySeen||{})[m.id+y.id])||null};
+const mapsUrl=c=>'https://www.google.com/maps/search/?api=1&query='+encodeURIComponent([c.nombre,c.direccion,/cali/i.test(c.direccion||'')?'':'Cali'].filter(Boolean).join(', '));
 const pendingCall=()=>{const y=me();if(!y||visor()||y.invitado)return null;return upcoming().find(m=>m.estado==='abierta'&&(m.llamados||[]).includes(y.id)&&!m.convocados.includes(y.id)&&!(m.nov||[]).includes(y.id)&&m.by!==y.id&&inEsp(m,y.id)<0)||null};
 let callTeam=null;
 function showCall(){const el=$('#call'),y0=me(),up=y0&&S.matches.find(x=>x.estado!=='finalizado'&&x.subio?.[y0.id]);
   if(up){const tm=up.board?.[y0.id]?.team||'N';el.innerHTML=`<div class="call"><img src="${IMG.estadio}" alt=""><div class="cin"><div class="cl">LISTA DE ESPERA</div><div class="cd" style="margin-top:12px">¡ENTRASTE!</div><div class="cc">Se bajó alguien y pasaste de la lista de espera al partido del ${esc(fShort(up.fecha))} · ${esc(fTime(up.hora))}.<br><span>Vas con ${TEAM[tm]}. Si no puedes, bájate antes de ${esc(fCierre(up))}.</span></div>${cupoBar(up,1)}<div class="cbtn" style="grid-template-columns:1fr"><button class="si" data-act="subiok" data-m="${up.id}">¡De una!</button></div></div></div>`;return}
+  const hy=y0&&hoyMatch(y0);if(hy){const c=cancha(hy),tm=hy.board?.[y0.id]?.team||y0.equipo||'N';
+    el.innerHTML=`<div class="call"><img src="${IMG.estadio}" alt=""><div class="cin"><div class="cl">${esc(first(y0)).toUpperCase()}, HOY HAY FÚTBOL</div><div class="cd" style="margin-top:12px">PARTIDO HOY<br>${esc(fTime(hy.hora))}</div>
+    <div class="cc">${esc(c.nombre)} · ${esc(c.formato)}${c.direccion?`<br><span>${esc(c.direccion)}</span>`:''}</div>
+    <div class="hoyteam ${tm}"><i></i>Juegas con <b>${TEAM[tm]}</b> · van ${hy.convocados.length}</div>
+    <div class="cbtn"><button class="no" data-act="hoyok" data-m="${hy.id}">Listo</button><a class="si" href="${mapsUrl(c)}" target="_blank" rel="noopener" data-act="hoyok" data-m="${hy.id}">Cómo llegar</a></div>
+    <p class="hoyfoot">Si ya no puedes ir, avísale al admin. Si confirmaste y no vas, igual pagas.</p></div></div>`;return}
   const m=pendingCall();if(!m){el.innerHTML='';return}const y=me(),c=cancha(m),full=m.convocados.length>=m.cupo;callTeam=y.equipo||'N';
   const d=new Date(m.fecha+'T12:00:00'),dia=d.toLocaleDateString('es-CO',{weekday:'long'}).toUpperCase(),fe=d.toLocaleDateString('es-CO',{day:'numeric',month:'short'}).replace('.','').toUpperCase();
   el.innerHTML=`<div class="call"><img src="${IMG.estadio}" alt=""><div class="cin"><div class="cl">LLAMADO · ${esc(first(y)).toUpperCase()}</div>
@@ -989,6 +1002,7 @@ document.addEventListener('click',async e=>{
       while(m.convocados.length<m.cupo&&pool.length){const p=pool.shift();m.convocados.push(p.id);m.board[p.id]={team:p.equipo||'N'};m.nov=(m.nov||[]).filter(x=>x!==p.id)}
       let k=1;while(m.convocados.length<m.cupo){const g={id:'g'+uid(),nombre:'Invitado de prueba '+k++,rol:'MED',pie:'Diestro',dorsal:'',invitado:true,invitadoPor:me().id,email:'',foto:'',apodo:'',equipo:'B'};S.players.push(g);m.convocados.push(g.id);m.board[g.id]={team:'B'}}
       save();render();toast('Convocatoria completa: '+m.convocados.length+' de '+m.cupo);break}
+    case'hoyok':{S.hoySeen=S.hoySeen||{};S.hoySeen[t.dataset.m+me().id]=1;save();setTimeout(render,50);break}
     case'subiok':{const m=S.matches.find(x=>x.id===t.dataset.m);delete m.subio[me().id];save();render();break}
     case'callsi':{const m=S.matches.find(x=>x.id===t.dataset.m),y=me().id;if(m.convocados.length>=m.cupo){toEsp(m,y,callTeam||'N');callTeam=null;save();render();toast('Quedaste de '+(inEsp(m,y)+1)+' en la lista de espera');return}m.nov=(m.nov||[]).filter(x=>x!==y);if(!m.convocados.includes(y))m.convocados.push(y);m.board[y]={team:callTeam||'N'};callTeam=null;save();render();toast('¡Listo! Vas con '+TEAM[m.board[y].team]);break}
     case'callno':{const m=S.matches.find(x=>x.id===t.dataset.m),y=me().id;m.nov=[...new Set([...(m.nov||[]),y])];callTeam=null;save();render();toast('Anotado: no vas. Si cambias de idea, toca "Yo voy".');break}
